@@ -1,0 +1,20 @@
+version: "1"
+
+services:
+  community_db:
+    image: postgres
+    restart: always
+    container_name: community_postgres_db
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: password123
+      PGDATA: /data/postgres
+  rocket:
+    build: .
+    command: bash -c "cargo run"
+    links:
+      - community_db
+    ports:
+      - 8000:8000
+
