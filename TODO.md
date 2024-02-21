@@ -39,4 +39,11 @@
 - [ ] Friends feature
 - [ ] Block a user feature. If a user is blocked, they cannot see the user's profile, send them a message, or see their posts.
 - [ ] Unblock a user feature. If a user is unblocked, they can see the user's profile, send them a message, or see their posts.
+- [ ] Follow a user feature. The follow will be a request that the user can accept or deny. If the user accepts, the user will be able to see the user's posts on their feed if the user's account is private.
+- [ ] Unfollow a user feature. If a user is unfollowed, they cannot see the user's posts on their feed if the user's account is private.
+- [ ] Communities feature with the ability to create, join, leave, delete, and update a community. A community can be private.
+- [ ] Before a private account/community can be public, they must deal with ongoing requests in joining the community or following a user.
+- [ ] Algorithm to determine what posts to show on the user's homepage feed.
+- [ ] Pagination for the user's homepage feed, comments, messages, anything that's long.
+- [ ] Create a simple text editor to insert text, images, videos, files, and links.
 
