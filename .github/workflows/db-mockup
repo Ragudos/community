@@ -1,0 +1,35 @@
+name: Database mockup
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  mockup_database:
+    runs_on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_DB: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: 1234
+          ports:
+            - 5432:5432
+          options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retires 5
+    steps:
+      - name: Wait for database to be ready
+        run: sleep 10s
+      - name: Get DB URL
+        id: db_url
+        run: echo "::set-output name=url::postgres//postgres:1234@localhost:5432/postgres"
+      - name: Upload URL as artifact
+        uses: actions/upload-artifact@v2
+        with:
+            - name: db_url
+              path: .
