@@ -16,6 +16,12 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - name: Download Artifact
+      uses: actions/download-artifact@v2
+      with:
+        name: db_url
+    - name: Set Database URL Env Variable
+      run: echo "DATABASE_URL=$(cat db_url/url)" >> $GITHUB_ENV
     - name: Build
       run: cargo build --verbose
     - name: Run tests
