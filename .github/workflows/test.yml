@@ -14,8 +14,23 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    services:
+        postgres:
+          image: postgres:latest
+          env:
+            POSTGRES_DB: postgres
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: 1234
+            ports:
+              5432:5432
+            options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retires 5
     steps:
     - uses: actions/checkout@v3
+    - name: Wait for database to be ready
+      run: sleep 10s
+    - name: Get DB URL
+      id: db_url
+      run: echo "DATABASE_URL=url::postgres://postgres:1234@localhost:5432/postgres" >> "$GITHUB_ENV"
     - name: Build
       run: cargo build --verbose
     - name: Run tests
