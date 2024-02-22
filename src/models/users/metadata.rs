@@ -55,6 +55,15 @@ pub enum RequestStatus {
     Blocked,
 }
 
+#[derive(Serialize, Deserialize, PartialEq, Eq, Type, Clone, Debug)]
+#[sqlx(type_name = "accountstatus", rename_all = "lowercase")]
+pub enum AccountStatus {
+    Active,
+    Inactive,
+    Deactivated,
+    Banned,
+}
+
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct JWT {
     pub token: User,
@@ -77,6 +86,7 @@ pub struct UserMetadata {
     pub gender: Gender,
     pub biography: Option<String>,
     pub is_private: bool,
+    pub account_status: AccountStatus,
     pub last_login_date: OffsetDateTime,
 }
 
@@ -107,6 +117,6 @@ pub struct UserToken {
     pub refresh_token: String,
     /// The time in ms that the refresh token will expire
     pub refresh_token_expires_in: OffsetDateTime,
-    pub refresh_token_creation_date: OffsetDateTime,
+    pub refresh_token_creation_date: OffsetDateTime
 }
 
