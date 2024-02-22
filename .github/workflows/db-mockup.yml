@@ -28,8 +28,3 @@ jobs:
       - name: Get DB URL
         id: db_url
         run: echo "DATABASE_URL=url::postgres://postgres:1234@localhost:5432/postgres" >> "$GITHUB_ENV"
-      - name: Upload URL as artifact
-        uses: actions/upload-artifact@v2
-        with:
-            name: db_url
-            path: .
