@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS community_memberships (
 	user_id INTEGER NOT NULL,
 	community_id INTEGER NOT NULL,
 	joined_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	role UserRole NOT NULL DEFAULT user,
+	role UserRole NOT NULL DEFAULT 'user',
 	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
 	FOREIGN KEY (community_id) REFERENCES communities(id) ON DELETE CASCADE
 );
@@ -100,7 +100,7 @@ CREATE TABLE IF NOT EXISTS comments (
 	videos TEXT[],
 	parent_comment_id INTEGER,
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	FOREIGN KEY (parent_id) REFERENCES comments(id) ON DELETE CASCADE,
+	FOREIGN KEY (parent_comment_id) REFERENCES comments(id) ON DELETE CASCADE,
 	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
 	FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE
 );
@@ -113,7 +113,7 @@ CREATE TABLE IF NOT EXISTS community_join_requests (
 	reason VARCHAR(255) NOT NULL,
 	known_from Referrals NOT NULL,
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	status RequestStatus NOT NULL DEFAULT pending,
+	status RequestStatus NOT NULL DEFAULT 'pending',
 	FOREIGN KEY (community_id) REFERENCES communities(id) ON DELETE CASCADE,
 	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
