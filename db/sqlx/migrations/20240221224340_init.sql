@@ -155,7 +155,7 @@ CREATE TABLE IF NOT EXISTS users_token (
 	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS users_owned_communities(
+CREATE TABLE IF NOT EXISTS users_joined_communities(
 	user_id INTEGER NOT NULL,
 	community_id INTEGER NOT NULL,
 	PRIMARY KEY (user_id, community_id),
@@ -163,7 +163,7 @@ CREATE TABLE IF NOT EXISTS users_owned_communities(
 	FOREIGN KEY (community_id) REFERENCES communities(id) ON DELETE CASCADE
 );
 
-CREATE INDEX IF NOT EXISTS idx_users_owned_communities ON users_owned_communities(user_id);
+CREATE INDEX IF NOT EXISTS idx_users_joined_communities ON users_joined_communities(user_id);
 
 -- SELECT * FROM community_posts WHERE community_id = $1; Get all posts in a community.
 CREATE INDEX IF NOT EXISTS idx_community_posts ON community_posts(community_id);
