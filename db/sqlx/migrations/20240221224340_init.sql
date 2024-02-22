@@ -1,7 +1,7 @@
 DO $$
 BEGIN
 	IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'gender') THEN
-		CREATE TYPE Gender as ENUM ('male', 'female', 'other', 'not-specified');
+		CREATE TYPE Gender as ENUM ('male', 'female', 'other', 'notspecified');
 	END IF;
 	IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'occupation') THEN
 		CREATE TYPE Occupation as ENUM ('student', 'teacher', 'engineer', 'doctor', 'lawyer', 'unemployed', 'other');
@@ -62,8 +62,11 @@ CREATE TABLE IF NOT EXISTS communities (
 	display_image TEXT NOT NULL,
 	cover_image TEXT,
 	description VARCHAR(255) NOT NULL,
+	owner_id INTEGER NOT NULL,
 	is_private BOOLEAN NOT NULL,
-	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+	category VARCHAR(60),
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS community_memberships (
@@ -151,6 +154,16 @@ CREATE TABLE IF NOT EXISTS users_token (
 	refresh_token_creation_date TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS users_owned_communities(
+	user_id INTEGER NOT NULL,
+	community_id INTEGER NOT NULL,
+	PRIMARY KEY (user_id, community_id),
+	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+	FOREIGN KEY (community_id) REFERENCES communities(id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_users_owned_communities ON users_owned_communities(user_id);
 
 -- SELECT * FROM community_posts WHERE community_id = $1; Get all posts in a community.
 CREATE INDEX IF NOT EXISTS idx_community_posts ON community_posts(community_id);

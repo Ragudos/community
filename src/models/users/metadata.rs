@@ -1,16 +1,11 @@
-use std::convert::Infallible;
-
 use rocket::{
-    async_trait,
-    http::Status,
-    outcome::IntoOutcome,
-    request::{FromRequest, Outcome, Request},
     serde::{Deserialize, Serialize},
     time::OffsetDateTime,
 };
-use serde_json::from_str;
+use sqlx::prelude::Type;
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, PartialEq, Eq, Type, Clone, Debug)]
+#[sqlx(type_name = "gender", rename_all = "lowercase")]
 pub enum Gender {
     Male,
     Female,
@@ -18,7 +13,8 @@ pub enum Gender {
     NotSpecified,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, PartialEq, Eq, Type, Clone, Debug)]
+#[sqlx(type_name = "occupation", rename_all = "lowercase")]
 pub enum Occupation {
     Student,
     Teacher,
@@ -29,7 +25,8 @@ pub enum Occupation {
     Other,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, PartialEq, Eq, Type, Clone, Debug)]
+#[sqlx(type_name = "userrole", rename_all = "lowercase")]
 pub enum UserRole {
     Owner,
     Admin,
@@ -37,7 +34,8 @@ pub enum UserRole {
     User,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, PartialEq, Eq, Type, Clone, Debug)]
+#[sqlx(type_name = "referrals", rename_all = "lowercase")]
 pub enum Referrals {
     Facebook,
     Twitter,
@@ -48,7 +46,8 @@ pub enum Referrals {
     Other,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, PartialEq, Eq, Type, Clone, Debug)]
+#[sqlx(type_name = "requeststatus", rename_all = "lowercase")]
 pub enum RequestStatus {
     Pending,
     Accepted,
@@ -57,77 +56,57 @@ pub enum RequestStatus {
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct JWT {
+    pub token: User,
+    pub expires_in: OffsetDateTime,
+    pub creation_date: OffsetDateTime,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct User {
-    pub id: isize,
+    pub id: i32,
     pub display_name: String,
     pub display_image: Option<String>,
     pub created_at: OffsetDateTime,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct UserMetadata<'lifetime> {
-    pub id: isize,
+pub struct UserMetadata {
+    pub id: i32,
     pub occupation: Occupation,
     pub gender: Gender,
-    pub biography: Option<&'lifetime str>,
+    pub biography: Option<String>,
     pub is_private: bool,
     pub last_login_date: OffsetDateTime,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct UserSocials<'lifetime> {
-    pub id: isize,
-    pub facebook: Option<&'lifetime str>,
-    pub twitter: Option<&'lifetime str>,
-    pub instagram: Option<&'lifetime str>,
-    pub linkedin: Option<&'lifetime str>,
-    pub reddit: Option<&'lifetime str>,
-    pub tiktok: Option<&'lifetime str>,
-    pub youtube: Option<&'lifetime str>,
+pub struct UserSocials {
+    pub id: i32,
+    pub facebook: Option<String>,
+    pub twitter: Option<String>,
+    pub instagram: Option<String>,
+    pub linkedin: Option<String>,
+    pub reddit: Option<String>,
+    pub tiktok: Option<String>,
+    pub youtube: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct UserCredentials<'lifetime> {
-    pub id: isize,
-    pub email: &'lifetime str,
-    pub password_hash: &'lifetime str,
-    pub first_name: &'lifetime str,
-    pub last_name: &'lifetime str,
+pub struct UserCredentials {
+    pub id: i32,
+    pub email: String,
+    pub password_hash: String,
+    pub first_name: String,
+    pub last_name: String,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct UserToken<'lifetime> {
-    pub id: isize,
-    pub refresh_token: &'lifetime str,
+pub struct UserToken {
+    pub user_id: i32,
+    pub refresh_token: String,
     /// The time in ms that the refresh token will expire
-    pub refresh_token_expires_in: isize,
+    pub refresh_token_expires_in: OffsetDateTime,
     pub refresh_token_creation_date: OffsetDateTime,
 }
 
-#[async_trait]
-impl<'r> FromRequest<'r> for User {
-    type Error = Infallible;
-
-    async fn from_request(request: &'r Request<'_>) -> Outcome<User, Self::Error> {
-        request
-            .cookies()
-            .get_private("Community__user-metadata")
-            .and_then(|cookie| {
-                let user_str = cookie.value_trimmed();
-                let parsed_user: Option<User> = from_str(user_str).ok();
-
-                match parsed_user {
-                    Some(user) => {
-                        // #TODO check if the user_metadata is expired. If so, check refresh token.
-                        // If refresh token is expired, return None
-                        Some(user)
-                    }
-                    None => {
-                        request.cookies().remove_private(cookie);
-                        None
-                    }
-                }
-            })
-            .or_forward(Status::Unauthorized)
-    }
-}
