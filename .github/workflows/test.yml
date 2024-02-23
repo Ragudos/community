@@ -31,7 +31,7 @@ jobs:
       id: db_url
       run: echo "DATABASE_URL=postgres://postgres:1234@localhost:5432/postgres" >> "$GITHUB_ENV"
     - name: Install sqlx
-      run: cargo install sqlx
+      run: cargo add sqlx
     - name: Fill Database with columns
       run: cargo sqlx migrate run --source=db/sqlx/migrations
     - name: Build
