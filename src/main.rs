@@ -12,16 +12,16 @@ fn rocket() -> _ {
             "/",
             routes![
                 api::get::root::page,
-                api::get::auth::redirect,
-                api::get::auth::login::page,
-                api::get::auth::register::page
             ]
         )
         .mount(
             "/auth",
             routes![
                 api::post::auth::deny_post_request,
-                api::post::auth::register::api_endpoint
+                api::post::auth::register::api_endpoint,
+                api::get::auth::redirect,
+                api::get::auth::login::page,
+                api::get::auth::register::page
             ]
         )
         .attach(db::stage())
