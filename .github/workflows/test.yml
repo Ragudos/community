@@ -31,6 +31,8 @@ jobs:
       id: db_url
       run: echo "DATABASE_URL=postgres://postgres:1234@localhost:5432/postgres" >> "$GITHUB_ENV"
     - name: Fill Database with columns
+      env:
+        PGPASSWORD: 1234
       run: psql -h localhost -U postgres -d postgres -f db/sqlx/migrations
     - name: Build
       run: cargo build --verbose
