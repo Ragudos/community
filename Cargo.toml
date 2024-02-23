@@ -12,8 +12,8 @@ rocket_dyn_templates = { version = "0.1.0", features = ["handlebars"] }
 rocket_db_pools = { version = "0.1.0", features = ["sqlx_postgres"] }
 rocket-multipart-form-data = "0.10.7"
 sqlx = { version = "0.7.3", features = ["macros", "migrate", "time"] }
-random-string = "1.1.0"
 serde = "1.0.197"
 time = { version = "0.3.34", features = ["serde"] }
 serde_json = "1.0.114"
+random-string = "1.1.0"
 

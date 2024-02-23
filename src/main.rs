@@ -11,3 +11,4 @@ fn rocket() -> _ {
         .attach(db::stage())
         .attach(handlebars::register())
 }
+

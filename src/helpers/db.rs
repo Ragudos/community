@@ -6,7 +6,7 @@ use rocket::{
 use rocket_db_pools::Database;
 use sqlx::query;
 
-use crate::models::users::metadata::{Gender, Occupation};
+use crate::models::users::metadata::{Gender, Occupation, UserRole};
 
 #[derive(Database)]
 #[database("sqlx")]
@@ -105,11 +105,13 @@ async fn seed_data(rocket: Rocket<Build>) -> Result {
 
                     if let Err(e) = query!(
                         r#"
-                            INSERT INTO users_owned_communities
-                            (user_id, community_id)
-                            VALUES ($1, $2);
+                            INSERT INTO community_memberships
+                            (user_id, community_id, role)
+                            VALUES ($1, $2, $3);
                         "#,
-                        1, 1
+                        1,
+                        1,
+                        UserRole::Owner as UserRole
                     ).execute(&mut *tx).await {
                         eprintln!("Failed to seed data: {:?}", e);
                         let _ = tx.rollback().await;

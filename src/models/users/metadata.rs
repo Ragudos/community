@@ -1,10 +1,10 @@
 use rocket::{
     serde::{Deserialize, Serialize},
-    time::OffsetDateTime,
+    time::OffsetDateTime, FromFormField,
 };
 use sqlx::prelude::Type;
 
-#[derive(Serialize, Deserialize, PartialEq, Eq, Type, Clone, Debug)]
+#[derive(Serialize, Deserialize, PartialEq, Eq, Type, FromFormField, Clone, Debug)]
 #[sqlx(type_name = "gender", rename_all = "lowercase")]
 pub enum Gender {
     Male,
@@ -13,7 +13,7 @@ pub enum Gender {
     NotSpecified,
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Eq, Type, Clone, Debug)]
+#[derive(Serialize, Deserialize, PartialEq, Eq, Type, FromFormField, Clone, Debug)]
 #[sqlx(type_name = "occupation", rename_all = "lowercase")]
 pub enum Occupation {
     Student,
@@ -34,7 +34,7 @@ pub enum UserRole {
     User,
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Eq, Type, Clone, Debug)]
+#[derive(Serialize, Deserialize, PartialEq, Eq, Type, FromFormField, Clone, Debug)]
 #[sqlx(type_name = "referrals", rename_all = "lowercase")]
 pub enum Referrals {
     Facebook,
@@ -105,10 +105,10 @@ pub struct UserSocials {
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct UserCredentials {
     pub id: i32,
-    pub email: String,
+    pub email: Option<String>,
     pub password_hash: String,
-    pub first_name: String,
-    pub last_name: String,
+    pub first_name: Option<String>,
+    pub last_name: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
