@@ -9,7 +9,7 @@ impl HtmxRedirect {
 }
 
 impl<'r> Responder<'r, 'static> for HtmxRedirect {
-    fn respond_to(self, request: &'r rocket::Request<'_>) -> Result<'static> {
+    fn respond_to(self, _request: &'r rocket::Request<'_>) -> Result<'static> {
         match self.1 {
             Some(uri) => {
                 Response::build()

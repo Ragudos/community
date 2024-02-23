@@ -4,19 +4,19 @@ use rocket::{async_trait, http::Status, request::{FromRequest, Outcome}, serde::
 use rocket_db_pools::Connection;
 use time::{Duration, OffsetDateTime};
 
-use crate::{helpers::db::DbConn, models::users::metadata::{User, UserToken, JWT}};
+use crate::{helpers::db::DbConn, models::{users::metadata::{UserToken, JWT}, JWT_NAME}};
 
 use super::db::traits::Token;
 
 #[async_trait]
-impl<'r> FromRequest<'r> for User {
+impl<'r> FromRequest<'r> for JWT {
     type Error = Infallible;
 
-    async fn from_request(request: &'r Request<'_>) -> Outcome<User, Self::Error> {
+    async fn from_request(request: &'r Request<'_>) -> Outcome<JWT, Self::Error> {
         let cookie = request.cookies()
-            .get_private("Community__jwt")
+            .get_private(JWT_NAME)
             .and_then(|cookie| {
-                let parsed_jwt = from_str::<JWT>(cookie.value());
+                let parsed_jwt = from_str::<JWT>(cookie.value_trimmed());
 
                 match parsed_jwt {
                     Ok(jwt) => Some(jwt),
@@ -30,7 +30,7 @@ impl<'r> FromRequest<'r> for User {
         match cookie {
             Some(jwt) => {
                 if !jwt.is_expired() {
-                    return Outcome::Success(jwt.token);
+                    return Outcome::Success(jwt);
                 }
 
                 let db = Connection::<DbConn>::from_request(request).await;
@@ -51,29 +51,27 @@ impl<'r> FromRequest<'r> for User {
                                                 return Outcome::Forward(Status::InternalServerError);
                                             }
 
-                                            request.cookies().remove_private("Community__jwt");
+                                            request.cookies().remove_private(JWT_NAME);
                                             return Outcome::Forward(Status::Unauthorized);
                                         }
 
                                         let new_jwt = JWT {
-                                            token: jwt.token.clone(),
+                                            token: jwt.token,
                                             expires_in: OffsetDateTime::now_utc().saturating_add(Duration::seconds(3600)),
                                             creation_date: OffsetDateTime::now_utc(),
                                         };
 
-                                        match new_jwt.to_cookie() {
-                                            Ok(cookie) => {
-                                                request.cookies().add_private(cookie);
-                                                return Outcome::Success(jwt.token);
-                                            },
-                                            Err(err) => {
-                                                eprintln!("Error creating JWT cookie: {:?}", err);
-                                                return Outcome::Forward(Status::InternalServerError);
-                                            }
+                                        if let Ok(cookie) = new_jwt.to_cookie() {
+                                            request.cookies().add_private(cookie);
+                                        } else {
+                                            eprintln!("Error creating JWT cookie");
+                                            return Outcome::Forward(Status::InternalServerError);
                                         }
+
+                                        return Outcome::Success(new_jwt);
                                     },
                                     None => {
-                                        request.cookies().remove_private("Community__jwt");
+                                        request.cookies().remove_private(JWT_NAME);
                                         return Outcome::Forward(Status::Unauthorized);
                                     }
                                 }
@@ -88,7 +86,7 @@ impl<'r> FromRequest<'r> for User {
                     Outcome::Error(_) => Outcome::Forward(Status::InternalServerError),
                 }
             },
-            None => Outcome::Forward(Status::InternalServerError),
+            None => Outcome::Forward(Status::Unauthorized),
         }
     }
 }

@@ -1,4 +1,4 @@
-use bcrypt::{hash, DEFAULT_COST};
+use bcrypt::{hash, hash_with_salt, DEFAULT_COST};
 use rocket::{
     fairing::{AdHoc, Result},
     Build, Rocket,
@@ -33,7 +33,13 @@ async fn seed_data(rocket: Rocket<Build>) -> Result {
             match transaction {
                 Ok(mut tx) => {
                     if let Err(e) = query!(
-                        r#"INSERT INTO users (id, display_name, display_image) VALUES ($1, $2, $3);"#,
+                        r#"
+                            INSERT INTO users (id, display_name, display_image)
+                            SELECT $1, $2, $3
+                            WHERE NOT EXISTS (
+                                SELECT 1 FROM users WHERE id = $1
+                            );
+                        "#,
                         1,
                         "deadkiller",
                         ""
@@ -47,7 +53,10 @@ async fn seed_data(rocket: Rocket<Build>) -> Result {
                         r#"
                             INSERT INTO users_metadata
                             (id, occupation, gender)
-                            VALUES ($1, $2, $3);
+                            SELECT $1, $2, $3
+                            WHERE NOT EXISTS (
+                                SELECT 1 FROM users_metadata WHERE id = $1
+                            );
                         "#,
                         1,
                         Occupation::Student as Occupation,
@@ -66,7 +75,10 @@ async fn seed_data(rocket: Rocket<Build>) -> Result {
                                 r#"
                                     INSERT INTO users_credentials
                                     (id, email, password_hash, first_name, last_name)
-                                    VALUES ($1, $2, $3, $4, $5);
+                                    SELECT $1, $2, $3, $4, $5
+                                    WHERE NOT EXISTS (
+                                        SELECT 1 FROM users_credentials WHERE id = $1
+                                    );
                                 "#,
                                 1,
                                 "johndoe@example.com",
@@ -89,14 +101,18 @@ async fn seed_data(rocket: Rocket<Build>) -> Result {
                     if let Err(e) = query!(
                         r#"
                             INSERT INTO communities
-                            (id, display_name, display_image, description, is_private)
-                            VALUES ($1, $2, $3, $4, $5);
+                            (id, display_name, display_image, description, is_private, owner_id)
+                            SELECT $1, $2, $3, $4, $5, $6
+                            WHERE NOT EXISTS (
+                                SELECT 1 FROM communities WHERE id = $1 AND owner_id = $6
+                            );
                         "#,
                         1,
                         "Rustaceans",
                         "",
                         "A community for Rust developers",
                         false,
+                        1
                     ).execute(&mut *tx).await {
                         eprintln!("Failed to seed data: {:?}", e);
                         let _ = tx.rollback().await;
@@ -107,7 +123,10 @@ async fn seed_data(rocket: Rocket<Build>) -> Result {
                         r#"
                             INSERT INTO community_memberships
                             (user_id, community_id, role)
-                            VALUES ($1, $2, $3);
+                            SELECT $1, $2, $3 
+                            WHERE NOT EXISTS (
+                                SELECT 1 FROM community_memberships WHERE user_id = $1 AND community_id = $2
+                            );
                         "#,
                         1,
                         1,

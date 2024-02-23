@@ -5,12 +5,12 @@ use crate::{controllers::forms::auth::{check_password, check_name}, models::user
 #[derive(FromForm)]
 pub struct RegisterFormData<'lifetime> {
     #[field(validate = check_name())]
-    display_name: &'lifetime str,
+    pub display_name: &'lifetime str,
     #[field(validate = check_password(&self.confirm_password))]
-    password: &'lifetime str,
+    pub password: &'lifetime str,
     #[field(validate = check_password(&self.password))]
-    confirm_password: &'lifetime str,
-    gender: Gender,
-    occupation: Occupation
+    pub confirm_password: &'lifetime str,
+    pub gender: Gender,
+    pub occupation: Occupation
 }
 

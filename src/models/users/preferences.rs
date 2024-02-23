@@ -17,3 +17,14 @@ impl From<&str> for Theme {
         }
     }
 }
+
+impl Into<&str> for Theme {
+    fn into(self) -> &'static str {
+        match self {
+            Theme::Light => "light",
+            Theme::Dark => "dark",
+            Theme::System => "system",
+        }
+    }
+}
+

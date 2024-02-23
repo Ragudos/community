@@ -1,5 +1,5 @@
 use rocket::fairing::Fairing;
-use rocket_dyn_templates::{handlebars::{handlebars_helper, Handlebars}, Template};
+use rocket_dyn_templates::{handlebars::handlebars_helper, Template};
 
 handlebars_helper!(eq_str: |x: str, y: str| x == y);
 handlebars_helper!(eq_num: |x: isize, y: isize| x == y);
@@ -21,6 +21,8 @@ pub fn register() -> impl Fairing {
 
 #[test]
 fn test_helpers() {
+    use rocket_dyn_templates::handlebars::Handlebars;
+
     let mut hbs = Handlebars::new();
 
     hbs.register_helper("eq_str", Box::new(eq_str));

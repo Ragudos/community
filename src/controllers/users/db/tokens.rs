@@ -1,12 +1,10 @@
-use std::borrow::Borrow;
-
 use rocket::{http::{Cookie, SameSite}, serde::json::to_string};
 use rocket_db_pools::Connection;
 use serde_json::Error;
 use sqlx::query_as;
 use time::OffsetDateTime;
 
-use crate::{helpers::db::DbConn, models::users::metadata::{User, UserToken, JWT}};
+use crate::{helpers::db::DbConn, models::{users::metadata::{User, UserToken, JWT}, JWT_NAME}};
 
 use super::traits::Token;
 
@@ -35,12 +33,12 @@ impl JWT {
         }
     }
 
-    pub fn to_cookie(self) -> Result<Cookie<'static>, Error>{
-        let stringified = to_string(self.borrow());
+    pub fn to_cookie(&self) -> Result<Cookie<'static>, Error>{
+        let stringified = to_string(self);
 
         match stringified {
             Ok(stringified) => {
-                Ok(Cookie::build(("Community__jwt", stringified))
+                Ok(Cookie::build((JWT_NAME, stringified))
                     .same_site(SameSite::Strict)
                     .path("/")
                     .expires(self.expires_in)
