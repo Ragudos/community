@@ -1,5 +1,5 @@
 use rocket::{get, http::CookieJar};
-use rocket_dyn_templates::Template;
+use rocket_dyn_templates::{context, Template};
 
 use crate::{controllers::users::preferences::get_theme_from_cookie, models::seo::metadata::SeoMetadata};
 
@@ -10,6 +10,6 @@ pub fn page(cookie: &CookieJar<'_>) -> Template {
             .theme(theme)
             .finalize();
 
-    Template::render("auth/login", metadata)
+    Template::render("auth/login", context! { metadata })
 }
 
