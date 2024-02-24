@@ -3,9 +3,9 @@
 - [x] Create Diagram for API Endpoints
 - [x] Create Database Schema
 - [x] Create helpers in Handlebars (i.e. eq_str to check for string equality)
-- [ ] Create a test suite for helpers created
-- [ ] Create migrations that match the schema
-- [ ] Create seed data (For testing)
+- [x] Create a test suite for helpers created
+- [] Create migrations that match the schema
+- [x] Create seed data (For testing)
 - [ ] Create the business logic for the APIs
 - [ ] Create a test suite for the business logic
 - [ ] Create the API endpoints
