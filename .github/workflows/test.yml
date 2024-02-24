@@ -27,13 +27,14 @@ jobs:
     - uses: actions/checkout@v3
     - name: Wait for database to be ready
       run: sleep 10s
-    - name: Get DB URL
-      id: db_url
-      run: echo "DATABASE_URL=postgres://postgres:1234@localhost:5432/postgres" >> "$GITHUB_ENV"
-    - name: Fill Database with columns
+    - name: Install pgMigrate
+      run: |
+        curl -L https://github.com/robinjmurphy/pgmigrate/releases/download/vX.X.X/pgmigrate-linux-amd64-X.X.X.tar.gz | tar xz
+        sudo mv pgmigrate /usr/local/bin/
+    - name: Run migration
       env:
         PGPASSWORD: 1234
-      run: psql -h localhost -U postgres -d postgres -f db/sqlx/migrations
+      run: pgmigrate migrate -dir /db/sqlx/migrations -dsn "postgres://postgres:1234@localhost:5432/postgres"
     - name: Build
       run: cargo build --verbose
     - name: Run tests
