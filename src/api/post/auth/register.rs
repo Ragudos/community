@@ -15,19 +15,30 @@ pub async fn api_endpoint(
     cookie_jar: &CookieJar<'_>,
     register_data: Form<RegisterFormData<'_>>,
 ) -> ApiResponse {
-    match User::is_name_taken(&mut db, &register_data.display_name).await {
+    let is_name_taken = User::is_name_taken(&mut db, &register_data.display_name).await;
+
+    match is_name_taken {
         Ok(false) => {
-            match hash(register_data.password.input, DEFAULT_COST) {
+            let hash_result = hash(register_data.password.input, DEFAULT_COST);
+
+            match hash_result {
                 Ok(hashed_password) => {
-                    match db.begin().await {
+                    let tx_result = db.begin().await;
+
+                    match tx_result {
                         Ok(mut tx) => {
-                            match User::create(&mut tx, &register_data.display_name).await {
+                            let user_result = User::create(&mut tx, &register_data.display_name).await;
+
+                            match user_result {
                                 Ok(user) => {
                                     let user_id = &user.id;
+                                    let user_metadata_result = UserMetadata::create(&mut tx, user_id, &register_data.gender, true).await;
 
-                                    match UserMetadata::create(&mut tx, user_id, &register_data.gender, true).await {
+                                    match user_metadata_result {
                                         Ok(_) => {
-                                            match UserCredentials::create(&mut tx, user_id, &hashed_password).await {
+                                            let user_credentials_result = UserCredentials::create(&mut tx, user_id, &hashed_password).await;
+
+                                            match user_credentials_result {
                                                 Ok(_) => {
                                                     let date_today = OffsetDateTime::now_utc();
                                                     let jwt = JWT::new(
@@ -40,10 +51,13 @@ pub async fn api_endpoint(
                                                         date_today.saturating_add(Duration::seconds(3600)),
                                                         date_today
                                                     );
+                                                    let parse_result = jwt.to_cookie();
 
-                                                    match jwt.to_cookie() {
+                                                    match parse_result {
                                                         Ok(cookie) => {
-                                                            match tx.commit().await {
+                                                            let commit_result = tx.commit().await;
+
+                                                            match commit_result {
                                                                 Ok(_) => {
                                                                     cookie_jar.add_private(cookie);
                                                                     ApiResponse::HtmxRedirect(HtmxRedirect::to(uri!(root::page)))
