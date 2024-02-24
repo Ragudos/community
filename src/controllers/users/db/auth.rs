@@ -1,15 +1,14 @@
-
 use rocket_db_pools::Connection;
 use sqlx::{postgres::PgQueryResult, query, query_as, Error, Postgres, Transaction};
 
-use crate::{helpers::db::DbConn, models::users::metadata::{Gender, Occupation, User, UserCredentials, UserMetadata}};
+use crate::{
+    helpers::db::DbConn,
+    models::users::metadata::{Gender, User, UserCredentials, UserMetadata},
+};
 
 impl User {
-    pub async fn is_name_taken(
-        db: &mut Connection<DbConn>,
-        name: &str,
-    ) -> Result<bool, Error> {
-        let result = query! (
+    pub async fn is_name_taken(db: &mut Connection<DbConn>, name: &str) -> Result<bool, Error> {
+        let result = query!(
             r#"
                 SELECT EXISTS (
                     SELECT 1
@@ -18,8 +17,10 @@ impl User {
                 );
             "#,
             name
-        ).fetch_one(&mut ***db).await?;
-        
+        )
+        .fetch_one(&mut ***db)
+        .await?;
+
         Ok(result.exists.unwrap_or(false))
     }
 
@@ -30,19 +31,19 @@ impl User {
     pub async fn create(
         tx: &mut Transaction<'_, Postgres>,
         display_name: &str,
-        display_image: &str,
     ) -> Result<User, Error> {
-        query_as! (
+        query_as!(
             User,
             r#"
                 INSERT INTO users
-                (display_name, display_image)
-                VALUES ($1, $2)
+                (display_name)
+                VALUES ($1)
                 RETURNING *;
             "#,
             display_name,
-            display_image
-        ).fetch_one(&mut **tx).await
+        )
+        .fetch_one(&mut **tx)
+        .await
     }
 }
 
@@ -54,21 +55,21 @@ impl UserMetadata {
     pub async fn create(
         tx: &mut Transaction<'_, Postgres>,
         user_id: &i32,
-        occupation: Occupation,
-        gender: Gender,
+        gender: &Gender,
         is_private: bool,
     ) -> Result<PgQueryResult, Error> {
         query!(
             r#"
                 INSERT INTO users_metadata
-                (id, occupation, gender, is_private)
-                VALUES ($1, $2, $3, $4);
+                (id, gender, is_private)
+                VALUES ($1, $2, $3);
             "#,
             user_id,
-            occupation as Occupation,
-            gender as Gender,
+            gender as &Gender,
             is_private
-        ).execute(&mut **tx).await
+        )
+        .execute(&mut **tx)
+        .await
     }
 }
 
@@ -82,7 +83,7 @@ impl UserCredentials {
         user_id: &i32,
         password_hash: &str,
     ) -> Result<PgQueryResult, Error> {
-        query! (
+        query!(
             r#"
                 INSERT INTO users_credentials
                 (id, password_hash)
@@ -90,7 +91,8 @@ impl UserCredentials {
             "#,
             user_id,
             password_hash,
-        ).execute(&mut **tx).await
+        )
+        .execute(&mut **tx)
+        .await
     }
 }
-

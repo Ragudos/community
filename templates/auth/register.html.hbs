@@ -5,6 +5,33 @@
 	</head>
 	<body>
 		{{> partials/main_header}}
+		<form hx-post="/auth/register" hx-trigger="submit" method="post" action="/auth/register">
+			<div class="input-group">
+				<label for="username">Username</label>
+				<input type="text" id="user" name="username" maxLength="60" placeholder="John Doe" required>
+			</div>
+			<div class="input-group">
+				<label for="password">Password</label>
+				<input type="password" id="password" name="password.input" minLength="8" placeholder="********" required>
+			</div>
+			<div class="input-group">
+				<label for="confirm_password">Password</label>
+				<input type="password" id="confirm_password" name="password.confirmation" minLength="8" placeholder="********" required>
+			</div>
+			<div class="input-group">
+				<label for="gender">Gender</label>
+				<select id="gender" name="gender">
+					<option selected value="" disabled>Choose your gender</option>
+					<option value="male">Male</option>
+					<option value="female">Female</option>
+					<option value="other">Other</option>
+					<option value="notspecified">Rather not say</option>
+				</select>
+			</div>
+			<button type="submit">
+				Register
+			</button>
+		</form>
 	</body>
 </html>
 

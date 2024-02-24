@@ -43,7 +43,10 @@ async fn seed_data(rocket: Rocket<Build>) -> Result {
                         1,
                         "deadkiller",
                         ""
-                    ).execute(&mut *tx).await {
+                    )
+                    .execute(&mut *tx)
+                    .await
+                    {
                         eprintln!("Failed to seed data: {:?}", e);
                         let _ = tx.rollback().await;
                         return Err(rocket);
@@ -61,7 +64,10 @@ async fn seed_data(rocket: Rocket<Build>) -> Result {
                         1,
                         Occupation::Student as Occupation,
                         Gender::Male as Gender,
-                    ).execute(&mut *tx).await {
+                    )
+                    .execute(&mut *tx)
+                    .await
+                    {
                         eprintln!("Failed to seed data: {:?}", e);
                         let _ = tx.rollback().await;
                         return Err(rocket);
@@ -85,12 +91,15 @@ async fn seed_data(rocket: Rocket<Build>) -> Result {
                                 hashed_password,
                                 "",
                                 "",
-                            ).execute(&mut *tx).await {
+                            )
+                            .execute(&mut *tx)
+                            .await
+                            {
                                 eprintln!("Failed to seed data: {:?}", e);
                                 let _ = tx.rollback().await;
                                 return Err(rocket);
                             }
-                        },
+                        }
                         Err(err) => {
                             eprintln!("Failed to hash password: {:?}", err);
                             let _ = tx.rollback().await;
@@ -113,7 +122,10 @@ async fn seed_data(rocket: Rocket<Build>) -> Result {
                         "A community for Rust developers",
                         false,
                         1
-                    ).execute(&mut *tx).await {
+                    )
+                    .execute(&mut *tx)
+                    .await
+                    {
                         eprintln!("Failed to seed data: {:?}", e);
                         let _ = tx.rollback().await;
                         return Err(rocket);
@@ -143,13 +155,13 @@ async fn seed_data(rocket: Rocket<Build>) -> Result {
                     }
 
                     Ok(rocket)
-                },
+                }
                 Err(e) => {
                     eprintln!("Failed to start transaction: {:?}", e);
                     return Err(rocket);
                 }
             }
-        },
+        }
         None => Err(rocket),
     }
 }

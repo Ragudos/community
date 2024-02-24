@@ -18,9 +18,9 @@ impl From<&str> for Theme {
     }
 }
 
-impl Into<&str> for Theme {
-    fn into(self) -> &'static str {
-        match self {
+impl From<Theme> for &'static str {
+    fn from(theme: Theme) -> &'static str {
+        match theme {
             Theme::Light => "light",
             Theme::Dark => "dark",
             Theme::System => "system",

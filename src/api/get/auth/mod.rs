@@ -1,7 +1,7 @@
-pub mod register;
 pub mod login;
+pub mod register;
 
-use rocket::{uri, get, response::Redirect};
+use rocket::{get, response::Redirect, uri};
 
 use crate::models::{api::ApiResponse, users::metadata::JWT};
 
@@ -9,4 +9,3 @@ use crate::models::{api::ApiResponse, users::metadata::JWT};
 pub fn redirect(_jwt: JWT) -> ApiResponse {
     ApiResponse::Redirect(Redirect::to(uri!("/homepage")))
 }
-

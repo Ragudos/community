@@ -1,6 +1,10 @@
 use std::io::Cursor;
 
-use rocket::{http::Status, response::{Redirect, Responder}, Response};
+use rocket::{
+    http::Status,
+    response::{Redirect, Responder},
+    Response,
+};
 
 use crate::controllers::htmx::{redirect::HtmxRedirect, refresh::HtmxRefresh};
 
@@ -17,13 +21,10 @@ impl<'a> Responder<'a, 'static> for ApiResponse {
             Self::HtmxRefresh(htmx_refresh) => htmx_refresh.respond_to(request),
             Self::HtmxRedirect(htmx_redirect) => htmx_redirect.respond_to(request),
             Self::Redirect(redirect) => redirect.respond_to(request),
-            Self::String(status, string) => {
-                Response::build()
-                    .status(status)
-                    .sized_body(string.len(), Cursor::new(string))
-                    .ok()
-            },
+            Self::String(status, string) => Response::build()
+                .status(status)
+                .sized_body(string.len(), Cursor::new(string))
+                .ok(),
         }
     }
 }
-

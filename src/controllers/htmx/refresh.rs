@@ -1,5 +1,8 @@
-use rocket::{http::Status, response::{Responder, Result}, Response};
-
+use rocket::{
+    http::Status,
+    response::{Responder, Result},
+    Response,
+};
 
 /// Refresh the page.
 pub struct HtmxRefresh;
@@ -12,4 +15,3 @@ impl<'a> Responder<'a, 'static> for HtmxRefresh {
             .ok()
     }
 }
-

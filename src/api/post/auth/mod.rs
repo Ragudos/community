@@ -8,4 +8,3 @@ pub mod register;
 pub fn deny_post_request(_jwt: JWT) -> ApiResponse {
     ApiResponse::String(Status::Forbidden, "You are already logged in.")
 }
-

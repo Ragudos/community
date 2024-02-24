@@ -4,5 +4,3 @@ macro_rules! auth_uri {
         rocket::uri!("/auth", $($t)*)
     }
 }
-
-

@@ -24,13 +24,13 @@ END $$;
 CREATE TABLE IF NOT EXISTS users (
 	id SERIAL PRIMARY KEY,
 	display_name VARCHAR(60) UNIQUE NOT NULL,
-	display_image TEXT NOT NULL,
+	display_image TEXT,
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS users_metadata (
 	id INTEGER PRIMARY KEY,
-	occupation Occupation NOT NULL,
+	occupation Occupation,
 	gender Gender NOT NULL,
 	biography VARCHAR(255),
 	is_private BOOLEAN NOT NULL,

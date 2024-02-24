@@ -1,6 +1,7 @@
 use rocket::{
     serde::{Deserialize, Serialize},
-    time::OffsetDateTime, FromFormField,
+    time::OffsetDateTime,
+    FromFormField,
 };
 use sqlx::prelude::Type;
 
@@ -82,7 +83,7 @@ pub struct User {
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct UserMetadata {
     pub id: i32,
-    pub occupation: Occupation,
+    pub occupation: Option<Occupation>,
     pub gender: Gender,
     pub biography: Option<String>,
     pub is_private: bool,
@@ -117,6 +118,5 @@ pub struct UserToken {
     pub refresh_token: String,
     /// The time in ms that the refresh token will expire
     pub refresh_token_expires_in: OffsetDateTime,
-    pub refresh_token_creation_date: OffsetDateTime
+    pub refresh_token_creation_date: OffsetDateTime,
 }
-

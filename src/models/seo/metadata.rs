@@ -85,4 +85,3 @@ impl SeoMetadata {
         SeoMetadataBuilder::new()
     }
 }
-
