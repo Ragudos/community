@@ -17,6 +17,6 @@ pub struct Password<'lifetime> {
 pub struct RegisterFormData<'lifetime> {
     #[field(validate = check_name(), name = "username")]
     pub display_name: &'lifetime str,
-    pub password: Strict<Password<'lifetime>>,
+    pub password: Password<'lifetime>,
     pub gender: Gender,
 }
