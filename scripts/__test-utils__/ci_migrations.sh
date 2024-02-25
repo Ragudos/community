@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DIR="/db/sqlx/migrations"
+DIR="db/sqlx/migrations"
 
 # Iterate through each file in the migration folder
 for FILE in "$DIR"/*; do
