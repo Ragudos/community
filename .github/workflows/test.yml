@@ -32,7 +32,7 @@ jobs:
     - name: Run migration
       env:
         PGPASSWORD: 1234
-      run: chmod +x scripts/__test-utils__/ci_migrations.sh && scripts/__test-utils__/ci_migrations.sh
+      run: scripts/__test-utils__/ci_migrations.sh
     - name: Build
       run: cargo build --verbose
     - name: Run tests
