@@ -1,0 +1,25 @@
+<script type="text/javascript">
+    var recaptchaOnLoad = () => {
+        console.log('Recaptcha is ready');
+    }
+    var recaptchaOnVerify = async (token) => {
+        if (window.Worker) {
+            var worker = new Worker("/assets/app/workers/captcha.js");
+
+            worker.postMessage(token);
+            worker.onmessage = (e) => {
+                console.log(e.data);
+            }
+        } else {
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/captcha/verify", true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                }
+            }
+            xhr.send(JSON.stringify({ token: response }));
+        }
+    }
+</script>
+<script src="https://www.google.com/recaptcha/api.js?onload=recaptchaOnLoad" async defer></script>

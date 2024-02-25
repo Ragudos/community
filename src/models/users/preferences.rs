@@ -27,4 +27,3 @@ impl From<Theme> for &'static str {
         }
     }
 }
-

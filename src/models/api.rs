@@ -13,6 +13,7 @@ pub enum ApiResponse {
     HtmxRedirect(HtmxRedirect),
     HtmxRefresh(HtmxRefresh),
     String(Status, &'static str),
+    StringDynamic(Status, String),
 }
 
 impl<'a> Responder<'a, 'static> for ApiResponse {
@@ -22,6 +23,10 @@ impl<'a> Responder<'a, 'static> for ApiResponse {
             Self::HtmxRedirect(htmx_redirect) => htmx_redirect.respond_to(request),
             Self::Redirect(redirect) => redirect.respond_to(request),
             Self::String(status, string) => Response::build()
+                .status(status)
+                .sized_body(string.len(), Cursor::new(string))
+                .ok(),
+            Self::StringDynamic(status, string) => Response::build()
                 .status(status)
                 .sized_body(string.len(), Cursor::new(string))
                 .ok(),

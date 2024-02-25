@@ -13,7 +13,8 @@ use time::{Duration, OffsetDateTime};
 use crate::{
     helpers::db::DbConn,
     models::{
-        users::metadata::{UserToken, JWT}, JWT_NAME
+        users::metadata::{UserToken, JWT},
+        JWT_NAME,
     },
 };
 
@@ -47,7 +48,8 @@ impl<'r> FromRequest<'r> for JWT {
                         // the old refresh token is invalidated. Therefore, logging this client
                         // out.
                         let token_query_result =
-                            UserToken::db_select_by_refresh_token(&mut db, &jwt.refresh_token).await;
+                            UserToken::db_select_by_refresh_token(&mut db, &jwt.refresh_token)
+                                .await;
                         match token_query_result {
                             Ok(Some(token)) => {
                                 if !jwt.is_expired() {
@@ -55,9 +57,11 @@ impl<'r> FromRequest<'r> for JWT {
                                 }
 
                                 if token.is_expired() {
-                                    let res =
-                                        UserToken::db_delete_by_refresh_token(&mut db, &jwt.refresh_token)
-                                            .await;
+                                    let res = UserToken::db_delete_by_refresh_token(
+                                        &mut db,
+                                        &jwt.refresh_token,
+                                    )
+                                    .await;
 
                                     request.cookies().remove_private(JWT_NAME);
 
@@ -83,18 +87,18 @@ impl<'r> FromRequest<'r> for JWT {
                                 if let Ok(cookie) = new_jwt.to_cookie() {
                                     request.cookies().add_private(cookie);
                                 } else {
+                                    request.cookies().remove_private(JWT_NAME);
                                     eprintln!("Error creating JWT cookie");
                                     return Outcome::Forward(Status::InternalServerError);
                                 }
 
                                 return Outcome::Success(new_jwt);
-                            },
+                            }
                             Ok(None) => {
                                 request.cookies().remove_private(JWT_NAME);
                                 return Outcome::Forward(Status::Unauthorized);
-                            },
+                            }
                             Err(err) => {
-                                request.cookies().remove_private(JWT_NAME);
                                 eprintln!("Error querying refresh token: {:?}", err);
                                 return Outcome::Forward(Status::InternalServerError);
                             }
@@ -105,9 +109,10 @@ impl<'r> FromRequest<'r> for JWT {
                 }
             }
             None => {
+                // We remove the cookie because it might invalid.
                 request.cookies().remove_private(JWT_NAME);
-                Outcome::Forward(Status::Unauthorized)
-            },
+                Outcome::Forward(Status::BadRequest)
+            }
         }
     }
 }

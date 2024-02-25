@@ -24,7 +24,10 @@ impl User {
         Ok(result.exists.unwrap_or(false))
     }
 
-    pub async fn get_by_display_name(db: &mut Connection<DbConn>, name: &str) -> Result<Option<User>, Error> {
+    pub async fn get_by_display_name(
+        db: &mut Connection<DbConn>,
+        name: &str,
+    ) -> Result<Option<User>, Error> {
         query_as!(
             User,
             r#"
@@ -128,3 +131,4 @@ impl UserCredentials {
         Ok(result.map(|r| r.password_hash))
     }
 }
+

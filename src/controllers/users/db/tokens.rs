@@ -30,7 +30,12 @@ impl Token for UserToken {
 }
 
 impl JWT {
-    pub fn new(token: User, expires_in: OffsetDateTime, creation_date: OffsetDateTime, refresh_token: String) -> Self {
+    pub fn new(
+        token: User,
+        expires_in: OffsetDateTime,
+        creation_date: OffsetDateTime,
+        refresh_token: String,
+    ) -> Self {
         JWT {
             token,
             refresh_token,
@@ -152,5 +157,4 @@ impl UserToken {
 
         Ok(())
     }
-
 }

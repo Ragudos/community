@@ -28,4 +28,3 @@ pub struct LoginFormData<'lifetime> {
     pub display_name: &'lifetime str,
     pub password: &'lifetime str,
 }
-

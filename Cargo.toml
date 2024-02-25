@@ -16,4 +16,6 @@ serde = "1.0.197"
 time = { version = "0.3.34", features = ["serde"] }
 serde_json = "1.0.114"
 random-string = "1.1.0"
+dotenv = "0.15.0"
+reqwest = "0.11.24"
 
