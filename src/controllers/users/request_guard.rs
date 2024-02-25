@@ -59,8 +59,9 @@ impl<'r> FromRequest<'r> for JWT {
                                         UserToken::db_delete_by_refresh_token(&mut db, &jwt.refresh_token)
                                             .await;
 
+                                    request.cookies().remove_private(JWT_NAME);
+
                                     if res.is_err() {
-                                        request.cookies().remove_private(JWT_NAME);
                                         eprintln!(
                                             "Error deleting refresh token: {:?}",
                                             res.err().unwrap()
@@ -68,7 +69,6 @@ impl<'r> FromRequest<'r> for JWT {
                                         return Outcome::Forward(Status::InternalServerError);
                                     }
 
-                                    request.cookies().remove_private(JWT_NAME);
                                     return Outcome::Forward(Status::Unauthorized);
                                 }
 
