@@ -1,13 +1,13 @@
 use rocket::form::{Error, Result};
 
-pub fn check_password<'v>(password: &'v str, confirm_password: &'v str) -> Result<'v, ()> {
+pub fn check_password<'v>(password: &'v str, confirm_password: Option<&'v str>) -> Result<'v, ()> {
     if password.len() < 8 {
         Err(Error::validation(
             "Password must contain at least 8 characters.",
         ))?;
     }
 
-    if password.len() != confirm_password.len() {
+    if confirm_password.is_some() && password.len() != confirm_password.unwrap().len() {
         Err(Error::validation("Passwords do not match"))?;
     }
 

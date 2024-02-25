@@ -5,6 +5,19 @@
 	</head>
 	<body>
 		{{> partials/main_header}}
+		<form hx-sync="this" hx-post="/auth/login" hx-trigger="submit" method="post" action="/auth/login">
+			<div class="input-group">
+				<label for="username">Username</label>
+				<input type="text" id="user" name="username" maxLength="60" placeholder="John Doe" required>
+			</div>
+			<div class="input-group">
+				<label for="password">Password</label>
+				<input type="password" id="password" name="password" minLength="8" placeholder="********" required>
+			</div>
+			<button type="submit">
+				Login
+			</button>
+		</form>
 	</body>
 </html>
 

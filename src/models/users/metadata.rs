@@ -70,6 +70,7 @@ pub struct JWT {
     pub token: User,
     pub expires_in: OffsetDateTime,
     pub creation_date: OffsetDateTime,
+    pub refresh_token: String,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]

@@ -18,9 +18,10 @@ fn rocket() -> _ {
             routes![
                 api::post::auth::deny_post_request,
                 api::post::auth::register::api_endpoint,
+                api::post::auth::login::api_endpoint,
                 api::get::auth::redirect,
                 api::get::auth::login::page,
-                api::get::auth::register::page
+                api::get::auth::register::page,
             ],
         )
         .mount("/assets", FileServer::from("assets"))

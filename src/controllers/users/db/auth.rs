@@ -24,6 +24,20 @@ impl User {
         Ok(result.exists.unwrap_or(false))
     }
 
+    pub async fn get_by_display_name(db: &mut Connection<DbConn>, name: &str) -> Result<Option<User>, Error> {
+        query_as!(
+            User,
+            r#"
+                SELECT *
+                FROM users
+                WHERE display_name = $1;
+            "#,
+            name
+        )
+        .fetch_optional(&mut ***db)
+        .await
+    }
+
     /// This is in a transaction to make sure that
     /// the user's metadata and credentials get inserted.
     /// If either or both fails, then the operation
@@ -94,5 +108,23 @@ impl UserCredentials {
         )
         .execute(&mut **tx)
         .await
+    }
+
+    pub async fn get_password_by_id(
+        db: &mut Connection<DbConn>,
+        user_id: &i32,
+    ) -> Result<Option<String>, Error> {
+        let result = query!(
+            r#"
+                SELECT password_hash
+                FROM users_credentials
+                WHERE id = $1;
+            "#,
+            user_id
+        )
+        .fetch_optional(&mut ***db)
+        .await?;
+
+        Ok(result.map(|r| r.password_hash))
     }
 }

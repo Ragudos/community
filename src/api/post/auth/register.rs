@@ -5,8 +5,7 @@ use sqlx::Acquire;
 use time::{Duration, OffsetDateTime};
 
 use crate::{
-    controllers::htmx::redirect::HtmxRedirect, helpers::db::DbConn, models::{api::ApiResponse, forms::auth::RegisterFormData, users::metadata::{User, UserCredentials, UserMetadata, JWT}},
-    api::get::root
+    api::get::root, controllers::htmx::redirect::HtmxRedirect, helpers::db::DbConn, models::{api::ApiResponse, forms::auth::RegisterFormData, users::metadata::{User, UserCredentials, UserMetadata, UserToken, JWT}}
 };
 
 #[post("/register", data = "<register_data>", rank = 2)]
@@ -40,37 +39,50 @@ pub async fn api_endpoint(
 
                                             match user_credentials_result {
                                                 Ok(_) => {
-                                                    let date_today = OffsetDateTime::now_utc();
-                                                    let jwt = JWT::new(
-                                                        User {
-                                                            id: user.id,
-                                                            display_name: user.display_name,
-                                                            display_image: user.display_image,
-                                                            created_at: user.created_at
-                                                        },
-                                                        date_today.saturating_add(Duration::seconds(3600)),
-                                                        date_today
-                                                    );
-                                                    let parse_result = jwt.to_cookie();
+                                                    let time_today = OffsetDateTime::now_utc();
+                                                    let refresh_token = random_string::generate(64, random_string::charsets::ALPHANUMERIC);
+                                                    let store_token_result = UserToken::db_create(&mut tx, user_id, &refresh_token).await;
 
-                                                    match parse_result {
-                                                        Ok(cookie) => {
-                                                            let commit_result = tx.commit().await;
+                                                    match store_token_result {
+                                                        Ok(_) => {
+                                                             let jwt = JWT::new(
+                                                                User {
+                                                                    id: user.id,
+                                                                    display_name: user.display_name,
+                                                                    display_image: user.display_image,
+                                                                    created_at: user.created_at,
+                                                                },
+                                                                time_today.saturating_add(Duration::seconds(3600)),
+                                                                time_today,
+                                                                refresh_token
+                                                            );
+                                                            let parse_result = jwt.to_cookie();
 
-                                                            match commit_result {
-                                                                Ok(_) => {
-                                                                    cookie_jar.add_private(cookie);
-                                                                    ApiResponse::HtmxRedirect(HtmxRedirect::to(uri!(root::page)))
+                                                            match parse_result {
+                                                                Ok(cookie) => {
+                                                                    let commit_result = tx.commit().await;
+
+                                                                    match commit_result {
+                                                                        Ok(_) => {
+                                                                            cookie_jar.add_private(cookie);
+                                                                            ApiResponse::HtmxRedirect(HtmxRedirect::to(uri!(root::page)))
+                                                                        },
+                                                                        Err(err) => {
+                                                                            eprintln!("Error: {}", err);
+                                                                            ApiResponse::String(Status::InternalServerError, "Something went wrong.")
+                                                                        }
+                                                                    }
                                                                 },
                                                                 Err(err) => {
+                                                                    let _ = tx.rollback().await;
                                                                     eprintln!("Error: {}", err);
-                                                                    ApiResponse::String(Status::InternalServerError, "Something went wrong.")
+                                                                    return ApiResponse::String(Status::InternalServerError, "Something went wrong.");
                                                                 }
                                                             }
-                                                         },
+                                                        },
                                                         Err(err) => {
                                                             let _ = tx.rollback().await;
-                                                            eprintln!("Error: {}", err);
+                                                            eprintln!("Error storing refresh token: {:?}", err);
                                                             return ApiResponse::String(Status::InternalServerError, "Something went wrong.");
                                                         }
                                                     }

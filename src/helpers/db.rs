@@ -1,4 +1,4 @@
-use bcrypt::{hash, hash_with_salt, DEFAULT_COST};
+use bcrypt::{hash, DEFAULT_COST};
 use rocket::{
     fairing::{AdHoc, Result},
     Build, Rocket,
@@ -40,7 +40,7 @@ async fn seed_data(rocket: Rocket<Build>) -> Result {
                                 SELECT 1 FROM users WHERE id = $1
                             );
                         "#,
-                        1,
+                        0,
                         "deadkiller",
                         ""
                     )
@@ -61,7 +61,7 @@ async fn seed_data(rocket: Rocket<Build>) -> Result {
                                 SELECT 1 FROM users_metadata WHERE id = $1
                             );
                         "#,
-                        1,
+                        0,
                         Occupation::Student as Occupation,
                         Gender::Male as Gender,
                     )
@@ -86,7 +86,7 @@ async fn seed_data(rocket: Rocket<Build>) -> Result {
                                         SELECT 1 FROM users_credentials WHERE id = $1
                                     );
                                 "#,
-                                1,
+                                0,
                                 "johndoe@example.com",
                                 hashed_password,
                                 "",
@@ -116,12 +116,12 @@ async fn seed_data(rocket: Rocket<Build>) -> Result {
                                 SELECT 1 FROM communities WHERE id = $1 AND owner_id = $6
                             );
                         "#,
-                        1,
+                        0,
                         "Rustaceans",
                         "",
                         "A community for Rust developers",
                         false,
-                        1
+                        0
                     )
                     .execute(&mut *tx)
                     .await
@@ -140,8 +140,8 @@ async fn seed_data(rocket: Rocket<Build>) -> Result {
                                 SELECT 1 FROM community_memberships WHERE user_id = $1 AND community_id = $2
                             );
                         "#,
-                        1,
-                        1,
+                        0,
+                        0,
                         UserRole::Owner as UserRole
                     ).execute(&mut *tx).await {
                         eprintln!("Failed to seed data: {:?}", e);
