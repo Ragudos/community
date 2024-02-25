@@ -1,7 +1,9 @@
 #!/bin/bash
 
+DIR="/db/sqlx/migrations"
+
 # Iterate through each file in the migration folder
-for FILE in "/db/sqlx/migrations/*"; do
+for FILE in "$DIR"/*; do
     if [ -f "$FILE" ]; then
         echo "Running migration: $FILE"
         psql -h "localhost" -p "5432" -U "postgres" -d "postgres" -f "$FILE"
