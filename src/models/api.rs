@@ -5,6 +5,7 @@ use rocket::{
     response::{Redirect, Responder},
     Response,
 };
+use rocket_dyn_templates::Template;
 
 use crate::controllers::htmx::{redirect::HtmxRedirect, refresh::HtmxRefresh};
 
@@ -14,6 +15,7 @@ pub enum ApiResponse {
     HtmxRefresh(HtmxRefresh),
     String(Status, &'static str),
     StringDynamic(Status, String),
+    Template(Template),
 }
 
 impl<'a> Responder<'a, 'static> for ApiResponse {
@@ -30,6 +32,7 @@ impl<'a> Responder<'a, 'static> for ApiResponse {
                 .status(status)
                 .sized_body(string.len(), Cursor::new(string))
                 .ok(),
+            Self::Template(template) => template.respond_to(request),
         }
     }
 }

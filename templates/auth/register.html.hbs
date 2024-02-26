@@ -6,7 +6,7 @@
 	</head>
 	<body>
 		{{> partials/main_header}}
-		<form hx-post="/auth/register" hx-trigger="submit" method="post" action="/auth/register">
+		<form data-withcaptcha="true" hx-sync="this" hx-post="/auth/register" hx-trigger="submit" method="post" action="/auth/register">
 			<div class="input-group">
 				<label for="username">Username</label>
 				<input type="text" id="user" name="username" maxLength="60" placeholder="John Doe" required>
@@ -21,7 +21,7 @@
 			</div>
 			<div class="input-group">
 				<label for="gender">Gender</label>
-				<select id="gender" name="gender">
+				<select id="gender" name="gender" required>
 					<option selected value="" disabled>Choose your gender</option>
 					<option value="male">Male</option>
 					<option value="female">Female</option>
@@ -30,10 +30,7 @@
 				</select>
 			</div>
 			{{> partials/components/recaptcha}}
-			<button type="submit">
-				Register
-			</button>
+			<button type="submit">Register</button>
 		</form>
 	</body>
 </html>
-

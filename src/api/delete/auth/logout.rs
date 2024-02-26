@@ -1,7 +1,19 @@
-use rocket::{delete, http::{CookieJar, Status}};
+use rocket::{
+    delete,
+    http::{CookieJar, Status},
+};
 use rocket_db_pools::Connection;
 
-use crate::{api::get::auth, auth_uri, controllers::htmx::redirect::HtmxRedirect, helpers::db::DbConn, models::{api::ApiResponse, users::metadata::{UserToken, JWT}}};
+use crate::{
+    api::get::auth,
+    auth_uri,
+    controllers::htmx::redirect::HtmxRedirect,
+    helpers::db::DbConn,
+    models::{
+        api::ApiResponse,
+        users::metadata::{UserToken, JWT},
+    },
+};
 
 #[delete("/logout")]
 pub async fn api_endpoint(
@@ -13,15 +25,15 @@ pub async fn api_endpoint(
     let parse_result = jwt.to_cookie();
 
     match parse_result {
-        Ok(cookie) =>  {
+        Ok(cookie) => {
             if let Err(err) = UserToken::db_delete_by_refresh_token(&mut db, &refresh_token).await {
                 eprintln!("Error deleting token: {:?}", err);
                 return ApiResponse::String(Status::InternalServerError, "Something went wrong.");
             };
 
             cookie_jar.remove_private(cookie);
-            ApiResponse::HtmxRedirect(HtmxRedirect::to(auth_uri!(auth::login::page))) 
-        },
+            ApiResponse::HtmxRedirect(HtmxRedirect::to(auth_uri!(auth::login::page)))
+        }
         Err(err) => {
             eprintln!("Error parsing JWT: {:?}", err);
             return ApiResponse::String(Status::BadRequest, "Something went wrong.");
@@ -35,4 +47,3 @@ pub async fn api_endpoint(
 pub async fn deny_delete_request() -> ApiResponse {
     ApiResponse::HtmxRedirect(HtmxRedirect::to(auth_uri!(auth::login::page)))
 }
-

@@ -131,4 +131,3 @@ impl UserCredentials {
         Ok(result.map(|r| r.password_hash))
     }
 }
-

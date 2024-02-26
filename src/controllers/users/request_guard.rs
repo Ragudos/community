@@ -1,5 +1,3 @@
-use std::convert::Infallible;
-
 use rocket::{
     async_trait,
     http::Status,
@@ -22,97 +20,85 @@ use super::db::traits::Token;
 
 #[async_trait]
 impl<'r> FromRequest<'r> for JWT {
-    type Error = Infallible;
+    type Error = &'r str;
 
     async fn from_request(request: &'r Request<'_>) -> Outcome<JWT, Self::Error> {
-        let cookie = request.cookies().get_private(JWT_NAME).and_then(|cookie| {
-            let parsed_jwt = from_str::<JWT>(cookie.value_trimmed());
+        let Some(cookie) = request.cookies().get_private(JWT_NAME) else {
+            request.cookies().remove_private(JWT_NAME);
+            return Outcome::Forward(Status::Unauthorized);
+        };
 
-            match parsed_jwt {
-                Ok(jwt) => Some(jwt),
-                Err(err) => {
-                    eprintln!("Error parsing JWT: {:?}", err);
-                    None
-                }
-            }
-        });
+        let stringified_jwt = cookie.value();
 
-        match cookie {
-            Some(jwt) => {
-                let db = Connection::<DbConn>::from_request(request).await;
+        let Ok(jwt) = from_str::<JWT>(stringified_jwt) else {
+            // Means that the JWT has probably been tampered with.
+            request.cookies().remove_private(JWT_NAME);
+            return Outcome::Error((
+                Status::BadRequest,
+                "Unable to process request. Please try again.",
+            ));
+        };
 
-                match db {
-                    Outcome::Success(mut db) => {
-                        // We select by refresh token so that if a user logs in from a different
-                        // account,
-                        // the old refresh token is invalidated. Therefore, logging this client
-                        // out.
-                        let token_query_result =
-                            UserToken::db_select_by_refresh_token(&mut db, &jwt.refresh_token)
-                                .await;
-                        match token_query_result {
-                            Ok(Some(token)) => {
-                                if !jwt.is_expired() {
-                                    return Outcome::Success(jwt);
-                                }
+        let Outcome::Success(mut db) = Connection::<DbConn>::from_request(request).await else {
+            return Outcome::Error((
+                Status::InternalServerError,
+                "The server is unable to process your request. Please try again later.",
+            ));
+        };
 
-                                if token.is_expired() {
-                                    let res = UserToken::db_delete_by_refresh_token(
-                                        &mut db,
-                                        &jwt.refresh_token,
-                                    )
-                                    .await;
+        let Ok(token_query_result) =
+            UserToken::db_select_by_refresh_token(&mut db, &jwt.refresh_token).await
+        else {
+            return Outcome::Error((
+                Status::InternalServerError,
+                "The server is unable to process your request. Please try again later.",
+            ));
+        };
 
-                                    request.cookies().remove_private(JWT_NAME);
+        let Some(token) = token_query_result else {
+            // We remove the cookie because that means this JWT is now invalid.
+            // Meaning that the user logged in on another device.
+            request.cookies().remove_private(JWT_NAME);
+            return Outcome::Forward(Status::Unauthorized);
+        };
 
-                                    if res.is_err() {
-                                        eprintln!(
-                                            "Error deleting refresh token: {:?}",
-                                            res.err().unwrap()
-                                        );
-                                        return Outcome::Forward(Status::InternalServerError);
-                                    }
-
-                                    return Outcome::Forward(Status::Unauthorized);
-                                }
-
-                                let new_jwt = JWT {
-                                    token: jwt.token,
-                                    expires_in: OffsetDateTime::now_utc()
-                                        .saturating_add(Duration::seconds(3600)),
-                                    creation_date: OffsetDateTime::now_utc(),
-                                    refresh_token: jwt.refresh_token,
-                                };
-
-                                if let Ok(cookie) = new_jwt.to_cookie() {
-                                    request.cookies().add_private(cookie);
-                                } else {
-                                    request.cookies().remove_private(JWT_NAME);
-                                    eprintln!("Error creating JWT cookie");
-                                    return Outcome::Forward(Status::InternalServerError);
-                                }
-
-                                return Outcome::Success(new_jwt);
-                            }
-                            Ok(None) => {
-                                request.cookies().remove_private(JWT_NAME);
-                                return Outcome::Forward(Status::Unauthorized);
-                            }
-                            Err(err) => {
-                                eprintln!("Error querying refresh token: {:?}", err);
-                                return Outcome::Forward(Status::InternalServerError);
-                            }
-                        }
-                    }
-                    Outcome::Forward(_) => Outcome::Forward(Status::InternalServerError),
-                    Outcome::Error(_) => Outcome::Forward(Status::InternalServerError),
-                }
-            }
-            None => {
-                // We remove the cookie because it might invalid.
-                request.cookies().remove_private(JWT_NAME);
-                Outcome::Forward(Status::BadRequest)
-            }
+        if !jwt.is_expired() {
+            return Outcome::Success(jwt);
         }
+
+        if token.is_expired() {
+            request.cookies().remove_private(JWT_NAME);
+
+            let Err(err) = UserToken::db_delete_by_refresh_token(&mut db, &jwt.refresh_token).await
+            else {
+                return Outcome::Forward(Status::Unauthorized);
+            };
+
+            eprintln!("Error deleting refresh token: {:?}", err);
+            return Outcome::Error((
+                Status::InternalServerError,
+                "The server is unable to process your request. Please try again later.",
+            ));
+        }
+
+        let time_today = OffsetDateTime::now_utc();
+        let new_jwt = JWT::new(
+            jwt.token,
+            time_today.saturating_add(Duration::seconds(3600)),
+            time_today,
+            jwt.refresh_token,
+        );
+
+        let Ok(stringified_new_jwt) = new_jwt.to_cookie() else {
+            // We remove since the JWT is technically expired.
+            request.cookies().remove_private(JWT_NAME);
+            return Outcome::Error((
+                Status::InternalServerError,
+                "The server is unable to process your request. Please try again later.",
+            ));
+        };
+
+        request.cookies().add_private(stringified_new_jwt);
+        Outcome::Success(new_jwt)
     }
 }

@@ -20,6 +20,8 @@ pub struct RegisterFormData<'lifetime> {
     pub display_name: &'lifetime str,
     pub password: Password<'lifetime>,
     pub gender: Gender,
+    #[field(name = "g-recaptcha-response")]
+    pub recaptcha_token: &'lifetime str,
 }
 
 #[derive(FromForm)]
@@ -27,4 +29,6 @@ pub struct LoginFormData<'lifetime> {
     #[field(validate = check_name(), name = "username")]
     pub display_name: &'lifetime str,
     pub password: &'lifetime str,
+    #[field(name = "g-recaptcha-response")]
+    pub recaptcha_token: &'lifetime str,
 }
