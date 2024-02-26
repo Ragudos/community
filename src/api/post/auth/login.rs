@@ -2,14 +2,14 @@ use bcrypt::verify;
 use rocket::{
     form::Form,
     http::{CookieJar, Status},
-    post, uri,
+    post,
 };
 use rocket_db_pools::Connection;
 use sqlx::Acquire;
 use time::{Duration, OffsetDateTime};
 
 use crate::{
-    api::get::root,
+    api::get::homepage::root,
     controllers::{htmx::redirect::HtmxRedirect, recaptcha::verify_token},
     helpers::db::DbConn,
     models::{
@@ -17,6 +17,7 @@ use crate::{
         forms::auth::LoginFormData,
         users::metadata::{User, UserCredentials, UserToken, JWT},
     },
+    homepage_uri
 };
 
 #[post("/login", data = "<login_data>", rank = 2)]
@@ -66,11 +67,10 @@ pub async fn api_endpoint(
         time_today,
         new_refresh_token
     );
-
     let Ok(cookie) = jwt.to_cookie() else {
         return Err(ApiResponse::String(Status::InternalServerError, "Something went wrong."));
     };   
 
     cookie_jar.add_private(cookie);
-    Ok(ApiResponse::HtmxRedirect(HtmxRedirect::to(uri!(root::page))))
+    Ok(ApiResponse::HtmxRedirect(HtmxRedirect::to(homepage_uri!(root::page))))
 }

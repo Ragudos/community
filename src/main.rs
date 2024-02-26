@@ -26,6 +26,14 @@ fn rocket() -> _ {
                 api::get::auth::redirect,
                 api::get::auth::login::page,
                 api::get::auth::register::page,
+                api::get::auth::root::page
+            ],
+        )
+        .mount(
+            "/homepage",
+            routes![
+                api::get::homepage::root::page,
+                api::get::homepage::redirect
             ],
         )
         .mount("/assets", FileServer::from("assets"))

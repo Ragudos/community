@@ -4,3 +4,10 @@ macro_rules! auth_uri {
         rocket::uri!("/auth", $($t)*)
     }
 }
+
+#[macro_export]
+macro_rules! homepage_uri {
+    ($($t:tt)*) => {
+        rocket::uri!("/homepage", $($t)*)
+    }
+}

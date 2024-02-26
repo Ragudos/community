@@ -2,21 +2,18 @@ use bcrypt::{hash, DEFAULT_COST};
 use rocket::{
     form::Form,
     http::{CookieJar, Status},
-    post, uri,
+    post
 };
 use rocket_db_pools::Connection;
 use sqlx::Acquire;
 use time::{Duration, OffsetDateTime};
 
 use crate::{
-    api::get::root,
-    controllers::{htmx::redirect::HtmxRedirect, recaptcha::verify_token},
-    helpers::db::DbConn,
-    models::{
+    api::get::auth::root, auth_uri, controllers::{htmx::redirect::HtmxRedirect, recaptcha::verify_token}, helpers::db::DbConn, models::{
         api::ApiResponse,
         forms::auth::RegisterFormData,
         users::metadata::{User, UserCredentials, UserMetadata, UserToken, JWT},
-    },
+    }
 };
 
 #[post("/register", data = "<register_data>", rank = 2)]
@@ -71,7 +68,7 @@ pub async fn api_endpoint(
     tx.commit().await?;
 
     cookie_jar.add_private(stringified_jwt);
-    Ok(ApiResponse::HtmxRedirect(HtmxRedirect::to(uri!(
+    Ok(ApiResponse::HtmxRedirect(HtmxRedirect::to(auth_uri!(
         root::page
     ))))
 }
