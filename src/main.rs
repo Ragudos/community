@@ -31,7 +31,8 @@ fn rocket_from_config(figment: Figment) -> Rocket<Build> {
                 api::get::auth::redirect,
                 api::get::auth::login::page,
                 api::get::auth::register::page,
-                api::get::auth::root::page
+                api::get::auth::root::page,
+                api::get::auth::deny_welcome_page
             ],
         )
         .mount(
