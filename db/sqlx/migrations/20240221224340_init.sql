@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS users_metadata (
 	occupation Occupation,
 	gender Gender NOT NULL,
 	biography VARCHAR(255),
-	is_private BOOLEAN NOT NULL,
+	is_private BOOLEAN NOT NULL DEFAULT true,
 	account_status AccountStatus NOT NULL DEFAULT 'active',
 	last_login_date TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	FOREIGN KEY (id) REFERENCES users(id) ON DELETE CASCADE
