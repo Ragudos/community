@@ -77,10 +77,18 @@
 
     function delete_toast(id) {
         const toaster = document.getElementById("__toaster__");
-
-        let toast = toasts.find(t => t.toast.id === id);
+        let idx; 
+        
+        let toast = toasts.find((t, index) => {
+            idx = index;
+            return t.toast.id === id
+        });
 
         clearTimeout(toast.timeout);
         toast.toast.remove();
+        
+        if (idx !== undefined) {
+            toasts.splice(idx, 1);
+        }
     }
 })();

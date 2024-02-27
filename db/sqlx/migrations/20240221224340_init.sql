@@ -18,6 +18,9 @@ BEGIN
 	IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'accountstatus') THEN
 		CREATE TYPE AccountStatus as ENUM ('active', 'inactive', 'deactivated', 'banned');
 	END IF;
+	IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'visibility') THEN
+		CREATE TYPE Visibility as ENUM ('public', 'followers', 'private');
+	END IF;
 END $$;
 		
 
@@ -92,6 +95,7 @@ CREATE TABLE IF NOT EXISTS posts (
 	images TEXT[],
 	videos TEXT[],
 	is_pinned BOOLEAN NOT NULL,
+	visibility Visibility DEFAULT 'public',
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
