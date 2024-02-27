@@ -4,9 +4,7 @@ use rocket_dyn_templates::{context, Template};
 use crate::{
     controllers::users::preferences::get_theme_from_cookie,
     helpers::get_recaptcha_sitekey,
-    models::{
-        api::ApiResponse, captcha::Captcha, seo::metadata::SeoMetadata
-    },
+    models::{api::ApiResponse, captcha::Captcha, seo::metadata::SeoMetadata},
 };
 
 #[get("/register", rank = 2)]

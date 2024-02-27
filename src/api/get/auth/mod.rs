@@ -5,7 +5,9 @@ pub mod root;
 use rocket::{get, response::Redirect};
 
 use crate::{
-    api::get::{homepage::root as index_route, auth::login as login_page}, auth_uri, homepage_uri, models::{api::ApiResponse, users::metadata::JWT}
+    api::get::{auth::login as login_page, homepage::root as index_route},
+    auth_uri, homepage_uri,
+    models::{api::ApiResponse, users::metadata::JWT},
 };
 
 #[get("/<_..>")]

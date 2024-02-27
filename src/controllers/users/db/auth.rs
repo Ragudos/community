@@ -41,6 +41,20 @@ impl User {
         .await
     }
 
+    pub async fn get_by_id(db: &mut Connection<DbConn>, id: &i32) -> Result<Option<User>, Error> {
+        query_as!(
+            User,
+            r#"
+                SELECT *
+                FROM users
+                WHERE id = $1;
+            "#,
+            id
+        )
+        .fetch_optional(&mut ***db)
+        .await
+    }
+
     /// This is in a transaction to make sure that
     /// the user's metadata and credentials get inserted.
     /// If either or both fails, then the operation

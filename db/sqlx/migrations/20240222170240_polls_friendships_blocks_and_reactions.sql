@@ -73,4 +73,3 @@ CREATE INDEX IF NOT EXISTS idx_poll_votes_on_poll_option ON poll_votes(poll_opti
 CREATE INDEX IF NOT EXISTS idx_reactions_on_post ON reactions(post_id);
 CREATE INDEX IF NOT EXISTS idx_reactions_on_comment ON reactions(comment_id);
 CREATE INDEX IF NOT EXISTS idx_reactions_of_user ON reactions(user_id);
-

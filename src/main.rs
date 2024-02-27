@@ -4,7 +4,7 @@ extern crate rocket;
 use rocket as rocket_mod;
 
 use community::{
-    api,
+    api, catchers,
     helpers::{db, handlebars},
 };
 use rocket_mod::{figment::Figment, fs::FileServer, Build, Config, Rocket};
@@ -39,9 +39,19 @@ fn rocket_from_config(figment: Figment) -> Rocket<Build> {
             "/homepage",
             routes![api::get::homepage::root::page, api::get::homepage::redirect],
         )
+        .mount(
+            "/preview",
+            routes![
+                api::get::preview::community::api_endpoint,
+                api::get::preview::user::api_endpoint,
+                api::get::preview::community::amount_of_members,
+                api::get::preview::deny_request
+            ],
+        )
         .mount("/assets", FileServer::from("assets"))
         .attach(db::stage())
-        .attach(handlebars::register());
+        .attach(handlebars::register())
+        .register("/", catchers![catchers::unprocessable_entity]);
 
     rocket
 }

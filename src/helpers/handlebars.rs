@@ -3,7 +3,7 @@ use rocket_dyn_templates::{handlebars::handlebars_helper, Template};
 
 handlebars_helper!(eq_str: |x: str, y: str| x == y);
 handlebars_helper!(eq_num: |x: isize, y: isize| x == y);
-handlebars_helper!(is_str_empty: |x: str| x.is_empty());
+handlebars_helper!(is_str_empty: |x: Option<String>| x.is_none() || x.unwrap().is_empty());
 
 pub fn register() -> impl Fairing {
     Template::custom(|engines| {

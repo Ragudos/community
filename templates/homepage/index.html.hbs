@@ -5,5 +5,9 @@
 	</head>
 	<body>
 		{{> partials/main_header}}
+		<button hx-get="/preview/community" hx-target="#list">
+			Click me!
+		</button>
+		<ul id="list"></ul>
 	</body>
 </html>
