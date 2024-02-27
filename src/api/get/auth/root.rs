@@ -1,4 +1,9 @@
-use crate::{api::get::homepage, controllers::users::preferences::get_theme_from_cookie, homepage_uri, models::{api::ApiResponse, seo::metadata::SeoMetadata, users::metadata::JWT}};
+use crate::{
+    api::get::homepage,
+    controllers::users::preferences::get_theme_from_cookie,
+    homepage_uri,
+    models::{api::ApiResponse, seo::metadata::SeoMetadata, users::metadata::JWT},
+};
 use rocket::{get, http::CookieJar, response::Redirect};
 use rocket_dyn_templates::{context, Template};
 use time::{Duration, OffsetDateTime};
@@ -18,6 +23,6 @@ pub fn page(jwt: JWT, cookie: &CookieJar<'_>) -> ApiResponse {
         context! {
             metadata,
             user: jwt.token
-        }
+        },
     ))
 }

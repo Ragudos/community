@@ -3,7 +3,10 @@ use rocket_dyn_templates::{context, Template};
 
 use crate::{
     controllers::users::preferences::get_theme_from_cookie,
-    models::{api::ApiResponse, captcha::Captcha, seo::metadata::SeoMetadata},
+    helpers::get_recaptcha_sitekey,
+    models::{
+        api::ApiResponse, captcha::Captcha, seo::metadata::SeoMetadata
+    },
 };
 
 #[get("/register", rank = 2)]
@@ -16,7 +19,8 @@ pub fn page(cookie: &CookieJar<'_>) -> ApiResponse {
         context! {
             metadata,
             captcha: Captcha {
-                action: "register"
+                action: "register",
+                sitekey: get_recaptcha_sitekey()
             }
         },
     ))

@@ -3,6 +3,7 @@ use rocket::serde::{Deserialize, Serialize};
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Captcha {
     pub action: &'static str,
+    pub sitekey: &'static str,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]

@@ -1,7 +1,10 @@
 use rocket::{get, http::CookieJar};
 use rocket_dyn_templates::{context, Template};
 
-use crate::{controllers::users::preferences::get_theme_from_cookie, models::{api::ApiResponse, seo::metadata::SeoMetadata, users::metadata::JWT}};
+use crate::{
+    controllers::users::preferences::get_theme_from_cookie,
+    models::{api::ApiResponse, seo::metadata::SeoMetadata, users::metadata::JWT},
+};
 
 #[get("/")]
 pub fn page(jwt: JWT, cookie: &CookieJar<'_>) -> ApiResponse {
@@ -13,6 +16,6 @@ pub fn page(jwt: JWT, cookie: &CookieJar<'_>) -> ApiResponse {
         context! {
             metadata,
             user: jwt.token
-        }
+        },
     ))
 }

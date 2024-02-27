@@ -1,7 +1,7 @@
 var recaptchaOnLoad = () => {
     document.querySelectorAll(".g-recaptcha").forEach((el) => {
         grecaptcha.render(el, {
-            sitekey:"6Lc2hH8pAAAAAC0YCMf8LsPa0O662Dw-iR-wX615",
+            sitekey: document.querySelector("meta[name=\"g-recaptcha-sitekey\"]").getAttribute("content"),
             theme: document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light",
             size: el.dataset.size,
         });

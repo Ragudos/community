@@ -2,18 +2,22 @@ use bcrypt::{hash, DEFAULT_COST};
 use rocket::{
     form::Form,
     http::{CookieJar, Status},
-    post
+    post,
 };
 use rocket_db_pools::Connection;
 use sqlx::Acquire;
 use time::{Duration, OffsetDateTime};
 
 use crate::{
-    api::get::auth::root, auth_uri, controllers::{htmx::redirect::HtmxRedirect, recaptcha::verify_token}, helpers::db::DbConn, models::{
+    api::get::auth::root,
+    auth_uri,
+    controllers::{htmx::redirect::HtmxRedirect, recaptcha::verify_token},
+    helpers::{db::DbConn, get_environment},
+    models::{
         api::ApiResponse,
         forms::auth::RegisterFormData,
         users::metadata::{User, UserCredentials, UserMetadata, UserToken, JWT},
-    }
+    },
 };
 
 #[post("/register", data = "<register_data>", rank = 2)]
@@ -23,8 +27,9 @@ pub async fn api_endpoint(
     register_data: Form<RegisterFormData<'_>>,
 ) -> Result<ApiResponse, ApiResponse> {
     let recaptcha_result = verify_token(&register_data.recaptcha_token).await?;
+    let env = get_environment();
 
-    if recaptcha_result.action != Some("register".to_string()) {
+    if recaptcha_result.action != Some("register".to_string()) && env != "development" {
         return Err(ApiResponse::String(
             Status::Unauthorized,
             "The captcha taken is not meant for this request.",

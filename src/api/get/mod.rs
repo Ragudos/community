@@ -1,3 +1,4 @@
 pub mod auth;
-pub mod root;
 pub mod homepage;
+pub mod preview;
+pub mod root;

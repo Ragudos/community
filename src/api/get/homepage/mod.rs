@@ -1,6 +1,6 @@
 use rocket::{get, response::Redirect};
 
-use crate::{auth_uri, models::api::ApiResponse, api::get::auth::login};
+use crate::{api::get::auth::login, auth_uri, models::api::ApiResponse};
 
 pub mod root;
 

@@ -1,7 +1,8 @@
 use rocket::http::Status;
 
-use crate::models::{
-    api::ApiResponse, captcha::RecaptchaResponse, errors::captcha::RecaptchaErrorCodes,
+use crate::{
+    helpers::get_recaptcha_secret,
+    models::{api::ApiResponse, captcha::RecaptchaResponse, errors::captcha::RecaptchaErrorCodes},
 };
 
 /// if and error occurs, return an API respone,
@@ -14,7 +15,8 @@ pub async fn verify_token(token: &str) -> Result<RecaptchaResponse, ApiResponse>
         ));
     }
 
-    let secret = dotenv::var("RECAPTCHA_SECRET_KEY")?;
+    let secret = get_recaptcha_secret()?;
+
     let client = reqwest::Client::new();
     let body = format!("secret={}&response={}", secret, token);
     let response = client
