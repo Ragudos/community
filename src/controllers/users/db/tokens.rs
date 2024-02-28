@@ -146,6 +146,21 @@ impl UserToken {
         Ok(user_token)
     }
 
+    pub async fn db_tx_select_by_user_id(
+        tx: &mut Transaction<'_, Postgres>,
+        user_id: &i32,
+    ) -> Result<Option<Self>, sqlx::Error> {
+        let user_token = query_as!(
+            UserToken,
+            r#"SELECT * FROM users_token WHERE user_id = $1"#,
+            user_id
+        )
+        .fetch_optional(&mut **tx)
+        .await?;
+
+        Ok(user_token)
+    }
+
     pub async fn db_delete_by_refresh_token(
         db: &mut Connection<DbConn>,
         refresh_token: &str,

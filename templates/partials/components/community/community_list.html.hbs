@@ -1,45 +1,47 @@
-{{#each communities}}
-<li class="community__preview-container">
-    {{#unless (is_str_empty this.cover_image)}}
-        <div class="community__preview-cover-image-container">
-            <img
-                src="{{this.cover_image}}"
-                alt="{{this.display_name}}'s cover image"
-                width="480"
-                height="200"       
-            />
+<div id="section-of-communities">
+    {{#each communities}}
+    <div class="card community__preview-container">
+        {{#unless (is_str_empty this.cover_image)}}
+            <div class="community__preview-cover-image-container">
+                <img
+                    src="{{this.cover_image}}"
+                    alt="{{this.display_name}}'s cover image"
+                    width="480"
+                    height="200"       
+                />
+            </div>
+        {{/unless}}
+        <div class="community__preview-name-img-container">
+            <div class="community__preview-img-container">
+                <img
+                    src="{{this.display_image}}"
+                    alt="{{this.display_name}}'s display image"
+                    width="32"
+                    height="32"
+                />
+            </div>
+            <div class="community__preview-name-container">
+                <p><strong>{{this.display_name}}</strong></p>
+                <small><strong>{{#if this.is_private}}Private{{else}}Anyone can join{{/if}}</strong></small>
+            </div>
         </div>
-    {{/unless}}
-    <div class="community__preview-name-img-container">
-        <div class="community__preview-img-container">
-            <img
-                src="{{this.display_image}}"
-                alt="{{this.display_name}}'s display image"
-                width="32"
-                height="32"
-            />
+        <p class="community__preview-description">{{this.description}}</p>
+        {{#if (is_str_empty this.category)}}
+            <div class="community__preview-category">
+                <p>{{this.category}}</p>
+            </div>
+        {{/if}}
+        <div class="community__members-owner-container">
+            <div hx-swap="outerHTML" hx-trigger="revealed" hx-get="/preview/community/amount-of-members?community_id={{this.id}}">
+                <p>Loading...</p>
+            </div>
+            <div hx-swap="outerHTML" hx-trigger="revealed" hx-get="/preview/user?user_id={{this.owner_id}}">
+                <p>Loading...</p>
+            </div>
         </div>
-        <div class="community__preview-name-container">
-            <p><strong>{{this.display_name}}</strong></p>
-            <small><strong>{{#if this.is_private}}Private{{else}}Anyone can join{{/if}}</strong></small>
-        </div>
+        <a href="/community/join?community_id={{this.id}}&user_id={{user.id}}">
+            Join now
+        </a>
     </div>
-    <p class="community__preview-description">{{this.description}}</p>
-    {{#if (is_str_empty this.category)}}
-        <div class="community__preview-category">
-            <p>{{this.category}}</p>
-        </div>
-    {{/if}}
-    <div class="community__members-owner-container">
-        <div hx-swap="outerHTML" hx-trigger="revealed" hx-get="/preview/community/amount-of-members?community_id={{this.id}}">
-            <p>Loading...</p>
-        </div>
-        <div hx-swap="outerHTML" hx-trigger="revealed" hx-get="/preview/user?user_id={{this.owner_id}}">
-            <p>Loading...</p>
-        </div>
-    </div>
-    <a href="/community/join?community_id={{this.id}}&user_id={{user.id}}">
-        Join now
-    </a>
-</li>
-{{/each}}
+    {{/each}}
+</div>

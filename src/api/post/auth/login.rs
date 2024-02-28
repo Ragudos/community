@@ -76,7 +76,14 @@ pub async fn api_endpoint(
         ));
     };
 
-    UserToken::db_update_refresh_token(&mut tx, &user.id, &new_refresh_token).await?;
+    let existing_token = UserToken::db_tx_select_by_user_id(&mut tx, &user.id).await?;
+
+    if let Some(_) = existing_token {
+        UserToken::db_update_refresh_token(&mut tx, &user.id, &new_refresh_token).await?;
+    } else {
+        UserToken::db_create(&mut tx, &user.id, &new_refresh_token).await?;
+    }
+
     tx.commit().await?;
 
     let time_today = OffsetDateTime::now_utc();
