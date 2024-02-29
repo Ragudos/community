@@ -1,23 +1,39 @@
 #[macro_use]
 extern crate rocket;
 
-use rocket as rocket_mod;
+use std::sync::atomic::AtomicU32;
+
+use rocket::{self as rocket_mod, figment::Provider};
 
 use community::{
     api, catchers,
-    helpers::{db, handlebars},
+    helpers::{db, handlebars}, models::rate_limiter::RateLimit,
 };
-use rocket_mod::{figment::Figment, fs::FileServer, Build, Config, Rocket};
+use rocket_mod::{figment::{Figment, Profile}, fs::FileServer, Build, Config, Rocket};
 
 #[launch]
 fn rocket() -> _ {
     dotenv::dotenv().ok();
 
-    let config = Config::figment();
+    let config = Config::figment().merge(("rate-limit-capacity", 100 as u32));
     rocket_from_config(config)
 }
 
 fn rocket_from_config(figment: Figment) -> Rocket<Build> {
+    let rate_limit_capacity = figment
+        .data()
+        .unwrap();
+    let rate_limit_capacity = rate_limit_capacity
+        .get(&Profile::Global)
+        .unwrap();
+    let rate_limit_capacity = rate_limit_capacity
+        .get("rate-limit-capacity")
+        .unwrap()
+        .to_num()
+        .unwrap()
+        .to_u32()
+        .unwrap();
+
     let rocket = rocket_mod::custom(figment)
         .mount("/", routes![api::get::root::page,])
         .mount(
@@ -48,9 +64,15 @@ fn rocket_from_config(figment: Figment) -> Rocket<Build> {
                 api::get::preview::deny_request
             ],
         )
+        .mount("/build", FileServer::from("build"))
         .mount("/assets", FileServer::from("assets"))
         .attach(db::stage())
         .attach(handlebars::register())
+        .manage(RateLimit {
+            capacity: AtomicU32::new(rate_limit_capacity),
+            time_accumulator_started: time::OffsetDateTime::now_utc(),
+            requests: AtomicU32::new(0),
+        })
         .register("/", catchers![catchers::unprocessable_entity]);
 
     rocket
@@ -74,7 +96,8 @@ mod test_utils {
         db_config.insert("url", db_url.into());
         pg_config.insert("sqlx", db_config.into());
 
-        let figment = rocket::Config::figment().merge(("databases", pg_config));
+        let figment = rocket::Config::figment().merge(("databases", pg_config))
+        .merge(("rate-limit-capacity", 2 as u32));
 
         let client = Client::tracked(rocket_from_config(figment))
             .await
@@ -132,5 +155,52 @@ mod general_tests {
             Some("Please choose a different username.".to_string()),
             response.into_string().await
         );
+    }
+
+    #[rocket::async_test]
+    async fn test_login() {
+        let client = get_client().await;
+        let response = client.get("/auth/login").dispatch().await;
+
+        assert_eq!(response.status(), Status::Ok);
+
+        let mut request = client.post("/auth/login")
+            .header(ContentType::Form)
+            .body(r#"username=deadkiller&password=12345678&g-recaptcha-response=test"#);
+
+        request.add_header(ContentType::Form);
+
+        let response = request.dispatch().await;
+        let redirect_uri = response.headers().get("HX-Redirect").collect::<String>();
+
+        assert_eq!(response.status(), Status::Ok);
+        assert_eq!(redirect_uri, "/homepage");
+    }
+
+    #[rocket::async_test]
+    async fn test_limiter() {
+        let client = get_client().await;
+
+        for _ in 0..2 {
+            let mut request = client.post("/auth/login")
+                .header(ContentType::Form)
+                .body(r#"username=deadkiller&password=12345678&g-recaptcha-response=test"#);
+
+            request.add_header(ContentType::Form);
+            request.dispatch().await;
+
+            let request = client.delete("/auth/logout");
+
+            request.dispatch().await;
+        }
+
+        let mut request = client.post("/auth/login")
+            .header(ContentType::Form)
+            .body(r#"username=deadkiller&password=12345678&g-recaptcha-response=test"#);
+
+        request.add_header(ContentType::Form);
+
+        let response = request.dispatch().await;
+        assert_eq!(response.status(), Status::TooManyRequests);
     }
 }

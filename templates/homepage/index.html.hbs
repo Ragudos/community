@@ -2,8 +2,8 @@
 <html lang="{{ metadata.language }}" data-theme="{{ metadata.theme }}">
 	<head>
 		{{> partials/head}}
-		<link rel="preload" href="/assets/styles/homepage.css" as="style">
-		<link rel="stylesheet" href="/assets/styles/homepage.css">
+		<link rel="preload" href="/build/styles/homepage.min.css" as="style">
+		<link rel="stylesheet" href="/build/styles/homepage.min.css">
 	</head>
 	<body>
 		{{> partials/main_header}}
@@ -17,7 +17,7 @@
 					id="search"
 					name="search"
 					placeholder="Search for anything"
-					hx-post="/search"
+					hx-get="/search/community"
 					hx-trigger="keyup changed delay:500ms, search"
 					hx-target="#section-of-communities"
 				>

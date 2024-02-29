@@ -2,7 +2,7 @@ use bcrypt::verify;
 use rocket::{
     form::Form,
     http::{CookieJar, Status},
-    post,
+    post, State,
 };
 use rocket_db_pools::Connection;
 use sqlx::Acquire;
@@ -14,9 +14,7 @@ use crate::{
     helpers::{db::DbConn, get_environment},
     homepage_uri,
     models::{
-        api::ApiResponse,
-        forms::auth::LoginFormData,
-        users::metadata::{User, UserCredentials, UserToken, JWT},
+        api::ApiResponse, forms::auth::LoginFormData, rate_limiter::RateLimit, users::metadata::{User, UserCredentials, UserToken, JWT}
     },
 };
 
@@ -25,7 +23,10 @@ pub async fn api_endpoint(
     mut db: Connection<DbConn>,
     cookie_jar: &CookieJar<'_>,
     login_data: Form<LoginFormData<'_>>,
+    rate_limit: &State<RateLimit>
 ) -> Result<ApiResponse, ApiResponse> {
+    rate_limit.add_to_limit_or_return("The server is experiencing high loads of requests. Please try again later.")?;
+
     let recaptcha_result = verify_token(&login_data.recaptcha_token).await?;
     let env = get_environment();
 

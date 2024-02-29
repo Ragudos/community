@@ -5,8 +5,7 @@ use crate::{
     controllers::users::preferences::get_theme_from_cookie,
     helpers::get_recaptcha_sitekey,
     models::{
-        api::ApiResponse, captcha::Captcha, seo::metadata::SeoMetadata, RECAPTCHA_CLIENT_SITEKEY,
-        RECAPTCHA_SITEKEY_FOR_TESTS,
+        api::ApiResponse, captcha::Captcha, seo::metadata::SeoMetadata,
     },
 };
 

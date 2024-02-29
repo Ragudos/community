@@ -1,22 +1,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="{{ metadata.description }}">
-<meta name="title" content="{{ metadata.title }}">
-<!-- Open Graph / Facebook -->
-<meta name="og:title" content="{{ metadata.title }}">
-<meta name="og:description" content="{{ metadata.description }}">
-<meta property="og:site_name" content="{{ metadata.site_name }}">
-<meta name="environment" content="{{ metdata.env}}">
-<title>{{ metadata.title }}</title>
-<!-- Styles -->
-<link rel="preload" href="/assets/styles/globals.css" as="style">
-<link rel="stylesheet" href="/assets/styles/globals.css">
-<!-- Scripts -->
-<link rel="preload" href="/assets/app/htmx/htmx.min.js" as="script">
-<link rel="preload" href="/assets/app/toaster/index.js" as="script">
-<link rel="preload" href="/assets/app/components.js" as="script" crossorigin="anonymous">
-<script src="/assets/app/htmx/htmx.min.js"></script>
-<script src="/assets/app/toaster/index.js"></script>
-<script src="/assets/app/components.js" type="module" crossorigin="anonymous"></script>
-<script>window.addEventListener("DOMContentLoaded", window.toaster.init_toast);</script>
-<script>!function(){let e=0,t,t2;document.addEventListener("htmx:error",r=>{clearTimeout(t),e>10&&(clearTimeout(t2),window.toaster.toast("error","Wowza! You've got a lot of errors. Take a break and come back later."),r.target.querySelectorAll("*").forEach(r=>{r.setAttribute("disabled","true")}),t2=setTimeout(()=>{r.target.querySelectorAll("*").forEach(r=>{r.removeAttribute("disabled")})},5e3)),e++,t=setTimeout(()=>{e=0},5e3)})}();</script>
+        {{> partials/head/seo}}
+        {{> partials/head/preloads}}
+        {{> partials/head/load_assets}}
+        {{> partials/head/dev}}

@@ -4,3 +4,4 @@ pub mod forms;
 pub mod htmx;
 pub mod recaptcha;
 pub mod users;
+pub mod rate_limiter;
