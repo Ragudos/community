@@ -6,14 +6,14 @@
 	</head>
 	<body>
 		{{> partials/main_header}}
-		<form data-withcaptcha="true" hx-sync="this" hx-post="/auth/login" hx-trigger="submit" method="post" action="/auth/login">
+		<form class="container" data-withcaptcha="true" hx-sync="this" hx-post="/auth/login" hx-trigger="submit" method="post" action="/auth/login">
 			<div class="input-group">
 				<label for="username">Username</label>
-				<input type="text" id="user" name="username" maxLength="60" placeholder="John Doe" required>
+				<input autocomplete="off" autocapitalize="off"type="text" id="user" name="username" maxLength="60" placeholder="John Doe" required>
 			</div>
 			<div class="input-group">
 				<label for="password">Password</label>
-				<input type="password" id="password" name="password" minLength="8" placeholder="********" required>
+				<input autocomplete="off" autocapitalize="off"type="password" id="password" name="password" minLength="8" placeholder="********" required>
 			</div>
 			{{> partials/components/recaptcha}}
 			<button type="submit">

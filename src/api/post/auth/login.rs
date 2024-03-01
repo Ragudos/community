@@ -90,7 +90,7 @@ pub async fn api_endpoint(
     let time_today = OffsetDateTime::now_utc();
     let jwt = JWT::new(
         user,
-        time_today.saturating_add(Duration::seconds(3600)),
+        time_today.saturating_add(Duration::seconds(1000)),
         time_today,
         new_refresh_token,
     );

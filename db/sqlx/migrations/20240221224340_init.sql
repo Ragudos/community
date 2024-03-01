@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS communities (
 	id SERIAL PRIMARY KEY,
 	display_name VARCHAR(50) UNIQUE NOT NULL,
 	display_image TEXT NOT NULL,
-	cover_image TEXT,
+	cover_image TEXT NOT NULL,
 	description VARCHAR(255) NOT NULL,
 	owner_id INTEGER NOT NULL,
 	is_private BOOLEAN NOT NULL,

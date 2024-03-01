@@ -1,4 +1,4 @@
-import"./chunk-OVMSGTSF.min.mjs";var t=`<?xml version="1.0" encoding="utf-8"?>
+import"./chunk-FJRNAZQX.min.mjs";var t=`<?xml version="1.0" encoding="utf-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="margin: auto; display: block; shape-rendering: auto;" width="287px" height="287px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
 <g transform="rotate(0 50 50)">
   <rect x="47" y="24" rx="0" ry="0" width="6" height="12" fill="#fe718d">

@@ -65,7 +65,7 @@ pub async fn api_endpoint(
             display_image: user.display_image,
             created_at: user.created_at,
         },
-        time_today.saturating_add(Duration::seconds(3600)),
+        time_today.saturating_add(Duration::seconds(1000)),
         time_today,
         refresh_token,
     );

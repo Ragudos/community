@@ -29,13 +29,13 @@ pub async fn api_endpoint(
     )))
 }
 
-#[get("/community/amount-of-members?<community_id>")]
+#[get("/community/amount-of-members?<community_display_name>")]
 pub async fn amount_of_members(
     mut db: Connection<DbConn>,
     _jwt: JWT,
-    community_id: i32,
+    community_display_name: &str,
 ) -> Result<ApiResponse, ApiResponse> {
-    let amount = Community::get_total_members_count(&mut db, community_id).await?;
+    let amount = Community::get_total_members_count_by_display_name(&mut db, community_display_name).await?;
 
     Ok(ApiResponse::Template(Template::render(
         "partials/components/community/amount_of_members",

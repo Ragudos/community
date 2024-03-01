@@ -36,9 +36,12 @@ document.addEventListener("htmx:error", (evt) => {
 });
 
 document.addEventListener("htmx:responseError", (evt) => {
-    console.log(evt);
     if (evt instanceof CustomEvent) {
         const message = evt.detail.xhr?.responseText || "Something went wrong.";
         toast.error({ message }, { theme: document.documentElement.dataset.theme as "light" | "dark" || "light"})
     }
+});
+
+document.addEventListener("htmx:sendError", (evt) => {
+    toast.error({ message: "Failed to connect to server." });
 });

@@ -20,6 +20,7 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
-    "@webdevaaron/vanilla-toast": "^0.7.3"
+    "@webdevaaron/vanilla-toast": "^0.7.3",
+    "cropperjs": "^1.6.1"
   }
 }

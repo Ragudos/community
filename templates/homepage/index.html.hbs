@@ -4,27 +4,37 @@
 		{{> partials/head}}
 		<link rel="preload" href="/build/styles/homepage.min.css" as="style">
 		<link rel="stylesheet" href="/build/styles/homepage.min.css">
+		
 	</head>
 	<body>
 		{{> partials/main_header}}
-		<main>
-			<section>
+		<main class="container">
+			<section class="homepage__container">
 				<h1>Discover communities</h1>
 				<p>or <a href="/create/community">create your own</a></p>
 				<br>
-				<input
-					type="search"
-					id="search"
-					name="search"
-					placeholder="Search for anything"
-					hx-get="/search/community"
-					hx-trigger="keyup changed delay:500ms, search"
-					hx-target="#section-of-communities"
-				>
-			</section>
-			<section>
-				<h2>Communities</h2>
+				<div>
+					<input
+						type="search"
+						id="search"
+						name="search"
+						placeholder="Search for anything"
+						hx-get="/search/community"
+						hx-trigger="keyup changed delay:100ms, search"
+						hx-target="#section-of-communities"
+						autocomplete="off"
+						autocapitalize="off"
+					>
+					<!-- TODO: Add Categories -->
+				</div>
 				<div id="section-of-communities" hx-indicator=".skeleton" hx-trigger="revealed" hx-get="/preview/community/" hx-swap="outerHTML">
+					<div class="skeleton skeleton__rectangle-opposite"></div>
+					<div class="skeleton skeleton__rectangle-opposite"></div>
+					<div class="skeleton skeleton__rectangle-opposite"></div>
+					<div class="skeleton skeleton__rectangle-opposite"></div>
+					<div class="skeleton skeleton__rectangle-opposite"></div>
+					<div class="skeleton skeleton__rectangle-opposite"></div>
+					<div class="skeleton skeleton__rectangle-opposite"></div>
 					<div class="skeleton skeleton__rectangle-opposite"></div>
 					<div class="skeleton skeleton__rectangle-opposite"></div>
 					<div class="skeleton skeleton__rectangle-opposite"></div>

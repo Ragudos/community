@@ -8,7 +8,7 @@ pub struct Community {
     pub id: i32,
     pub display_name: String,
     pub display_image: String,
-    pub cover_image: Option<String>,
+    pub cover_image: String,
     pub description: String,
     pub owner_id: i32,
     pub is_private: bool,

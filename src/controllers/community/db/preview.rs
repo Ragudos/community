@@ -20,7 +20,29 @@ impl Community {
         Ok(result.exists)
     }
 
-    pub async fn get_total_members_count(
+    pub async fn get_total_members_count_by_display_name(
+        db: &mut Connection<DbConn>,
+        display_name: &str,
+    ) -> Result<Option<i64>, Error> {
+        let result = sqlx::query!(
+            r#"
+            SELECT COUNT(*)
+            FROM community_memberships
+            WHERE community_id = (
+                SELECT id
+                FROM communities
+                WHERE display_name = $1
+            )
+            "#,
+            display_name
+        )
+        .fetch_one(&mut ***db)
+        .await?;
+
+        Ok(result.count)
+    }
+
+    pub async fn get_total_members_count_by_id(
         db: &mut Connection<DbConn>,
         community_id: i32,
     ) -> Result<Option<i64>, Error> {

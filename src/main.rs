@@ -3,19 +3,36 @@ extern crate rocket;
 
 use std::sync::atomic::AtomicU32;
 
-use rocket::{self as rocket_mod, figment::Provider};
+use rocket::{self as rocket_mod, figment::{value::{Map, Value}, Provider}};
 
 use community::{
     api, catchers,
-    helpers::{db, handlebars}, models::rate_limiter::RateLimit,
+    helpers::{db, get_environment, handlebars}, models::rate_limiter::RateLimit,
 };
-use rocket_mod::{figment::{Figment, Profile}, fs::FileServer, Build, Config, Rocket};
+use rocket_mod::{figment::{Figment, Profile}, fs::FileServer, Build, Rocket};
+
+enum Env {
+    Development,
+    Testing,
+    Production,
+}
+
+impl From<String> for Env {
+    fn from(env: String) -> Self {
+        match env.as_str() {
+            "development" => Self::Development,
+            "testing" => Self::Testing,
+            "production" => Self::Production,
+            _ => panic!("Invalid environment"),
+        }
+    }
+}
 
 #[launch]
 fn rocket() -> _ {
     dotenv::dotenv().ok();
 
-    let config = Config::figment().merge(("rate-limit-capacity", 100 as u32));
+    let config = create_config(get_environment().into());
     rocket_from_config(config)
 }
 
@@ -64,6 +81,13 @@ fn rocket_from_config(figment: Figment) -> Rocket<Build> {
                 api::get::preview::deny_request
             ],
         )
+        .mount(
+            "/search",
+            routes![
+                api::get::search::community::search_community,
+                api::get::search::deny_search
+            ]
+        )
         .mount("/build", FileServer::from("build"))
         .mount("/assets", FileServer::from("assets"))
         .attach(db::stage())
@@ -73,31 +97,43 @@ fn rocket_from_config(figment: Figment) -> Rocket<Build> {
             time_accumulator_started: time::OffsetDateTime::now_utc(),
             requests: AtomicU32::new(0),
         })
-        .register("/", catchers![catchers::unprocessable_entity]);
+        .register("/", catchers![catchers::unprocessable_entity, catchers::not_found]);
 
     rocket
 }
 
-#[cfg(test)]
-mod test_utils {
-    use rocket::{
-        figment::value::{Map, Value},
-        local::asynchronous::Client,
+fn create_config(env: Env) -> Figment {
+    let db_url = dotenv::var("DATABASE_URL").expect("DATABASE_URL must be set");
+    let secret_key = dotenv::var("ROCKET_SECRET_KEY").expect("ROCKET_SECRET_KEY must be set");
+
+    let mut db_config: Map<_, Value> = Map::new();
+    let mut pg_config: Map<_, Value> = Map::new();
+
+    let rate_limit_capacity: u32 = match env {
+        Env::Development => 100,
+        Env::Testing => 2,
+        Env::Production => 100,
     };
 
-    use crate::rocket_from_config;
+    db_config.insert("url", db_url.into());
+    pg_config.insert("sqlx", db_config.into());
+
+    let figment = rocket::Config::figment()
+    .merge(("databases", pg_config))
+    .merge(("rate-limit-capacity", rate_limit_capacity))
+    .merge(("secret_key", secret_key));
+
+    figment
+}
+
+#[cfg(test)]
+mod test_utils {
+    use rocket::local::asynchronous::Client;
+
+    use crate::{create_config, rocket_from_config, Env};
 
     pub async fn get_client() -> Client {
-        let db_url = dotenv::var("DATABASE_URL").expect("DATABASE_URL must be set");
-
-        let mut db_config: Map<_, Value> = Map::new();
-        let mut pg_config: Map<_, Value> = Map::new();
-
-        db_config.insert("url", db_url.into());
-        pg_config.insert("sqlx", db_config.into());
-
-        let figment = rocket::Config::figment().merge(("databases", pg_config))
-        .merge(("rate-limit-capacity", 2 as u32));
+        let figment = create_config(Env::Testing);
 
         let client = Client::tracked(rocket_from_config(figment))
             .await

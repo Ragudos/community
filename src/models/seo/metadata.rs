@@ -2,8 +2,8 @@ use serde::{Deserialize, Serialize};
 
 use crate::{helpers::get_environment, models::users::preferences::Theme};
 
-const SITE_NAME: &str = "Kommunidad";
-const DESCRIPTION: &str = "Kommunidad is a social media platform for communities.";
+const SITE_NAME: &str = "Community";
+const DESCRIPTION: &str = "Community is a social media platform for communities.";
 
 #[derive(Default, Serialize, Deserialize, Clone)]
 pub struct OpenGraphMetadata {

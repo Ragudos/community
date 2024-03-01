@@ -4,7 +4,17 @@ use rocket_dyn_templates::{handlebars::handlebars_helper, Template};
 handlebars_helper!(eq_str: |x: str, y: str| x == y);
 handlebars_helper!(eq_num: |x: isize, y: isize| x == y);
 handlebars_helper!(is_str_empty: |x: Option<String>| x.is_none() || x.unwrap().is_empty());
-
+handlebars_helper!(num_abbr: |x: isize| {
+    if x < 1_000 {
+        x.to_string()
+    } else if x < 1_000_000 {
+        format!("{:.1}k", x as f64 / 1_000.0)
+    } else if x < 1_000_000_000 {
+        format!("{:.1}m", x as f64 / 1_000_000.0)
+    } else {
+        format!("{:.1}b", x as f64 / 1_000_000_000.0)
+    }
+});
 pub fn register() -> impl Fairing {
     Template::custom(|engines| {
         engines
@@ -16,6 +26,7 @@ pub fn register() -> impl Fairing {
         engines
             .handlebars
             .register_helper("is_str_empty", Box::new(is_str_empty));
+        engines.handlebars.register_helper("num_abbr", Box::new(num_abbr));
     })
 }
 
@@ -35,7 +46,10 @@ fn test_helpers() {
     let is_str_empty_result =
         hbs.render_template(r#"{{#if (is_str_empty "")}}true{{else}}false{{/if}}"#, &());
 
+    let num_abbr_result = hbs.render_template(r#"{{num_abbr 1000}}"#, &());
+
     assert_eq!(eq_str_result.unwrap(), "true");
     assert_eq!(eq_num_result.unwrap(), "true");
     assert_eq!(is_str_empty_result.unwrap(), "true");
+    assert_eq!(num_abbr_result.unwrap(), "1.0k");
 }

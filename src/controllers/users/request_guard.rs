@@ -84,7 +84,7 @@ impl<'r> FromRequest<'r> for JWT {
         let time_today = OffsetDateTime::now_utc();
         let new_jwt = JWT::new(
             jwt.token,
-            time_today.saturating_add(Duration::seconds(3600)),
+            time_today.saturating_add(Duration::seconds(1000)),
             time_today,
             jwt.refresh_token,
         );

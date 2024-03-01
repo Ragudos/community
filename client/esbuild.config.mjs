@@ -3,6 +3,7 @@ import * as esbuild from "esbuild";
 const h = await esbuild.build({
     entryPoints: [
         "src/index.ts",
+        "src/crop.ts",
         "src/styles/*.css"
     ],
     "bundle": true,
