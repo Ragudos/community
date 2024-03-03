@@ -9,7 +9,7 @@ use crate::{
 #[get("/?<q>&<o>")]
 pub fn page(jwt: JWT, cookie: &CookieJar<'_>, q: Option<&str>, o: Option<i64>) -> ApiResponse {
     let offset = match o {
-        Some(offset) => offset * 20,
+        Some(offset) => offset,
         None => 0,
     };
     let theme = get_theme_from_cookie(cookie);
