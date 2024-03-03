@@ -56,7 +56,7 @@ CREATE TABLE IF NOT EXISTS users_socials (
 
 CREATE TABLE IF NOT EXISTS users_credentials (
 	id INTEGER PRIMARY KEY,
-	email VARCHAR(100) UNIQUE,
+	email VARCHAR(255) UNIQUE,
 	password_hash TEXT NOT NULL,
 	first_name VARCHAR(60),
 	last_name VARCHAR(60),
@@ -68,7 +68,7 @@ CREATE TABLE IF NOT EXISTS communities (
 	display_name VARCHAR(50) UNIQUE NOT NULL,
 	display_image TEXT NOT NULL,
 	cover_image TEXT NOT NULL,
-	description VARCHAR(255) NOT NULL,
+	description VARCHAR(100) NOT NULL,
 	owner_id INTEGER NOT NULL,
 	is_private BOOLEAN NOT NULL,
 	category VARCHAR(60),
