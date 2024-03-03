@@ -1,0 +1,116 @@
+{{#unless (eq (len bread_crumbs) 0)}}
+    <button
+        {{#if (eq offset 0)}}disabled="true"{{/if}}
+        hx-get="/preview/community?o={{(sub offset 1)}}"
+        hx-target="#section-of-communities"
+        hx-include="#search-input"
+        hx-swap="outerHTML"
+    >Prev</button>
+    <div class="breadcrumbs">
+        {{#if (gt page_count 6)}}
+            {{#if (gte offset 4)}}
+                <button
+                    hx-get="/preview/community?&o=0"
+                    hx-target="#section-of-communities"
+                    hx-include="#search-input"
+                    class="square"
+                    hx-swap="outerHTML"
+                >1</button>
+                <span>...</span>
+            {{/if}}
+            {{#each bread_crumbs}}
+                {{#if (and (gte ../offset 4) (lte ../offset (sub ../page_count 4)))}}
+                    {{#if (eq this (sub ../offset 1))}}
+                        <button
+                            hx-get="/preview/community?&o={{this}}"
+                            hx-target="#section-of-communities"
+                            hx-include="#search-input"
+                            class="square"
+                            hx-swap="outerHTML"
+                        >
+                            {{(add this 1)}}
+                        </button>
+                    {{/if}}
+                    {{#if (eq this ../offset)}}
+                        <button
+                            disabled="true"
+                            hx-get="/preview/community?&o={{this}}"
+                            hx-target="#section-of-communities"
+                            hx-include="#search-input"
+                            class="square"
+                            hx-swap="outerHTML"
+                        >
+                            {{(add this 1)}}
+                        </button>
+                    {{/if}}
+                    {{#if (eq this (add ../offset 1))}}
+                        <button
+                            {{#if (eq this ../offset)}}disabled="true"{{/if}}
+                            hx-get="/preview/community?&o={{this}}"
+                            hx-target="#section-of-communities"
+                            hx-include="#search-input"
+                            class="square"
+                            hx-swap="outerHTML"
+                        >
+                            {{(add this 1)}}
+                        </button>
+                    {{/if}}
+                {{else}}
+                    {{#if (and (lt this 5) (lte ../offset 5))}}
+                        <button
+                            {{#if (eq this ../offset)}}disabled="true"{{/if}}
+                            hx-get="/preview/community?&o={{this}}"
+                            hx-target="#section-of-communities"
+                            hx-include="#search-input"
+                            class="square"
+                            hx-swap="outerHTML"
+                        >
+                            {{(add this 1)}}
+                        </button>
+                    {{/if}}
+                    {{#if (and (gt this (sub ../page_count 6)) (gte ../offset (sub ../page_count 6)))}}
+                        <button
+                            {{#if (eq this ../offset)}}disabled="true"{{/if}}
+                            hx-get="/preview/community?&o={{this}}"
+                            hx-target="#section-of-communities"
+                            hx-include="#search-input"
+                            class="square"
+                            hx-swap="outerHTML"
+                        >
+                            {{(add this 1)}}
+                        </button>
+                    {{/if}}
+                {{/if}}
+            {{/each}}
+
+            {{#if (lt offset (sub page_count 4))}}
+                <span>...</span>
+                <button
+                    hx-get="/preview/community?&o={{(sub page_count 1)}}"
+                    hx-target="#section-of-communities"
+                    hx-include="#search-input"
+                    class="square"
+                    hx-swap="outerHTML"
+                >{{page_count}}</button>
+            {{/if}}
+        {{else}}
+            {{#each bread_crumbs}}
+                <button
+                    {{#if (eq ../offset this)}}disabled="true"{{/if}}
+                    hx-get="/preview/community?&o={{this}}"
+                    hx-target="#section-of-communities"
+                    hx-include="#search-input"
+                    class="square"
+                    hx-swap="outerHTML"
+                >{{(add this 1)}}</button>
+            {{/each}}
+        {{/if}}
+    </div>
+    <button
+        {{#if (or (eq page_count 0) (eq offset (sub page_count 1)))}}disabled="true"{{/if}}
+        hx-get="/preview/community?o={{(add offset 1)}}"
+        hx-target="#section-of-communities"
+        hx-include="#search-input"
+        hx-swap="outerHTML"
+    >Next</button>
+{{/unless}}

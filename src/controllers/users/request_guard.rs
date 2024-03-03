@@ -6,7 +6,6 @@ use rocket::{
     Request,
 };
 use rocket_db_pools::Connection;
-use time::{Duration, OffsetDateTime};
 
 use crate::{
     helpers::db::DbConn,
@@ -24,7 +23,6 @@ impl<'r> FromRequest<'r> for JWT {
 
     async fn from_request(request: &'r Request<'_>) -> Outcome<JWT, Self::Error> {
         let Some(cookie) = request.cookies().get_private(JWT_NAME) else {
-            request.cookies().remove_private(JWT_NAME);
             return Outcome::Forward(Status::Unauthorized);
         };
 
@@ -62,10 +60,6 @@ impl<'r> FromRequest<'r> for JWT {
             return Outcome::Forward(Status::Unauthorized);
         };
 
-        if !jwt.is_expired() {
-            return Outcome::Success(jwt);
-        }
-
         if token.is_expired() {
             request.cookies().remove_private(JWT_NAME);
 
@@ -81,24 +75,8 @@ impl<'r> FromRequest<'r> for JWT {
             ));
         }
 
-        let time_today = OffsetDateTime::now_utc();
-        let new_jwt = JWT::new(
-            jwt.token,
-            time_today.saturating_add(Duration::seconds(1000)),
-            time_today,
-            jwt.refresh_token,
-        );
-
-        let Ok(stringified_new_jwt) = new_jwt.to_cookie() else {
-            // We remove since the JWT is technically expired.
-            request.cookies().remove_private(JWT_NAME);
-            return Outcome::Error((
-                Status::InternalServerError,
-                "The server is unable to process your request. Please try again later.",
-            ));
-        };
-
-        request.cookies().add_private(stringified_new_jwt);
-        Outcome::Success(new_jwt)
+        // Since the JWT is automatically deleted on the browser,
+        // when it expires, we don't need to delete it here.
+        Outcome::Success(jwt)
     }
 }

@@ -1,3 +1,3 @@
-{{#if (eq_str metadata.env "development")}}
+{{#if (eq metadata.env "development")}}
 <script>!function(){let e,t=document.createElement("div");function n(){document.getElementById("screen_size_indicator").innerText=`${window.innerWidth}px`}t.id="screen_size_indicator",t.style.position="fixed",t.style.bottom="0",t.style.right="0",t.style.backgroundColor="hsl(var(--foreground))",t.style.color="hsl(var(--background))",document.body.appendChild(t),window.addEventListener("resize",()=>{clearTimeout(e),e=setTimeout(n,1e3)})}();</script>
 {{/if}}

@@ -3,8 +3,9 @@
 	<head>
 		{{> partials/head}}
 		{{> partials/scripts/recaptcha}}
+		{{> partials/head/htmx-loading}}
 	</head>
-	<body>
+	<body hx-ext="loading-states">
 		{{> partials/main_header}}
 		<form class="container" data-withcaptcha="true" hx-sync="this" hx-post="/auth/register" hx-trigger="submit" method="post" action="/auth/register">
 			<div class="input-group">

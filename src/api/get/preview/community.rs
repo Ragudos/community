@@ -1,4 +1,4 @@
-use rocket::get;
+use rocket::{get, http::Status};
 use rocket_db_pools::Connection;
 use rocket_dyn_templates::{context, Template};
 
@@ -8,23 +8,57 @@ use crate::{
 };
 
 /// offset is how much the database should offset the results by.
-#[get("/community?<offset>")]
+#[get("/community?<q>&<o>")]
 pub async fn api_endpoint(
     mut db: Connection<DbConn>,
     jwt: JWT,
-    offset: Option<i64>,
+    o: Option<i64>,
+    q: Option<&str>,
 ) -> Result<ApiResponse, ApiResponse> {
-    let offset = match offset {
-        Some(offset) => (offset - 1) * 20,
+    let offset = match o {
+        Some(offset) => offset,
         None => 0,
     };
-    let communities = Community::get_all_by_offset_weighted(&mut db, &20, &offset).await?;
+    let offset_p = offset * 20;
+
+    if offset.is_negative() {
+        return Err(ApiResponse::String(Status::BadRequest, "Offset cannot be negative"));
+    }
+
+    let communities = match q {
+        Some(q) => {
+            if q.is_empty() {
+                Community::get_all_by_offset_weighted(&mut db, &20, &offset_p).await?
+            } else {
+                Community::search_all_by_offset_weighted(&mut db, &20, &offset_p, &q).await?
+            }
+        }
+        None => Community::get_all_by_offset_weighted(&mut db, &20, &offset_p).await?,
+    };
+    let page_count = Community::get_communities_count(&mut db, q).await?;
 
     Ok(ApiResponse::Template(Template::render(
-        "partials/components/community/community_list",
+        "partials/components/community/search-result",
         context! {
             communities,
-            user: jwt.token
+            user: jwt.token,
+            offset,
+            search: q,
+            page_count: match page_count.clone() {
+                Some(page_count) => page_count.to_string().parse::<u64>().unwrap(),
+                None => 0
+            },
+            bread_crumbs: match page_count {
+                Some(page_count) => {
+                    let mut vec = Vec::new();
+                    for i in 0..page_count.to_string().parse::<u64>().unwrap() {
+                        vec.push(i);
+                    }
+
+                    vec
+                },
+                None => vec![]
+            }
         },
     )))
 }
@@ -35,7 +69,8 @@ pub async fn amount_of_members(
     _jwt: JWT,
     community_display_name: &str,
 ) -> Result<ApiResponse, ApiResponse> {
-    let amount = Community::get_total_members_count_by_display_name(&mut db, community_display_name).await?;
+    let amount =
+        Community::get_total_members_count_by_display_name(&mut db, community_display_name).await?;
 
     Ok(ApiResponse::Template(Template::render(
         "partials/components/community/amount_of_members",

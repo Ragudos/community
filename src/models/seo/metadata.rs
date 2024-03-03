@@ -21,7 +21,7 @@ pub struct SeoMetadata {
     pub site_name: &'static str,
     pub language: &'static str,
     pub theme: &'static str,
-    pub env: String
+    pub env: String,
 }
 
 #[derive(Default, Clone)]

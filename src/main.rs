@@ -3,13 +3,24 @@ extern crate rocket;
 
 use std::sync::atomic::AtomicU32;
 
-use rocket::{self as rocket_mod, figment::{value::{Map, Value}, Provider}};
+use rocket::{
+    self as rocket_mod,
+    figment::{
+        value::{Map, Value},
+        Provider,
+    },
+};
 
 use community::{
     api, catchers,
-    helpers::{db, get_environment, handlebars}, models::rate_limiter::RateLimit,
+    helpers::{db, get_environment, handlebars},
+    models::rate_limiter::RateLimit,
 };
-use rocket_mod::{figment::{Figment, Profile}, fs::FileServer, Build, Rocket};
+use rocket_mod::{
+    figment::{Figment, Profile},
+    fs::FileServer,
+    Build, Rocket,
+};
 
 enum Env {
     Development,
@@ -37,12 +48,8 @@ fn rocket() -> _ {
 }
 
 fn rocket_from_config(figment: Figment) -> Rocket<Build> {
-    let rate_limit_capacity = figment
-        .data()
-        .unwrap();
-    let rate_limit_capacity = rate_limit_capacity
-        .get(&Profile::Global)
-        .unwrap();
+    let rate_limit_capacity = figment.data().unwrap();
+    let rate_limit_capacity = rate_limit_capacity.get(&Profile::Global).unwrap();
     let rate_limit_capacity = rate_limit_capacity
         .get("rate-limit-capacity")
         .unwrap()
@@ -81,13 +88,6 @@ fn rocket_from_config(figment: Figment) -> Rocket<Build> {
                 api::get::preview::deny_request
             ],
         )
-        .mount(
-            "/search",
-            routes![
-                api::get::search::community::search_community,
-                api::get::search::deny_search
-            ]
-        )
         .mount("/build", FileServer::from("build"))
         .mount("/assets", FileServer::from("assets"))
         .attach(db::stage())
@@ -97,7 +97,10 @@ fn rocket_from_config(figment: Figment) -> Rocket<Build> {
             time_accumulator_started: time::OffsetDateTime::now_utc(),
             requests: AtomicU32::new(0),
         })
-        .register("/", catchers![catchers::unprocessable_entity, catchers::not_found]);
+        .register(
+            "/",
+            catchers![catchers::unprocessable_entity, catchers::not_found, catchers::internal_server_error],
+        );
 
     rocket
 }
@@ -119,9 +122,9 @@ fn create_config(env: Env) -> Figment {
     pg_config.insert("sqlx", db_config.into());
 
     let figment = rocket::Config::figment()
-    .merge(("databases", pg_config))
-    .merge(("rate-limit-capacity", rate_limit_capacity))
-    .merge(("secret_key", secret_key));
+        .merge(("databases", pg_config))
+        .merge(("rate-limit-capacity", rate_limit_capacity))
+        .merge(("secret_key", secret_key));
 
     figment
 }
@@ -200,7 +203,8 @@ mod general_tests {
 
         assert_eq!(response.status(), Status::Ok);
 
-        let mut request = client.post("/auth/login")
+        let mut request = client
+            .post("/auth/login")
             .header(ContentType::Form)
             .body(r#"username=deadkiller&password=12345678&g-recaptcha-response=test"#);
 
@@ -218,7 +222,8 @@ mod general_tests {
         let client = get_client().await;
 
         for _ in 0..2 {
-            let mut request = client.post("/auth/login")
+            let mut request = client
+                .post("/auth/login")
                 .header(ContentType::Form)
                 .body(r#"username=deadkiller&password=12345678&g-recaptcha-response=test"#);
 
@@ -230,7 +235,8 @@ mod general_tests {
             request.dispatch().await;
         }
 
-        let mut request = client.post("/auth/login")
+        let mut request = client
+            .post("/auth/login")
             .header(ContentType::Form)
             .body(r#"username=deadkiller&password=12345678&g-recaptcha-response=test"#);
 

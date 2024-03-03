@@ -181,3 +181,4 @@ CREATE INDEX IF NOT EXISTS idx_users_comments ON comments(user_id);
 CREATE INDEX IF NOT EXISTS idx_comments_of_user_in_post ON comments(post_id, user_id);
 CREATE INDEX IF NOT EXISTS idx_replies_in_comment ON comments(parent_comment_id, post_id, user_id);
 
+CREATE EXTENSION IF NOT EXISTS pg_trgm;

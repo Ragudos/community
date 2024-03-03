@@ -4,40 +4,50 @@
 		{{> partials/head}}
 		<link rel="preload" href="/build/styles/homepage.min.css" as="style">
 		<link rel="stylesheet" href="/build/styles/homepage.min.css">
-		
+		{{> partials/head/htmx-loading}}
 	</head>
-	<body>
+	<body hx-ext="loading-states">
 		{{> partials/main_header}}
 		<main class="container">
 			<section class="homepage__container">
 				<h1>Discover communities</h1>
 				<p>or <a href="/create/community">create your own</a></p>
-				<br>
-				<div>
-					<input
-						type="search"
-						id="search"
-						name="search"
-						placeholder="Search for anything"
-						hx-get="/search/community"
-						hx-trigger="keyup changed delay:100ms, search"
-						hx-target="#section-of-communities"
-						autocomplete="off"
-						autocapitalize="off"
-					>
-					<!-- TODO: Add Categories -->
+				<div style="margin-top: 5rem">
+					<div data-loading-states class="search-input-container">
+						<input id="offset-input" type="number" hidden readonly value="{{offset}}" name="o">
+						<svg style="pointer-events: none; touch-action: none;">
+							<use href="/assets/icons/icons.svg#search"></use>
+						</svg>
+						<input
+							hx-trigger="keyup changed delay:500ms, seach"
+							hx-get="/preview/community"
+							hx-target="#section-of-communities"
+							hx-swap="outerHTML"
+							hx-sync="#search-input:replace"
+							id="search-input"
+							type="search"
+							name="q"
+							value="{{search}}"
+							title="Search for anything"
+							placeholder="Search for anything"
+							autocomplete="off"
+							autocapitalize="off"
+							data-loading-delay="200"
+						>
+						<span role="presentation" class="spinner" data-loading-class="spin" data-loading></span>
+					</div>
 				</div>
-				<div id="section-of-communities" hx-indicator=".skeleton" hx-trigger="revealed" hx-get="/preview/community/" hx-swap="outerHTML">
-					<div class="skeleton skeleton__rectangle-opposite"></div>
-					<div class="skeleton skeleton__rectangle-opposite"></div>
-					<div class="skeleton skeleton__rectangle-opposite"></div>
-					<div class="skeleton skeleton__rectangle-opposite"></div>
-					<div class="skeleton skeleton__rectangle-opposite"></div>
-					<div class="skeleton skeleton__rectangle-opposite"></div>
-					<div class="skeleton skeleton__rectangle-opposite"></div>
-					<div class="skeleton skeleton__rectangle-opposite"></div>
-					<div class="skeleton skeleton__rectangle-opposite"></div>
-					<div class="skeleton skeleton__rectangle-opposite"></div>
+				<!-- TODO: Add Categories -->
+				<div data-loading-states id="section-of-communities" hx-trigger="revealed" hx-indicator=".skeleton" hx-get="/preview/community?q={{search}}&o={{offset}}" hx-swap="outerHTML">
+					<div data-type="card" style="--_skeleton-delay:0ms" class="skeleton"></div>
+					<div data-type="card" style="--_skeleton-delay:200ms" class="skeleton"></div>
+					<div data-type="card" style="--_skeleton-delay:400ms" class="skeleton"></div>
+					<div data-type="card" style="--_skeleton-delay:600ms" class="skeleton"></div>
+					<div data-type="card" style="--_skeleton-delay:800ms" class="skeleton"></div>
+					<div data-type="card" style="--_skeleton-delay:1000ms" class="skeleton"></div>
+					<div data-type="card" style="--_skeleton-delay:1200ms" class="skeleton"></div>
+				</div>
+				<div id="offset-breadcrumbs">
 				</div>
 			</section>
 		</main>

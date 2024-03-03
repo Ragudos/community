@@ -5,9 +5,9 @@ pub mod errors;
 pub mod forms;
 pub mod messaging;
 pub mod notifications;
+pub mod rate_limiter;
 pub mod seo;
 pub mod users;
-pub mod rate_limiter;
 
 pub const JWT_NAME: &str = "Community__jwt";
 pub const RECAPTCHA_SITEKEY_FOR_TESTS: &str = "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI";

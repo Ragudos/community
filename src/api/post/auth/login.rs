@@ -6,15 +6,16 @@ use rocket::{
 };
 use rocket_db_pools::Connection;
 use sqlx::Acquire;
-use time::{Duration, OffsetDateTime};
+use time::OffsetDateTime;
 
 use crate::{
-    api::get::homepage::root,
     controllers::{htmx::redirect::HtmxRedirect, recaptcha::verify_token},
     helpers::{db::DbConn, get_environment},
-    homepage_uri,
     models::{
-        api::ApiResponse, forms::auth::LoginFormData, rate_limiter::RateLimit, users::metadata::{User, UserCredentials, UserToken, JWT}
+        api::ApiResponse,
+        forms::auth::LoginFormData,
+        rate_limiter::RateLimit,
+        users::metadata::{User, UserCredentials, UserToken, JWT},
     },
 };
 
@@ -23,9 +24,11 @@ pub async fn api_endpoint(
     mut db: Connection<DbConn>,
     cookie_jar: &CookieJar<'_>,
     login_data: Form<LoginFormData<'_>>,
-    rate_limit: &State<RateLimit>
+    rate_limit: &State<RateLimit>,
 ) -> Result<ApiResponse, ApiResponse> {
-    rate_limit.add_to_limit_or_return("The server is experiencing high loads of requests. Please try again later.")?;
+    rate_limit.add_to_limit_or_return(
+        "The server is experiencing high loads of requests. Please try again later.",
+    )?;
 
     let recaptcha_result = verify_token(&login_data.recaptcha_token).await?;
     let env = get_environment();
@@ -88,12 +91,7 @@ pub async fn api_endpoint(
     tx.commit().await?;
 
     let time_today = OffsetDateTime::now_utc();
-    let jwt = JWT::new(
-        user,
-        time_today.saturating_add(Duration::seconds(1000)),
-        time_today,
-        new_refresh_token,
-    );
+    let jwt = JWT::new(user, time_today, new_refresh_token);
     let Ok(cookie) = jwt.to_cookie() else {
         return Err(ApiResponse::String(
             Status::InternalServerError,
@@ -102,7 +100,5 @@ pub async fn api_endpoint(
     };
 
     cookie_jar.add_private(cookie);
-    Ok(ApiResponse::HtmxRedirect(HtmxRedirect::to(homepage_uri!(
-        root::page
-    ))))
+    Ok(ApiResponse::HtmxRedirect(HtmxRedirect::to("/homepage")))
 }

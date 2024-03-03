@@ -13,7 +13,7 @@ document.addEventListener("htmx:error", (evt) => {
         
         if (errors > 10) {
             clearTimeout(timeout2);
-            toast.error({ message: "Wowza! Please slow down." },  { theme: document.documentElement.dataset.theme as "light" | "dark" || "light" })
+            toast.error({ message: "Wowza! Please slow down." },  { style: "plain", theme: document.documentElement.dataset.theme as "light" | "dark" || "light" })
             // @ts-ignore
             evt.target.querySelectorAll("*").forEach((el) => {
                 el.setAttribute("disabled", "true");
@@ -38,10 +38,10 @@ document.addEventListener("htmx:error", (evt) => {
 document.addEventListener("htmx:responseError", (evt) => {
     if (evt instanceof CustomEvent) {
         const message = evt.detail.xhr?.responseText || "Something went wrong.";
-        toast.error({ message }, { theme: document.documentElement.dataset.theme as "light" | "dark" || "light"})
+        toast.error({ message }, { style: "plain", theme: document.documentElement.dataset.theme as "light" | "dark" || "light"})
     }
 });
 
 document.addEventListener("htmx:sendError", (evt) => {
-    toast.error({ message: "Failed to connect to server." });
+    toast.error({ message: "Failed to connect to server." }, { style: "plain", theme: document.documentElement.dataset.theme as "light" | "dark" || "light" });
 });

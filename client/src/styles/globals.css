@@ -1,6 +1,6 @@
 :root {
-    --background: 300 20% 99%;
-    --foreground: 260 20% 3%;
+    --background: 300 20% 96%;
+    --foreground: 260 20% 6%;
     --card: 300 20% 99%;
     --card-foreground: 260 20% 3%;
     --popover: 300 20% 99%;
@@ -26,11 +26,13 @@
     --max-content-width: 65rem;
 
     color-scheme: light;
+
+    --toast-width: min(25rem, calc(100vw - 2rem));
 }
 
 [data-theme=dark] {
-    --background: 300 20% 1%;
-    --foreground: 260 20% 97%;
+    --background: 300 20% 6%;
+    --foreground: 260 20% 96%;
     --card: 300 20% 1%;
     --card-foreground: 260 20% 97%;
     --popover: 300 20% 1%;
@@ -50,6 +52,32 @@
     --ring: 321 17% 60%;
 
     color-scheme: dark;
+}
+
+@media (prefers-color-scheme:dark) {
+    [data-theme=system] {
+        --background: 300 20% 6%;
+        --foreground: 260 20% 96%;
+        --card: 300 20% 1%;
+        --card-foreground: 260 20% 97%;
+        --popover: 300 20% 1%;
+        --popover-foreground: 260 20% 97%;
+        --primary: 250 17% 48%;
+        --primary-foreground: 260 20% 97%;
+        --secondary: 305 17% 27%;
+        --secondary-foreground: 260 20% 97%;
+        --muted: 300 20% 80%;
+        --muted-foreground: 260 20% 97%;
+        --accent: 322 17% 39%;
+        --accent-foreground: 260 20% 97%;
+        --destructive: 0 62% 30%;
+        --destructive-foreground: 262 22% 10%;
+        --border: 300 20% 60%;
+        --input: 300 20% 80%;
+        --ring: 321 17% 60%;
+
+        color-scheme: dark;
+    }
 }
 
 html:focus-within {
@@ -83,6 +111,10 @@ ul, ol {
     list-style: none;
     padding: 0;
     margin: 0;
+}
+
+main {
+    margin-top: 2rem;
 }
 
 h1,
@@ -182,45 +214,6 @@ small,
     }
 }
 
-@media only screen and (min-width: 1024px) {
-    h1 {
-        font-size: 5.61rem;
-    }
-
-    h2 {
-        font-size: 4.209rem;
-    }
-
-    h3 {
-        font-size: 3.157rem;
-    }
-
-    h4 {
-        font-size: 2.369rem;
-    }
-
-    h5 {
-        font-size: 1.777rem;
-    }
-
-    h6 {
-        font-size: 1.333rem;
-    }
-
-    p {
-        font-size: 1rem;
-    }
-
-    small,
-    .small {
-        font-size: 0.8em;
-    }
-
-    .big {
-        font-size: 1.175em;
-    }
-}
-
 .container {
     width: min(calc(100% - var(--container-padding) * 2), var(--max-content-width));
     margin-inline: auto;
@@ -236,8 +229,8 @@ img {
 
 svg,
 .icon {
-    width: 1.25em;
-    height: 1.25em;
+    width: 1rem;
+    height: 1rem;
 }
 
 a {
@@ -253,7 +246,7 @@ button,
 input[type=submit] {
     cursor: pointer;
 
-    background-color: hsl(var(--background));
+    background-color: transparent;
     color: hsl(var(--foreground));
 
     font-size: 0.875rem;
@@ -268,11 +261,6 @@ input[type=submit] {
     will-change: background-color;
     transition-property: background-color;
     transition-duration: var(--transition-duration, 0.25s);
-}
-
-button:hover,
-input[type=submit]:hover {
-    background-color: hsl(var(--accent) / 0.175);
 }
 
 a.primary {
@@ -318,22 +306,46 @@ input[type=submit].accent {
 button:hover,
 input[type=submit]:hover {
     --_bg-opacity: 0.87;
+    transform: scale(1.025);
+}
+
+button:disabled,
+a:disabled,
+input:disabled,
+textarea:disabled {
+    cursor: not-allowed !important;
+    opacity: 0.5 !important;
+    --_bg-opacity: 0.5;
+    transform: scale(1) !important;
 }
 
 button:focus-visible,
 input:focus-visible,
 a:focus-visible {
-    outline-offset: 4px;
+    outline-offset: 2px;
     outline: 2px solid currentColor;
 }
 
 input {
-    padding: 0.25rem 0.75rem;
-    border-color: hsl(var(--accent) / var(--_border-opacity, 0.75));
+    padding: 0.5rem 1rem;
+    border-color: hsl(var(--foreground) / var(--_border-opacity, 0.675));
 }
 
 input:focus-visible {
-    --_border-opacity: 1;
+    --_border-opacity: 0.97;
+}
+
+button.square,
+input[type=submit].square {
+    padding: 0;
+}
+
+@supports (aspect-ratio: 1/1) {
+    button.square,
+    input[type=submit].square {
+        aspect-ratio: 1/1;
+        min-width: 1.75rem;
+    }
 }
 
 button,
@@ -345,18 +357,17 @@ a {
 
 .skeleton {
     animation: skeleton-loading 1s linear infinite alternate;
+    animation-delay: var(--_skeleton-delay, 0ms);
     color: transparent !important;
     position: relative;
     overflow: hidden;
-}
-
-.skeleton {
     width: 100%;
+    background-color: hsl(0 0% 50% / 0.87);
 }
 
 .card {
     border: 1px solid hsl(var(--accent) / 0.5);
-    box-shadow: 0px 3px 16px hsl(var(--foreground) / 0.175);
+    box-shadow: 0px 2px 8px hsl(var(--foreground) / 0.175);
 
     border-radius: var(--radius);
 
@@ -372,7 +383,7 @@ a {
 .card:hover,
 .card:focus-within {
     transform: scale(1.005);
-    box-shadow: 0px 2px 12px hsl(var(--foreground) / 0.5);
+    box-shadow: 0px 1px 4px hsl(var(--foreground) / 0.87);
 }
 
 .with-overlay-bg {
@@ -397,6 +408,42 @@ a {
     background-position: center center;
     background-size: cover;
     background-repeat: no-repeat;
+}
+
+.hidden,
+[hidden] {
+    display: none !important;
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+.spinner {
+    border: 2px solid hsl(var(--accent) / 0.5);
+    border-top: 2px solid hsl(var(--accent));
+    border-radius: 50%;
+    width: 1.5rem;
+    height: 1.5rem;
+    display: block;
+}
+
+.spin {
+    animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 @keyframes skeleton-loading {

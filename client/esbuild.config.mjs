@@ -4,7 +4,8 @@ const h = await esbuild.build({
     entryPoints: [
         "src/index.ts",
         "src/crop.ts",
-        "src/styles/*.css"
+        "src/styles/*.css",
+        "src/workers/*.ts"
     ],
     "bundle": true,
     "outdir": "../build",
