@@ -88,6 +88,15 @@ fn rocket_from_config(figment: Figment) -> Rocket<Build> {
                 api::get::preview::deny_request
             ],
         )
+        .mount(
+            "/create",
+            routes![
+                api::get::create::community::page,
+                api::get::create::redirect,
+                api::post::create::deny_post_request,
+                api::post::create::community::api_endpoint
+            ],
+        )
         .mount("/build", FileServer::from("build"))
         .mount("/assets", FileServer::from("assets"))
         .attach(db::stage())
@@ -99,7 +108,11 @@ fn rocket_from_config(figment: Figment) -> Rocket<Build> {
         })
         .register(
             "/",
-            catchers![catchers::unprocessable_entity, catchers::not_found, catchers::internal_server_error],
+            catchers![
+                catchers::unprocessable_entity,
+                catchers::not_found,
+                catchers::internal_server_error
+            ],
         );
 
     rocket
@@ -108,6 +121,7 @@ fn rocket_from_config(figment: Figment) -> Rocket<Build> {
 fn create_config(env: Env) -> Figment {
     let db_url = dotenv::var("DATABASE_URL").expect("DATABASE_URL must be set");
     let secret_key = dotenv::var("ROCKET_SECRET_KEY").expect("ROCKET_SECRET_KEY must be set");
+    let service_account_path = dotenv::var("SERVICE_ACCOUNT").expect("SERVICE_ACCOUNT must be set");
 
     let mut db_config: Map<_, Value> = Map::new();
     let mut pg_config: Map<_, Value> = Map::new();
@@ -124,7 +138,8 @@ fn create_config(env: Env) -> Figment {
     let figment = rocket::Config::figment()
         .merge(("databases", pg_config))
         .merge(("rate-limit-capacity", rate_limit_capacity))
-        .merge(("secret_key", secret_key));
+        .merge(("secret_key", secret_key))
+        .merge(("service_account", service_account_path));
 
     figment
 }

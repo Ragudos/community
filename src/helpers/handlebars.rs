@@ -23,6 +23,8 @@ pub fn register() -> impl Fairing {
             .register_helper("num_abbr", Box::new(num_abbr));
         engines.handlebars.register_helper("add", Box::new(add));
         engines.handlebars.register_helper("sub", Box::new(sub));
-        engines.handlebars.register_helper("modulo", Box::new(modulo));
+        engines
+            .handlebars
+            .register_helper("modulo", Box::new(modulo));
     })
 }

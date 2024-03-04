@@ -6,6 +6,11 @@ let errors = 0;
 let timeout: ReturnType<typeof setTimeout>;
 let timeout2: ReturnType<typeof setTimeout>;
 
+function getTheme() {
+    let theme = document.documentElement.getAttribute("data-theme");
+    return theme == "dark" || theme == "light" ? theme : window.matchMedia("(prefers-color-scheme: dark)").matches;
+}
+
 document.addEventListener("htmx:error", (evt) => {
     if (evt instanceof CustomEvent) {
         clearTimeout(timeout);

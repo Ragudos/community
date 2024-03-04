@@ -24,5 +24,11 @@ pub fn check_name<'v>(name: &'v str) -> Result<'v, ()> {
         ))?;
     }
 
+    if !name.chars().all(|c| c.is_alphanumeric()) {
+        Err(Error::validation(
+            "Name can only contain alphanumeric characters.",
+        ))?;
+    }
+
     Ok(())
 }

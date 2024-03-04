@@ -1,6 +1,6 @@
 :root {
-    --background: 300 20% 96%;
-    --foreground: 260 20% 6%;
+    --background: 0 0% 96%;
+    --foreground: 0 0% 5%;
     --card: 300 20% 99%;
     --card-foreground: 260 20% 3%;
     --popover: 300 20% 99%;
@@ -31,8 +31,8 @@
 }
 
 [data-theme=dark] {
-    --background: 300 20% 6%;
-    --foreground: 260 20% 96%;
+    --background: 0 0% 5%;
+    --foreground: 0 0% 96%;
     --card: 300 20% 1%;
     --card-foreground: 260 20% 97%;
     --popover: 300 20% 1%;
@@ -56,8 +56,8 @@
 
 @media (prefers-color-scheme:dark) {
     [data-theme=system] {
-        --background: 300 20% 6%;
-        --foreground: 260 20% 96%;
+        --background: 0 0% 5%;
+        --foreground: 0 0% 96%;
         --card: 300 20% 1%;
         --card-foreground: 260 20% 97%;
         --popover: 300 20% 1%;
@@ -243,11 +243,15 @@ a:hover {
 }
 
 button,
-input[type=submit] {
-    cursor: pointer;
-
+input,
+textarea {
     background-color: transparent;
     color: hsl(var(--foreground));
+}
+
+button,
+input[type=submit] {
+    cursor: pointer;
 
     font-size: 0.875rem;
     font-weight: 600;

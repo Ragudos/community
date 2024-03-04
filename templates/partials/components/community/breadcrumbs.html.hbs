@@ -1,4 +1,4 @@
-{{#unless (eq (len bread_crumbs) 0)}}
+{{#unless (lte (len bread_crumbs) 1)}}
     <button
         {{#if (eq offset 0)}}disabled="true"{{/if}}
         hx-get="/preview/community?o={{(sub offset 1)}}"

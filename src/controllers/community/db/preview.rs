@@ -1,25 +1,11 @@
-use crate::{helpers::db::DbConn, models::community::schema::Community};
+use crate::{
+    helpers::db::DbConn,
+    models::community::schema::{Community, CommunityCategory},
+};
 use rocket_db_pools::Connection;
 use sqlx::{types::BigDecimal, Error};
 
 impl Community {
-    pub async fn is_name_taken(db: &mut Connection<DbConn>, name: &str) -> Result<bool, Error> {
-        let result = sqlx::query!(
-            r#"
-            SELECT EXISTS (
-                SELECT 1
-                FROM communities
-                WHERE display_name = $1
-            ) AS "exists!"
-            "#,
-            name
-        )
-        .fetch_one(&mut ***db)
-        .await?;
-
-        Ok(result.exists)
-    }
-
     pub async fn get_total_members_count_by_display_name(
         db: &mut Connection<DbConn>,
         display_name: &str,
@@ -69,7 +55,16 @@ impl Community {
         let communities = sqlx::query_as!(
             Community,
             r#"
-            SELECT c.*
+            SELECT
+            c.id,
+            c.display_name,
+            c.display_image,
+            c.cover_image,
+            c.description,
+            c.owner_id,
+            c.is_private,
+            c.category as "category: CommunityCategory",
+            created_at
             FROM communities c
             LEFT JOIN (
                 SELECT c.id,
@@ -119,7 +114,16 @@ impl Community {
         let communities = sqlx::query_as!(
             Community,
             r#"
-            SELECT c.*
+            SELECT
+            c.id,
+            c.display_name,
+            c.display_image,
+            c.cover_image,
+            c.description,
+            c.owner_id,
+            c.is_private,
+            c.category as "category: CommunityCategory",
+            created_at
             FROM communities c
             LEFT JOIN (
                 SELECT c.id,

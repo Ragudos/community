@@ -21,6 +21,9 @@ BEGIN
 	IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'visibility') THEN
 		CREATE TYPE Visibility as ENUM ('public', 'followers', 'private');
 	END IF;
+	IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'communitycategory') THEN
+		CREATE TYPE CommunityCategory as ENUM ('art', 'music', 'gaming', 'sports', 'science', 'technology', 'literature',' healthandfitness', 'selfimprovement');
+	END IF;
 END $$;
 		
 
@@ -71,7 +74,7 @@ CREATE TABLE IF NOT EXISTS communities (
 	description VARCHAR(100) NOT NULL,
 	owner_id INTEGER NOT NULL,
 	is_private BOOLEAN NOT NULL,
-	category VARCHAR(60),
+	category CommunityCategory,
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE
 );

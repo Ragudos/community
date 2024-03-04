@@ -5,6 +5,28 @@ use rocket::response::Redirect;
 
 use crate::models::api::ApiResponse;
 
+impl From<cloud_storage::Error> for ApiResponse {
+    fn from(value: cloud_storage::Error) -> Self {
+        eprintln!("Cloud Storage Error: {}", value);
+
+        ApiResponse::String(
+            rocket::http::Status::InternalServerError,
+            "Something went wrong.",
+        )
+    }
+}
+
+impl From<std::io::Error> for ApiResponse {
+    fn from(value: std::io::Error) -> Self {
+        eprintln!("IO Error: {}", value);
+
+        ApiResponse::String(
+            rocket::http::Status::InternalServerError,
+            "Something went wrong.",
+        )
+    }
+}
+
 /// Convert a `dotenv::Error` into an `ApiResponse` error,
 /// so we don't have to repeat ourselves in using match statements.
 impl From<dotenv::Error> for ApiResponse {

@@ -22,7 +22,10 @@ pub async fn api_endpoint(
     let offset_p = offset * 20;
 
     if offset.is_negative() {
-        return Err(ApiResponse::String(Status::BadRequest, "Offset cannot be negative"));
+        return Err(ApiResponse::String(
+            Status::BadRequest,
+            "Offset cannot be negative",
+        ));
     }
 
     let communities = match q {
