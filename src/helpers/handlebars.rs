@@ -1,41 +1,30 @@
 use rocket::fairing::Fairing;
 use rocket_dyn_templates::{handlebars::handlebars_helper, Template};
 
-handlebars_helper!(eq_str: |x: str, y: str| x == y);
-handlebars_helper!(eq_num: |x: isize, y: isize| x == y);
-handlebars_helper!(is_str_empty: |x: str| x.is_empty());
+handlebars_helper!(num_abbr: |x: isize| {
+    if x < 1_000 {
+        x.to_string()
+    } else if x < 1_000_000 {
+        format!("{:.1}k", x as f64 / 1_000.0)
+    } else if x < 1_000_000_000 {
+        format!("{:.1}m", x as f64 / 1_000_000.0)
+    } else {
+        format!("{:.1}b", x as f64 / 1_000_000_000.0)
+    }
+});
+handlebars_helper!(add: |x: isize, y: isize| x + y);
+handlebars_helper!(sub: |x: isize, y: isize| x - y);
+handlebars_helper!(modulo: |x: isize, y: isize| x % y);
 
 pub fn register() -> impl Fairing {
     Template::custom(|engines| {
         engines
             .handlebars
-            .register_helper("eq_str", Box::new(eq_str));
+            .register_helper("num_abbr", Box::new(num_abbr));
+        engines.handlebars.register_helper("add", Box::new(add));
+        engines.handlebars.register_helper("sub", Box::new(sub));
         engines
             .handlebars
-            .register_helper("eq_num", Box::new(eq_num));
-        engines
-            .handlebars
-            .register_helper("is_str_empty", Box::new(is_str_empty));
+            .register_helper("modulo", Box::new(modulo));
     })
-}
-
-#[test]
-fn test_helpers() {
-    use rocket_dyn_templates::handlebars::Handlebars;
-
-    let mut hbs = Handlebars::new();
-
-    hbs.register_helper("eq_str", Box::new(eq_str));
-    hbs.register_helper("eq_num", Box::new(eq_num));
-    hbs.register_helper("is_str_empty", Box::new(is_str_empty));
-
-    let eq_str_result =
-        hbs.render_template(r#"{{#if (eq_str "a" "a")}}true{{else}}false{{/if}}"#, &());
-    let eq_num_result = hbs.render_template(r#"{{#if (eq_num 1 1)}}true{{else}}false{{/if}}"#, &());
-    let is_str_empty_result =
-        hbs.render_template(r#"{{#if (is_str_empty "")}}true{{else}}false{{/if}}"#, &());
-
-    assert_eq!(eq_str_result.unwrap(), "true");
-    assert_eq!(eq_num_result.unwrap(), "true");
-    assert_eq!(is_str_empty_result.unwrap(), "true");
 }

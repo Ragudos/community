@@ -6,8 +6,12 @@ use crate::{
     models::{api::ApiResponse, seo::metadata::SeoMetadata, users::metadata::JWT},
 };
 
-#[get("/")]
-pub fn page(jwt: JWT, cookie: &CookieJar<'_>) -> ApiResponse {
+#[get("/?<q>&<o>")]
+pub fn page(jwt: JWT, cookie: &CookieJar<'_>, q: Option<&str>, o: Option<i64>) -> ApiResponse {
+    let offset = match o {
+        Some(offset) => offset,
+        None => 0,
+    };
     let theme = get_theme_from_cookie(cookie);
     let metadata = SeoMetadata::build().theme(theme).finalize();
 
@@ -15,7 +19,9 @@ pub fn page(jwt: JWT, cookie: &CookieJar<'_>) -> ApiResponse {
         "homepage/index",
         context! {
             metadata,
-            user: jwt.token
+            user: jwt.token,
+            offset,
+            search: q,
         },
     ))
 }

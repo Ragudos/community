@@ -1,16 +1,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="{{ metadata.description }}">
-<meta name="title" content="{{ metadata.title }}">
-<!-- Open Graph / Facebook -->
-<meta name="og:title" content="{{ metadata.title }}">
-<meta name="og:description" content="{{ metadata.description }}">
-<meta property="og:site_name" content="{{ metadata.site_name }}">
-<title>{{ metadata.title }}</title>
-<!-- Scripts -->
-<link rel="preload" href="/assets/app/htmx/htmx.min.js" as="script">
-<link rel="preload" href="/assets/app/toaster/index.js" as="script">
-<script src="/assets/app/htmx/htmx.min.js"></script>
-<script src="/assets/app/toaster/index.js"></script>
-<script>window.addEventListener("DOMContentLoaded", window.toaster.init_toast);</script>
-<script>let e=0,t,t2;document.addEventListener("htmx:error",r=>{clearTimeout(t),e>10&&(clearTimeout(t2),window.toaster.toast("error","Wowza! You've got a lot of errors. Take a break and come back later."),r.target.querySelectorAll("*").forEach(r=>{r.setAttribute("disabled","true")}),t2=setTimeout(()=>{r.target.querySelectorAll("*").forEach(r=>{r.removeAttribute("disabled")})},5e3)),e++,t=setTimeout(()=>{e=0},5e3)});</script>
+        {{> partials/head/seo}}
+        {{> partials/head/preloads}}
+        {{> partials/head/load_assets}}
+        {{> partials/head/dev}}

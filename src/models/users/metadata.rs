@@ -68,8 +68,7 @@ pub enum AccountStatus {
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct JWT {
     pub token: User,
-    pub expires_in: OffsetDateTime,
-    pub creation_date: OffsetDateTime,
+    pub created_at: OffsetDateTime,
     pub refresh_token: String,
 }
 

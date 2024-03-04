@@ -42,7 +42,7 @@ async fn seed_data(rocket: Rocket<Build>) -> Result {
                         "#,
                         0,
                         "deadkiller",
-                        ""
+                        "/assets/dummy/user_display_image.jpg"
                     )
                     .execute(&mut *tx)
                     .await
@@ -110,18 +110,19 @@ async fn seed_data(rocket: Rocket<Build>) -> Result {
                     if let Err(e) = query!(
                         r#"
                             INSERT INTO communities
-                            (id, display_name, display_image, description, is_private, owner_id)
-                            SELECT $1, $2, $3, $4, $5, $6
+                            (id, display_name, display_image, description, is_private, owner_id, cover_image)
+                            SELECT $1, $2, $3, $4, $5, $6, $7
                             WHERE NOT EXISTS (
                                 SELECT 1 FROM communities WHERE id = $1 AND owner_id = $6
                             );
                         "#,
                         0,
                         "Rustaceans",
-                        "",
+                        "/assets/dummy/community_display_image.jpg",
                         "A community for Rust developers",
                         false,
-                        0
+                        0,
+                        "/assets/dummy/community_cover_image.jpg"
                     )
                     .execute(&mut *tx)
                     .await

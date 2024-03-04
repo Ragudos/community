@@ -1,9 +1,9 @@
 use serde::{Deserialize, Serialize};
 
-use crate::models::users::preferences::Theme;
+use crate::{helpers::get_environment, models::users::preferences::Theme};
 
-const SITE_NAME: &str = "Kommunidad";
-const DESCRIPTION: &str = "Kommunidad is a social media platform for communities.";
+const SITE_NAME: &str = "Community";
+const DESCRIPTION: &str = "Community is a social media platform for communities.";
 
 #[derive(Default, Serialize, Deserialize, Clone)]
 pub struct OpenGraphMetadata {
@@ -21,6 +21,7 @@ pub struct SeoMetadata {
     pub site_name: &'static str,
     pub language: &'static str,
     pub theme: &'static str,
+    pub env: String,
 }
 
 #[derive(Default, Clone)]
@@ -31,6 +32,7 @@ pub struct SeoMetadataBuilder {
     site_name: &'static str,
     language: Option<&'static str>,
     theme: Option<&'static str>,
+    env: String,
 }
 
 impl SeoMetadataBuilder {
@@ -39,6 +41,7 @@ impl SeoMetadataBuilder {
             title: SITE_NAME,
             site_name: SITE_NAME,
             description: DESCRIPTION,
+            env: get_environment(),
             ..Self::default()
         }
     }
@@ -70,6 +73,7 @@ impl SeoMetadataBuilder {
 
     pub fn finalize(self) -> SeoMetadata {
         SeoMetadata {
+            env: self.env,
             title: self.title,
             description: self.description,
             open_graph: self.open_graph,

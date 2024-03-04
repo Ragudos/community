@@ -2,11 +2,11 @@ use bcrypt::{hash, DEFAULT_COST};
 use rocket::{
     form::Form,
     http::{CookieJar, Status},
-    post,
+    post, State,
 };
 use rocket_db_pools::Connection;
 use sqlx::Acquire;
-use time::{Duration, OffsetDateTime};
+use time::OffsetDateTime;
 
 use crate::{
     api::get::auth::root,
@@ -16,6 +16,7 @@ use crate::{
     models::{
         api::ApiResponse,
         forms::auth::RegisterFormData,
+        rate_limiter::RateLimit,
         users::metadata::{User, UserCredentials, UserMetadata, UserToken, JWT},
     },
 };
@@ -25,7 +26,12 @@ pub async fn api_endpoint(
     mut db: Connection<DbConn>,
     cookie_jar: &CookieJar<'_>,
     register_data: Form<RegisterFormData<'_>>,
+    rate_limit: &State<RateLimit>,
 ) -> Result<ApiResponse, ApiResponse> {
+    rate_limit.add_to_limit_or_return(
+        "The server is experiencing high loads of requests. Please try again later.",
+    )?;
+
     let recaptcha_result = verify_token(&register_data.recaptcha_token).await?;
     let env = get_environment();
 
@@ -64,7 +70,6 @@ pub async fn api_endpoint(
             display_image: user.display_image,
             created_at: user.created_at,
         },
-        time_today.saturating_add(Duration::seconds(3600)),
         time_today,
         refresh_token,
     );

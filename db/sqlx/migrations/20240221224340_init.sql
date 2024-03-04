@@ -21,6 +21,9 @@ BEGIN
 	IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'visibility') THEN
 		CREATE TYPE Visibility as ENUM ('public', 'followers', 'private');
 	END IF;
+	IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'communitycategory') THEN
+		CREATE TYPE CommunityCategory as ENUM ('art', 'music', 'gaming', 'sports', 'science', 'technology', 'literature',' healthandfitness', 'selfimprovement');
+	END IF;
 END $$;
 		
 
@@ -56,7 +59,7 @@ CREATE TABLE IF NOT EXISTS users_socials (
 
 CREATE TABLE IF NOT EXISTS users_credentials (
 	id INTEGER PRIMARY KEY,
-	email VARCHAR(100) UNIQUE,
+	email VARCHAR(255) UNIQUE,
 	password_hash TEXT NOT NULL,
 	first_name VARCHAR(60),
 	last_name VARCHAR(60),
@@ -67,11 +70,11 @@ CREATE TABLE IF NOT EXISTS communities (
 	id SERIAL PRIMARY KEY,
 	display_name VARCHAR(50) UNIQUE NOT NULL,
 	display_image TEXT NOT NULL,
-	cover_image TEXT,
-	description VARCHAR(255) NOT NULL,
+	cover_image TEXT NOT NULL,
+	description VARCHAR(100) NOT NULL,
 	owner_id INTEGER NOT NULL,
 	is_private BOOLEAN NOT NULL,
-	category VARCHAR(60),
+	category CommunityCategory,
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE
 );
@@ -181,3 +184,4 @@ CREATE INDEX IF NOT EXISTS idx_users_comments ON comments(user_id);
 CREATE INDEX IF NOT EXISTS idx_comments_of_user_in_post ON comments(post_id, user_id);
 CREATE INDEX IF NOT EXISTS idx_replies_in_comment ON comments(parent_comment_id, post_id, user_id);
 
+CREATE EXTENSION IF NOT EXISTS pg_trgm;

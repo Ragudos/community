@@ -1,9 +1,11 @@
 pub mod api;
 pub mod captcha;
+pub mod community;
 pub mod errors;
 pub mod forms;
 pub mod messaging;
 pub mod notifications;
+pub mod rate_limiter;
 pub mod seo;
 pub mod users;
 

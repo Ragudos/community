@@ -4,7 +4,7 @@
 - [x] Create Database Schema
 - [x] Create helpers in Handlebars (i.e. eq_str to check for string equality)
 - [x] Create a test suite for helpers created
-- [] Create migrations that match the schema
+- [x] Create migrations that match the schema
 - [x] Create seed data (For testing)
 - [ ] Create the business logic for the APIs
 - [ ] Create a test suite for the business logic
@@ -44,6 +44,8 @@
 - [ ] Communities feature with the ability to create, join, leave, delete, and update a community. A community can be private.
 - [ ] Before a private account/community can be public, they must deal with ongoing requests in joining the community or following a user.
 - [ ] Algorithm to determine what posts to show on the user's homepage feed.
+- [x] Algorithm to show what communities to show on homepage.
 - [ ] Pagination for the user's homepage feed, comments, messages, anything that's long.
 - [ ] Create a simple text editor to insert text, images, videos, files, and links.
+- [ ] Rate Limiter
 

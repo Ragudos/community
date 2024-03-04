@@ -1,0 +1,31 @@
+<div data-loading-states id="section-of-communities">
+    {{#if (eq (len communities) 0)}}
+    <div>0 community found.</div>
+    {{/if}}
+    {{#each communities}}
+    <a title="{{this.display_name}}" target="_blank" rel="noreferrer noopener" href="/community?community_name={{this.display_name}}"  class="card community__preview-container">
+        <div role="presentation" style="background-image: url({{this.cover_image}})" class="with-bg-image community__preview-cover-image"></div>
+        <div class="card-child">
+            <div class="community__preview-name-img-container">
+                <div class="community__preview-img-container">
+                    <img
+                        src="{{this.display_image}}"
+                        alt="{{this.display_name}}'s display image"
+                        width="40"
+                        height="40"
+                    />
+                </div>
+                <div style="font-size: 1.125rem;">{{this.display_name}}</div>
+            </div>
+            <p class="community__preview-description">{{this.description}}</p>
+            <div style="margin-top: auto; display: flex; align-items: center; gap: 0.5rem;">
+                <span>{{#if this.is_private}}Private{{else}}Public{{/if}}</span>
+                <span>•</span>
+                <div data-loading-aria-busy hx-indicator=".skeleton" style="display: inline-block; width: 6rem; height: 75%;"  hx-swap="outerHTML" hx-trigger="revealed" hx-get="/preview/community/amount-of-members?community_display_name={{this.display_name}}">
+                    <div class="skeleton" style="display: inline-block; height: 100%;"></div>
+                </div>
+            </div>
+        </div>
+    </a>
+    {{/each}}
+</div>

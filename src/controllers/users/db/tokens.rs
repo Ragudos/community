@@ -17,12 +17,6 @@ use crate::{
 
 use super::traits::Token;
 
-impl Token for JWT {
-    fn is_expired(&self) -> bool {
-        self.expires_in < OffsetDateTime::now_utc()
-    }
-}
-
 impl Token for UserToken {
     fn is_expired(&self) -> bool {
         self.refresh_token_expires_in < OffsetDateTime::now_utc()
@@ -30,17 +24,11 @@ impl Token for UserToken {
 }
 
 impl JWT {
-    pub fn new(
-        token: User,
-        expires_in: OffsetDateTime,
-        creation_date: OffsetDateTime,
-        refresh_token: String,
-    ) -> Self {
+    pub fn new(token: User, created_at: OffsetDateTime, refresh_token: String) -> Self {
         JWT {
             token,
+            created_at,
             refresh_token,
-            expires_in,
-            creation_date,
         }
     }
 
@@ -51,7 +39,7 @@ impl JWT {
             Ok(stringified) => Ok(Cookie::build((JWT_NAME, stringified))
                 .same_site(SameSite::Strict)
                 .path("/")
-                .expires(self.expires_in)
+                .expires(OffsetDateTime::now_utc().saturating_add(Duration::days(7)))
                 .secure(true)
                 .http_only(true)
                 .into()),
@@ -141,6 +129,21 @@ impl UserToken {
             user_id
         )
         .fetch_optional(&mut ***db)
+        .await?;
+
+        Ok(user_token)
+    }
+
+    pub async fn db_tx_select_by_user_id(
+        tx: &mut Transaction<'_, Postgres>,
+        user_id: &i32,
+    ) -> Result<Option<Self>, sqlx::Error> {
+        let user_token = query_as!(
+            UserToken,
+            r#"SELECT * FROM users_token WHERE user_id = $1"#,
+            user_id
+        )
+        .fetch_optional(&mut **tx)
         .await?;
 
         Ok(user_token)
