@@ -2,3 +2,4 @@
 .env*
 Rocket.toml
 service_account*
+build
