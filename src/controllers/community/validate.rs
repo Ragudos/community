@@ -7,7 +7,10 @@ pub fn check_name<'v>(name: &'v str) -> Result<'v, ()> {
         ))?;
     }
 
-    if !name.chars().all(|c| c.is_whitespace() || c.is_alphanumeric()) {
+    if !name
+        .chars()
+        .all(|c| c.is_whitespace() || c.is_alphanumeric())
+    {
         Err(Error::validation(
             "Name can only contain alphanumeric characters.",
         ))?;

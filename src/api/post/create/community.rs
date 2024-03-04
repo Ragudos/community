@@ -6,9 +6,15 @@ use rocket_db_pools::Connection;
 use sqlx::Acquire;
 
 use crate::{
-    controllers::recaptcha::verify_token, helpers::{db::DbConn, get_environment}, models::{
-        api::ApiResponse, community::schema::{Community, CommunityMembership}, forms::community::CreateCommunity, rate_limiter::RateLimit, users::metadata::{UserRole, JWT}
-    }
+    controllers::recaptcha::verify_token,
+    helpers::{db::DbConn, get_environment},
+    models::{
+        api::ApiResponse,
+        community::schema::{Community, CommunityMembership},
+        forms::community::CreateCommunity,
+        rate_limiter::RateLimit,
+        users::metadata::{UserRole, JWT},
+    },
 };
 
 struct ReturnOfUpload {
@@ -21,7 +27,7 @@ pub async fn api_endpoint(
     mut db: Connection<DbConn>,
     jwt: JWT,
     community_info: Form<CreateCommunity<'_>>,
-    rate_limit: &State<RateLimit>
+    rate_limit: &State<RateLimit>,
 ) -> Result<ApiResponse, ApiResponse> {
     println!("{:?}", community_info);
 

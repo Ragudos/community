@@ -1,5 +1,9 @@
 use crate::{
-    controllers::users::preferences::get_theme_from_cookie, helpers::get_recaptcha_sitekey, models::{api::ApiResponse, captcha::Captcha, seo::metadata::SeoMetadata, users::metadata::JWT}
+    controllers::users::preferences::get_theme_from_cookie,
+    helpers::get_recaptcha_sitekey,
+    models::{
+        api::ApiResponse, captcha::Captcha, seo::metadata::SeoMetadata, users::metadata::JWT,
+    },
 };
 use rocket::get;
 use rocket::http::CookieJar;
