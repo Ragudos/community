@@ -21,9 +21,7 @@
             <div style="margin-top: auto; display: flex; align-items: center; gap: 0.5rem;">
                 <span>{{#if this.is_private}}Private{{else}}Public{{/if}}</span>
                 <span>•</span>
-                <div data-loading-aria-busy hx-indicator=".skeleton" style="display: inline-block; width: 6rem; height: 75%;"  hx-swap="outerHTML" hx-trigger="revealed" hx-get="/preview/community/amount-of-members?community_display_name={{this.display_name}}">
-                    <div class="skeleton" style="display: inline-block; height: 100%;"></div>
-                </div>
+                <span>{{(num_abbr this.total_members)}} member/s</span>
             </div>
         </div>
     </a>

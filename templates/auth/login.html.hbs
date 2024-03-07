@@ -2,24 +2,25 @@
 <html lang="{{ metadata.language }}" data-theme="{{ metadata.theme }}">
 	<head>
 		{{> partials/head}}		
-		{{> partials/scripts/recaptcha}}
 		{{> partials/head/htmx-loading}}
 	</head>
 	<body hx-ext="loading-states">
 		{{> partials/main_header}}
-		<form class="container" data-withcaptcha="true" hx-sync="this" hx-post="/auth/login" hx-trigger="submit" method="post" action="/auth/login">
-			<div class="input-group">
-				<label for="username">Username</label>
-				<input autocomplete="off" autocapitalize="off"type="text" id="user" name="username" maxLength="60" placeholder="John Doe" required>
-			</div>
-			<div class="input-group">
-				<label for="password">Password</label>
-				<input autocomplete="off" autocapitalize="off"type="password" id="password" name="password" minLength="8" placeholder="********" required>
-			</div>
-			{{> partials/components/recaptcha}}
-			<button type="submit">
-				Login
-			</button>
-		</form>
+		<main class="container">
+			<form data-withcaptcha="true" hx-sync="this" hx-post="/auth/login" hx-trigger="submit" method="post" action="/auth/login">
+				<div class="input-group">
+					<label for="username">Username</label>
+					<input autocomplete="off" autocapitalize="off"type="text" id="user" name="username" maxLength="60" placeholder="John Doe" required>
+				</div>
+				<div class="input-group">
+					<label for="password">Password</label>
+					<input autocomplete="off" autocapitalize="off"type="password" id="password" name="password" minLength="8" placeholder="********" required>
+				</div>
+				<input value="" type="text" name="honeypot" style="display: none;">
+				<button type="submit">
+					Login
+				</button>
+			</form>
+		</main>
 	</body>
 </html>

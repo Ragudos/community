@@ -7,11 +7,11 @@ use rocket::{get, response::Redirect};
 use crate::{
     api::get::auth::login as login_page,
     auth_uri,
-    models::{api::ApiResponse, users::metadata::JWT},
+    models::{api::ApiResponse, users::schema::UserJWT},
 };
 
 #[get("/<_..>")]
-pub fn redirect(_jwt: JWT) -> ApiResponse {
+pub fn redirect(_jwt: UserJWT) -> ApiResponse {
     ApiResponse::Redirect(Redirect::to("/homepage"))
 }
 

@@ -1,10 +1,7 @@
 use rocket::{catch, http::Status, Request};
 use rocket_dyn_templates::{context, Template};
 
-use crate::{
-    controllers::users::preferences::get_theme_from_cookie,
-    models::{api::ApiResponse, seo::metadata::SeoMetadata},
-};
+use crate::models::{api::ApiResponse, seo::metadata::SeoMetadata, users::preferences::Theme};
 
 #[catch(422)]
 pub fn unprocessable_entity(_request: &Request) -> &'static str {
@@ -23,7 +20,7 @@ pub fn not_found(request: &Request) -> ApiResponse {
 
     // Else, it's just a url that doesn't exist.
 
-    let theme = get_theme_from_cookie(request.cookies());
+    let theme = Theme::from_cookie_jar(request.cookies());
     let metadata = SeoMetadata::build()
         .theme(theme)
         .title("404 Not Found")
@@ -52,7 +49,7 @@ pub fn internal_server_error(request: &Request) -> ApiResponse {
 
     // Else, it's just a url that doesn't exist.
 
-    let theme = get_theme_from_cookie(request.cookies());
+    let theme = Theme::from_cookie_jar(request.cookies());
     let metadata = SeoMetadata::build()
         .theme(theme)
         .title("500 Internal Server Error")

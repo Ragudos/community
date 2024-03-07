@@ -1,40 +1,62 @@
-use rocket::{
-    form::{Error, Result},
-    fs::TempFile,
-};
+use rocket::form::{Error, Result};
 
-const ONE_MEGABYTE: u64 = 1_000_000;
+pub fn validate_password<'v>(password: &str) -> Result<'v, ()> {
+    if password.len() < 8 {
+        return Err(Error::validation(
+            "Password must contain at least 8 characters.",
+        ))?;
+    }
 
-pub fn validate_input<'v>(name: &str) -> Result<'v, ()> {
-    if name.chars().any(|c| {
-        if c == '<' || c == '>' {
-            return true;
-        }
+    // Todo: Add more password validation here. Use Regex
 
-        false
-    }) {
-        Err(Error::validation("String cannot contain '<' or '>'."))?;
+    Ok(())
+}
+
+pub fn validate_password_with_confirmation<'v>(
+    password: &'v str,
+    confirm_password: &str,
+) -> Result<'v, ()> {
+    validate_password(password)?; // Validate password first
+
+    if password != confirm_password {
+        return Err(Error::validation("Passwords do not match"))?;
     }
 
     Ok(())
 }
 
-pub fn check_image<'v>(file: &TempFile<'v>) -> Result<'v, ()> {
-    if file.len() > ONE_MEGABYTE {
-        Err(Error::validation("Image can only be up to 1MB."))?;
+pub fn validate_display_name<'v>(display_name: &str) -> Result<'v, ()> {
+    if display_name.len() > 60 {
+        return Err(Error::validation(
+            "Name can only contain up to 60 characters.",
+        ))?;
     }
 
-    let Some(content_type) = file.content_type() else {
-        return Err(Error::validation("Image must be a valid format."))?;
-    };
-
-    if content_type.is_avif()
-        || content_type.is_webp()
-        || content_type.is_jpeg()
-        || content_type.is_png()
-    {
-        Ok(())
-    } else {
-        Err(Error::validation("Image must be a valid format."))?
+    if !display_name.chars().all(|c| c.is_alphanumeric()) {
+        return Err(Error::validation(
+            "Name can only contain alphanumeric characters.",
+        ))?;
     }
+
+    Ok(())
+}
+
+pub fn validate_255_length_texts<'v>(text: &str) -> Result<'v, ()> {
+    if text.len() > 255 {
+        return Err(Error::validation(
+            "Text can only contain up to 255 characters.",
+        ))?;
+    }
+
+    Ok(())
+}
+
+pub fn validate_honeypot<'v>(honeypot: &str) -> Result<'v, ()> {
+    if !honeypot.is_empty() {
+        return Err(Error::validation(
+            "You were detected to be a bot. Please try again.",
+        ))?;
+    }
+
+    Ok(())
 }

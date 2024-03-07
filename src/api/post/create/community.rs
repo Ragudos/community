@@ -1,19 +1,16 @@
-use std::{fs::File, io::Read};
+use std::{fs::File, io::Read, str::FromStr};
 
 use cloud_storage::{Client, Object};
 use rocket::{form::Form, fs::TempFile, http::Status, post, State};
 use rocket_db_pools::Connection;
-use sqlx::Acquire;
+use sqlx::{types::Uuid, Acquire};
 
 use crate::{
-    controllers::recaptcha::verify_token,
-    helpers::{db::DbConn, get_environment},
+    controllers::community::forms::CreateCommunity,
+    helpers::db::DbConn,
     models::{
-        api::ApiResponse,
-        community::schema::{Community, CommunityMembership},
-        forms::community::CreateCommunity,
-        rate_limiter::RateLimit,
-        users::metadata::{UserRole, JWT},
+        api::ApiResponse, community::schema::Community, rate_limiter::RateLimit,
+        users::schema::UserJWT,
     },
 };
 
@@ -25,27 +22,13 @@ struct ReturnOfUpload {
 #[post("/community", data = "<community_info>")]
 pub async fn api_endpoint(
     mut db: Connection<DbConn>,
-    jwt: JWT,
+    jwt: UserJWT,
     community_info: Form<CreateCommunity<'_>>,
     rate_limit: &State<RateLimit>,
 ) -> Result<ApiResponse, ApiResponse> {
-    println!("{:?}", community_info);
-
     rate_limit.add_to_limit_or_return(
         "The server is experiencing high loads of requests. Please try again later.",
     )?;
-
-    let recaptcha_result = verify_token(&community_info.recaptcha_token).await?;
-    let env = get_environment();
-
-    if recaptcha_result.action != Some("create_community".to_string()) && env != "development" {
-        return Err(ApiResponse::String(
-            Status::Unauthorized,
-            "The captcha taken is not meant for this request.",
-        ));
-    }
-
-    println!("Recaptcha finished");
 
     if Community::is_name_taken(&mut db, &community_info.display_name).await? {
         return Err(ApiResponse::String(
@@ -54,96 +37,37 @@ pub async fn api_endpoint(
         ));
     }
 
-    println!("Name verified to not be taken");
-
-    let display_image_result = upload_image(
-        "aaron_community_bucket",
-        "community",
-        &community_info.display_image,
-    )
-    .await?;
-
-    println!("Display image uploaded");
-
-    let cover_image_result = upload_image(
-        "aaron_community_bucket",
-        "community",
-        &community_info.cover_image,
-    )
-    .await?;
-
-    println!("Cover image uploaded");
-
     let mut tx = db.begin().await?;
 
-    let Ok(community_id) = Community::store(
+    let Ok(uid) = Uuid::from_str(&jwt.uid) else {
+        return Err(ApiResponse::String(
+            Status::InternalServerError,
+            "Failed to create community.",
+        ));
+    };
+    Community::create(
         &mut tx,
         &community_info.display_name,
-        &display_image_result.url,
-        &cover_image_result.url,
         &community_info.description,
-        community_info.is_private,
-        community_info.category.as_ref(),
-        &jwt.token.id,
+        &uid,
+    )
+    .await?;
+
+    let Ok(_) = Community::create(
+        &mut tx,
+        &community_info.display_name,
+        &community_info.description,
+        &uid,
     )
     .await
     else {
-        let res = delete_image("aaron_community_bucket", &display_image_result.object.name).await;
-
-        if let Err(err) = res {
-            eprintln!("Failed to delete image: {}", err);
-        }
-
-        let res = delete_image("aaron_community_bucket", &cover_image_result.object.name).await;
-
-        if let Err(err) = res {
-            eprintln!("Failed to delete image: {}", err);
-        }
-
         return Err(ApiResponse::String(
             Status::InternalServerError,
             "Failed to create community.",
         ));
     };
-
-    println!("Community stored");
-
-    let Ok(_) =
-        CommunityMembership::store(&mut tx, &jwt.token.id, &community_id, UserRole::Owner).await
-    else {
-        let res = delete_image("aaron_community_bucket", &display_image_result.object.name).await;
-
-        if let Err(err) = res {
-            eprintln!("Failed to delete image: {}", err);
-        }
-
-        let res = delete_image("aaron_community_bucket", &cover_image_result.object.name).await;
-
-        if let Err(err) = res {
-            eprintln!("Failed to delete image: {}", err);
-        }
-
-        return Err(ApiResponse::String(
-            Status::InternalServerError,
-            "Failed to create community.",
-        ));
-    };
-
-    println!("Membership stored");
 
     let Ok(_) = tx.commit().await else {
-        let res = delete_image("aaron_community_bucket", &display_image_result.object.name).await;
-
-        if let Err(err) = res {
-            eprintln!("Failed to delete image: {}", err);
-        }
-
-        let res = delete_image("aaron_community_bucket", &cover_image_result.object.name).await;
-
-        if let Err(err) = res {
-            eprintln!("Failed to delete image: {}", err);
-        }
-
         return Err(ApiResponse::String(
             Status::InternalServerError,
             "Failed to create community.",

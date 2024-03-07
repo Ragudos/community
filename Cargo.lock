@@ -365,6 +365,7 @@ dependencies = [
  "random-string",
  "reqwest",
  "rocket",
+ "rocket_csrf_token",
  "rocket_db_pools",
  "rocket_dyn_templates",
  "serde",
@@ -2032,6 +2033,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "rocket_csrf_token"
+version = "0.3.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4d3c793f7e7f1c842a7369488b406c4368adbf2da421549b444cee5223408517"
+dependencies = [
+ "base64 0.21.7",
+ "bcrypt",
+ "rand",
+ "rocket",
+]
+
+[[package]]
 name = "rocket_db_pools"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2466,6 +2479,7 @@ dependencies = [
  "tokio-stream",
  "tracing",
  "url",
+ "uuid",
  "webpki-roots",
 ]
 
@@ -2550,6 +2564,7 @@ dependencies = [
  "thiserror",
  "time",
  "tracing",
+ "uuid",
  "whoami",
 ]
 
@@ -2592,6 +2607,7 @@ dependencies = [
  "thiserror",
  "time",
  "tracing",
+ "uuid",
  "whoami",
 ]
 
@@ -2617,6 +2633,7 @@ dependencies = [
  "tracing",
  "url",
  "urlencoding",
+ "uuid",
 ]
 
 [[package]]
@@ -3071,6 +3088,12 @@ name = "urlencoding"
 version = "2.1.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "daf8dba3b7eb870caf1ddeed7bc9d2a049f3cfdfae7cb521b087cc33ae4c49da"
+
+[[package]]
+name = "uuid"
+version = "1.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f00cc9702ca12d3c81455259621e676d0f7251cec66a21e98fe2e9a37db93b2a"
 
 [[package]]
 name = "valuable"

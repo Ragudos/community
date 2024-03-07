@@ -14,30 +14,13 @@ use rocket::{
 use community::{
     api, catchers,
     helpers::{db, get_environment, handlebars},
-    models::rate_limiter::RateLimit,
+    models::{rate_limiter::RateLimit, Env, Environment},
 };
 use rocket_mod::{
     figment::{Figment, Profile},
     fs::FileServer,
     Build, Rocket,
 };
-
-enum Env {
-    Development,
-    Testing,
-    Production,
-}
-
-impl From<String> for Env {
-    fn from(env: String) -> Self {
-        match env.as_str() {
-            "development" => Self::Development,
-            "testing" => Self::Testing,
-            "production" => Self::Production,
-            _ => panic!("Invalid environment"),
-        }
-    }
-}
 
 #[launch]
 fn rocket() -> _ {
@@ -84,7 +67,6 @@ fn rocket_from_config(figment: Figment) -> Rocket<Build> {
             routes![
                 api::get::preview::community::api_endpoint,
                 api::get::preview::user::api_endpoint,
-                api::get::preview::community::amount_of_members,
                 api::get::preview::deny_request
             ],
         )
@@ -105,6 +87,9 @@ fn rocket_from_config(figment: Figment) -> Rocket<Build> {
             capacity: AtomicU32::new(rate_limit_capacity),
             time_accumulator_started: time::OffsetDateTime::now_utc(),
             requests: AtomicU32::new(0),
+        })
+        .manage(Environment {
+            environment: get_environment().into(),
         })
         .register(
             "/",

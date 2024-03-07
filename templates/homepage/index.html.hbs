@@ -38,16 +38,13 @@
 					</div>
 				</div>
 				<!-- TODO: Add Categories -->
-				<div data-loading-states id="section-of-communities" hx-trigger="revealed" hx-indicator=".skeleton" hx-get="/preview/community?q={{search}}&o={{offset}}" hx-swap="outerHTML">
+				<div data-loading-states id="section-of-communities" hx-trigger="revealed" hx-indicator=".skeleton" hx-get="/preview/community?{{#if search}}q={{search}}{{/if}}{{#if category}}&c={{category}}{{/if}}&o={{offset}}" hx-swap="outerHTML">
 					<div data-type="card" style="--_skeleton-delay:0ms" class="skeleton"></div>
 					<div data-type="card" style="--_skeleton-delay:200ms" class="skeleton"></div>
 					<div data-type="card" style="--_skeleton-delay:400ms" class="skeleton"></div>
-					<div data-type="card" style="--_skeleton-delay:600ms" class="skeleton"></div>
-					<div data-type="card" style="--_skeleton-delay:800ms" class="skeleton"></div>
-					<div data-type="card" style="--_skeleton-delay:1000ms" class="skeleton"></div>
-					<div data-type="card" style="--_skeleton-delay:1200ms" class="skeleton"></div>
 				</div>
 				<div id="offset-breadcrumbs">
+					{{> partials/components/community/breadcrumbs}}
 				</div>
 			</section>
 		</main>

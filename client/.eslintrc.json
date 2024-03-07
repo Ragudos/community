@@ -13,17 +13,16 @@
         "ecmaVersion": "latest",
         "sourceType": "script"
     },
-    "plugins": [
-        "@typescript/eslint",
-        "promise",
-        "prettier"
-    ],
+    "plugins": ["@typescript/eslint", "promise", "prettier"],
     "rules": {
         "semi": "error",
         "curly": ["error", "all"],
         "arrow-body-style": ["error", "as-needed"],
         "no-console": "warn",
-        "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+        "@typescript-eslint/no-unused-vars": [
+            "error",
+            { "argsIgnorePattern": "^_" }
+        ],
         "semi-spacing": "error",
         "semi-style": ["error", "last"],
         "no-multiple-empty-lines": ["error", { "max": 2 }]

@@ -7,7 +7,6 @@ use crate::models::{api::ApiResponse, rate_limiter::RateLimit};
 
 impl RateLimit {
     pub fn add_to_limit_or_return(&self, message: &'static str) -> Result<(), ApiResponse> {
-        println!("{:?}", self);
         if self.requests.load(Ordering::Relaxed) >= self.capacity.load(Ordering::Relaxed) {
             return Err(ApiResponse::String(Status::TooManyRequests, message));
         }

@@ -4,19 +4,16 @@ use rocket_dyn_templates::{context, Template};
 
 use crate::{
     helpers::db::DbConn,
-    models::{
-        api::ApiResponse,
-        users::metadata::{User, JWT},
-    },
+    models::{api::ApiResponse, users::schema::UserJWT},
 };
 
 #[get("/user?<user_id>")]
 pub async fn api_endpoint(
     mut db: Connection<DbConn>,
-    _jwt: JWT,
-    user_id: i32,
+    _jwt: UserJWT,
+    user_id: &str,
 ) -> Result<ApiResponse, ApiResponse> {
-    let user_info = User::get_by_id(&mut db, &user_id).await?;
+    let user_info = UserJWT::get_by_display_name(&mut db, &user_id).await?;
     let Some(user_info) = user_info else {
         return Err(ApiResponse::String(Status::NotFound, "User not found."));
     };

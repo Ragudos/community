@@ -7,7 +7,7 @@
     --_content-height: 12.5rem;
 }
 
-.skeleton[data-type=card],
+.skeleton[data-type="card"],
 .community__preview-container {
     height: calc(var(--_cover-img-height) + var(--_content-height));
 }
@@ -103,9 +103,8 @@
     top: 0;
     bottom: 0;
     margin-block: auto;
-    right: 1rem;;
+    right: 1rem;
 }
-
 
 #offset-breadcrumbs {
     margin-top: 2rem;

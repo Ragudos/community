@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use bcrypt::verify;
 use rocket::{
     form::Form,
@@ -5,17 +7,18 @@ use rocket::{
     post, State,
 };
 use rocket_db_pools::Connection;
-use sqlx::Acquire;
-use time::OffsetDateTime;
+use sqlx::types::Uuid;
 
 use crate::{
-    controllers::{htmx::redirect::HtmxRedirect, recaptcha::verify_token},
-    helpers::{db::DbConn, get_environment},
+    controllers::htmx::redirect::HtmxRedirect,
+    helpers::db::DbConn,
     models::{
         api::ApiResponse,
-        forms::auth::LoginFormData,
         rate_limiter::RateLimit,
-        users::metadata::{User, UserCredentials, UserToken, JWT},
+        users::{
+            form::LoginFormData,
+            schema::{UserCredentials, UserJWT},
+        },
     },
 };
 
@@ -30,17 +33,7 @@ pub async fn api_endpoint(
         "The server is experiencing high loads of requests. Please try again later.",
     )?;
 
-    let recaptcha_result = verify_token(&login_data.recaptcha_token).await?;
-    let env = get_environment();
-
-    if recaptcha_result.action != Some("login".to_string()) && env != "development" {
-        return Err(ApiResponse::String(
-            Status::Unauthorized,
-            "The captcha taken is not meant for this request.",
-        ));
-    }
-
-    let Ok(user) = User::get_by_display_name(&mut db, &login_data.display_name).await else {
+    let Ok(user) = UserJWT::get_by_display_name(&mut db, &login_data.display_name).await else {
         return Err(ApiResponse::String(
             Status::BadRequest,
             "Something went wrong. Please try again.",
@@ -52,7 +45,13 @@ pub async fn api_endpoint(
             "Invalid credentials",
         ));
     };
-    let Ok(Some(password)) = UserCredentials::get_password_by_id(&mut db, &user.id).await else {
+    let Ok(uid) = Uuid::from_str(&user.uid) else {
+        return Err(ApiResponse::String(
+            Status::InternalServerError,
+            "Something went wrong.",
+        ));
+    };
+    let Ok(password) = UserCredentials::get_password_hash(&mut db, &uid).await else {
         return Err(ApiResponse::String(
             Status::InternalServerError,
             "Something went wrong.",
@@ -72,26 +71,11 @@ pub async fn api_endpoint(
         ));
     }
 
-    let new_refresh_token = random_string::generate(32, random_string::charsets::ALPHANUMERIC);
-    let Ok(mut tx) = db.begin().await else {
-        return Err(ApiResponse::String(
-            Status::InternalServerError,
-            "Something went wrong.",
-        ));
+    let jwt = UserJWT {
+        uid: user.uid,
+        display_name: user.display_name,
+        display_image: user.display_image,
     };
-
-    let existing_token = UserToken::db_tx_select_by_user_id(&mut tx, &user.id).await?;
-
-    if let Some(_) = existing_token {
-        UserToken::db_update_refresh_token(&mut tx, &user.id, &new_refresh_token).await?;
-    } else {
-        UserToken::db_create(&mut tx, &user.id, &new_refresh_token).await?;
-    }
-
-    tx.commit().await?;
-
-    let time_today = OffsetDateTime::now_utc();
-    let jwt = JWT::new(user, time_today, new_refresh_token);
     let Ok(cookie) = jwt.to_cookie() else {
         return Err(ApiResponse::String(
             Status::InternalServerError,

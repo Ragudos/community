@@ -1,4 +1,5 @@
 import { mount_toaster, toast } from "@webdevaaron/vanilla-toast";
+import { getTheme } from "./utils";
 mount_toaster();
 
 const timers = [];
@@ -6,19 +7,17 @@ let errors = 0;
 let timeout: ReturnType<typeof setTimeout>;
 let timeout2: ReturnType<typeof setTimeout>;
 
-function getTheme() {
-    let theme = document.documentElement.getAttribute("data-theme");
-    return theme == "dark" || theme == "light" ? theme : window.matchMedia("(prefers-color-scheme: dark)").matches;
-}
-
 document.addEventListener("htmx:error", (evt) => {
     if (evt instanceof CustomEvent) {
         clearTimeout(timeout);
         errors++;
-        
+
         if (errors > 10) {
             clearTimeout(timeout2);
-            toast.error({ message: "Wowza! Please slow down." },  { style: "plain", theme: document.documentElement.dataset.theme as "light" | "dark" || "light" })
+            toast.error(
+                { message: "Wowza! Please slow down." },
+                { style: "plain", theme: getTheme() },
+            );
             // @ts-ignore
             evt.target.querySelectorAll("*").forEach((el) => {
                 el.setAttribute("disabled", "true");
@@ -43,10 +42,27 @@ document.addEventListener("htmx:error", (evt) => {
 document.addEventListener("htmx:responseError", (evt) => {
     if (evt instanceof CustomEvent) {
         const message = evt.detail.xhr?.responseText || "Something went wrong.";
-        toast.error({ message }, { style: "plain", theme: document.documentElement.dataset.theme as "light" | "dark" || "light"})
+        toast.error({ message }, { style: "plain", theme: getTheme() });
     }
 });
 
 document.addEventListener("htmx:sendError", (evt) => {
-    toast.error({ message: "Failed to connect to server." }, { style: "plain", theme: document.documentElement.dataset.theme as "light" | "dark" || "light" });
+    toast.error(
+        { message: "Failed to connect to server." },
+        { style: "plain", theme: getTheme() },
+    );
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll("dialog").forEach((dialog) => {
+        dialog.addEventListener("click", (evt) => {
+            for (const el of dialog.querySelectorAll("*")) { 
+                if (el === evt.target) {
+                    return;
+                }
+            }
+
+            dialog.close();
+        });
+    });
 });
