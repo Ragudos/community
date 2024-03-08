@@ -32,6 +32,7 @@ pub async fn api_endpoint(
                 Some(
                     split_values
                         .map(|s| s.into())
+                        .take(3)
                         .collect::<Vec<CommunityCategory>>(),
                 )
             }
@@ -146,17 +147,6 @@ pub async fn api_endpoint(
                 Some(page_count) => page_count.to_string().parse::<u64>().unwrap(),
                 None => 0
             },
-            bread_crumbs: match page_count {
-                Some(page_count) => {
-                    let mut vec = Vec::new();
-                    for i in 0..page_count.to_string().parse::<u64>().unwrap() {
-                        vec.push(i);
-                    }
-
-                    vec
-                },
-                None => vec![]
-            }
         },
     )))
 }

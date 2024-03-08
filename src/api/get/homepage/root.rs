@@ -40,6 +40,7 @@ pub fn page(
             offset,
             search: q,
             category: c,
+            page_count: 0,
             categories,
         },
     ))

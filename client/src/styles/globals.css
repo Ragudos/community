@@ -115,7 +115,6 @@ body {
     color: hsl(var(--foreground));
     background-color: hsl(var(--background));
     margin: 0;
-    min-height: 200dvh;
 }
 
 ul,
@@ -126,7 +125,7 @@ ol {
 }
 
 main {
-    margin-top: 2rem;
+    margin-block: 2rem;
 }
 
 h1,
