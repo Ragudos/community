@@ -1,9 +1,12 @@
-#section-of-communities {
+#section-of-communities[data-with-grid] {
     display: grid;
     grid-template-columns: 1fr;
     gap: 1rem;
+}
+
+#section-of-communities {
     margin-top: 2.5rem;
-    --_cover-img-height: 10.5rem;
+ --_cover-img-height: 10.5rem;
     --_content-height: 12.5rem;
 }
 
@@ -13,13 +16,13 @@
 }
 
 @media only screen and (min-width: 640px) {
-    #section-of-communities {
+    #section-of-communities[data-with-grid] {
         grid-template-columns: repeat(2, 1fr);
     }
 }
 
 @media only screen and (min-width: 1024px) {
-    #section-of-communities {
+    #section-of-communities[data-with-grid] {
         grid-template-columns: repeat(3, 1fr);
     }
 }

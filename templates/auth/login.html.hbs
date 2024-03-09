@@ -5,6 +5,7 @@
 		{{> partials/head/htmx-loading}}
 	</head>
 	<body hx-ext="loading-states">
+		{{> partials/components/noscript}}
 		{{> partials/main_header}}
 		<main class="container">
 			<form data-withcaptcha="true" hx-sync="this" hx-post="/auth/login" hx-trigger="submit" method="post" action="/auth/login">

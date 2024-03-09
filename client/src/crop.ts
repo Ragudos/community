@@ -1,4 +1,3 @@
-import { toast } from "@webdevaaron/vanilla-toast";
 import Cropper from "cropperjs";
 import { getTheme } from "./utils";
 // Also implement drop listener
@@ -14,31 +13,16 @@ elts.forEach((elt: HTMLInputElement) => {
         }
 
         if (elt.files.length > 1) {
-            toast.error(
-                { message: "Please select only one image" },
-                { style: "plain", theme: getTheme() },
-            );
             return;
         }
 
         const file = elt.files[0];
 
         if (file.size > 1024 * 1024) {
-            toast.error(
-                { message: "File size must be less than 1MB." },
-                { style: "plain", theme: getTheme() },
-            );
             return;
         }
 
         if (!mimeTypesAllowed.includes(file.type)) {
-            toast.error(
-                { message: "File type not supported." },
-                {
-                    style: "plain",
-                    theme: getTheme(),
-                },
-            );
             return;
         }
 

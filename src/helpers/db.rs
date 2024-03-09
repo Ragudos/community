@@ -107,31 +107,29 @@ async fn seed_data(rocket: Rocket<Build>) -> Result {
                         }
                     }
 
-                    for i in 0..20 {
-                        if let Err(e) = query!(
-                            r#"
-                                INSERT INTO communities
-                                (_id, display_name, display_image, description, is_private, owner_id, cover_image)
-                                SELECT $1, $2, $3, $4, $5, $6, $7
-                                WHERE NOT EXISTS (
-                                    SELECT 1 FROM communities WHERE _id = $1 AND owner_id = $6
-                                );
-                            "#,
-                            i,
-                            format!("Rustaceans {}", i),
-                            "/assets/dummy/community_display_image.jpg",
-                            "A community for Rust developers",
-                            false,
-                            0,
-                            "/assets/dummy/community_cover_image.jpg"
-                        )
-                        .execute(&mut *tx)
-                        .await
-                        {
-                            eprintln!("Failed to seed data: {:?}", e);
-                            let _ = tx.rollback().await;
-                            return Err(rocket);
-                        }
+                    if let Err(e) = query!(
+                        r#"
+                            INSERT INTO communities
+                            (_id, display_name, display_image, description, is_private, owner_id, cover_image)
+                            SELECT $1, $2, $3, $4, $5, $6, $7
+                            WHERE NOT EXISTS (
+                                SELECT 1 FROM communities WHERE _id = $1 AND owner_id = $6
+                            );
+                        "#,
+                        0,
+                        "Rustaceans",
+                        "/assets/dummy/community_display_image.jpg",
+                        "A community for Rust developers",
+                        false,
+                        0,
+                        "/assets/dummy/community_cover_image.jpg"
+                    )
+                    .execute(&mut *tx)
+                    .await
+                    {
+                        eprintln!("Failed to seed data: {:?}", e);
+                        let _ = tx.rollback().await;
+                        return Err(rocket);
                     }
 
                     if let Err(e) = tx.commit().await {

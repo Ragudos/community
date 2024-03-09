@@ -101,7 +101,7 @@ pub fn breadcrumbs_helper<'reg, 'rc>(
             rc.pop_block();
             let _ = out.write("<span>...</span>");
 
-            for i in total_pages - MAX_BREAD_CRUMBS_IN_MIDDLE + 1..total_pages +  1 {
+            for i in total_pages - MAX_BREAD_CRUMBS_IN_MIDDLE + 1..total_pages + 1 {
                 let mut block_context = BlockContext::new();
                 let mut block_param = BlockParams::new();
                 block_param.add_value("value", Value::from(i))?;

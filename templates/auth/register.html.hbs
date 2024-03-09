@@ -5,6 +5,7 @@
 		{{> partials/head/htmx-loading}}
 	</head>
 	<body hx-ext="loading-states">
+		{{> partials/components/noscript}}
 		{{> partials/main_header}}
 		<main class="container">
 			<form class="container" data-withcaptcha="true" id="register-form" hx-sync="#register-form:drop" hx-post="/auth/register" hx-trigger="submit" method="post" action="/auth/register">

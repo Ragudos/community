@@ -44,9 +44,9 @@ impl Community {
             SELECT CEIL(COUNT(*)::NUMERIC / $1) AS count
             FROM communities
             WHERE categories @> $2
-            AND similarity(display_name, $3) > 0.05
-            AND display_image IS NOT NULL AND cover_image IS NOT NULL
-            OR (display_image != '' AND cover_image != '' );
+            AND similarity(display_name, $3) > 0.1
+            AND (display_image IS NOT NULL AND cover_image IS NOT NULL
+            OR (display_image != '' AND cover_image != '' ));
             "#,
             BigDecimal::from(limit),
             categories as &Vec<CommunityCategory>,
@@ -68,8 +68,8 @@ impl Community {
             SELECT CEIL(COUNT(*)::NUMERIC / $1) AS count
             FROM communities
             WHERE categories @> $2
-            AND display_image IS NOT NULL AND cover_image IS NOT NULL
-            OR (display_image != '' AND cover_image != '');
+            AND (display_image IS NOT NULL AND cover_image IS NOT NULL
+            OR (display_image != '' AND cover_image != ''));
             "#,
             BigDecimal::from(limit),
             categories as &Vec<CommunityCategory>
@@ -89,9 +89,9 @@ impl Community {
             r#"
                 SELECT CEIL(COUNT(*)::NUMERIC / $1) AS count
                 FROM communities
-                WHERE similarity(display_name, $2) > 0.05
-                AND display_image IS NOT NULL AND cover_image IS NOT NULL
-                OR (display_image != '' AND cover_image != '');
+                WHERE similarity(display_name, $2) > 0.1
+                AND (display_image IS NOT NULL AND cover_image IS NOT NULL
+                OR (display_image != '' AND cover_image != ''));
                 "#,
             BigDecimal::from(limit),
             display_name
@@ -253,9 +253,10 @@ impl Community {
 
                GROUP BY c._id, m.members_count
             ) cm ON c._id = cm._id
-            WHERE display_image IS NOT NULL AND cover_image IS NOT NULL
-            OR (display_image != '' AND cover_image != '')
-            AND categories @> $1 AND similarity(c.display_name, $2) > 0.05
+            WHERE
+            categories @> $1 AND similarity(c.display_name, $2) > 0.1
+            AND (display_image IS NOT NULL AND cover_image IS NOT NULL
+            OR (display_image != '' AND cover_image != ''))
             ORDER BY COALESCE(cm.weighted_score, 0) DESC, c._created_at DESC
             LIMIT $3 OFFSET $4;
             "#,
@@ -353,9 +354,10 @@ impl Community {
 
                GROUP BY c._id, m.members_count
             ) cm ON c._id = cm._id
-            WHERE display_image IS NOT NULL AND cover_image IS NOT NULL
-            OR (display_image != '' AND cover_image != '')
-            AND categories @> $1
+            WHERE
+            categories @> $1
+            AND (display_image IS NOT NULL AND cover_image IS NOT NULL
+            OR (display_image != '' AND cover_image != ''))
             ORDER BY COALESCE(cm.weighted_score, 0) DESC, c._created_at DESC
             LIMIT $2 OFFSET $3;
             "#,
@@ -452,9 +454,10 @@ impl Community {
 
                GROUP BY c._id, m.members_count
             ) cm ON c._id = cm._id
-            WHERE display_image IS NOT NULL AND cover_image IS NOT NULL
-            OR (display_image != '' AND cover_image != '')
-            AND similarity(c.display_name, $1) > 0.05
+            WHERE
+            similarity(c.display_name, $1) > 0.1
+            AND (display_image IS NOT NULL AND cover_image IS NOT NULL
+            OR (display_image != '' AND cover_image != ''))
             ORDER BY COALESCE(cm.weighted_score, 0) DESC, c._created_at DESC
             LIMIT $2 OFFSET $3;
             "#,

@@ -1,6 +1,7 @@
 :root {
-    --background: 0 0% 96%;
-    --foreground: 0 0% 5%;
+    --hardest_bg: 300 20% 99%;
+    --background: 300 20% 94%;
+    --foreground: 260 20% 3%;
     --card: 300 20% 99%;
     --card-foreground: 260 20% 3%;
     --popover: 300 20% 99%;
@@ -31,8 +32,9 @@
 }
 
 [data-theme="dark"] {
-    --background: 0 0% 5%;
-    --foreground: 0 0% 96%;
+    --hardest_bg: 300 20% 3%;
+    --background: 300 20% 7%;
+    --foreground: 260 20% 99%;
     --card: 300 20% 1%;
     --card-foreground: 260 20% 97%;
     --popover: 300 20% 1%;
@@ -56,8 +58,9 @@
 
 @media (prefers-color-scheme: dark) {
     [data-theme="system"] {
-        --background: 0 0% 5%;
-        --foreground: 0 0% 96%;
+        --hardest_bg: 300 20% 3%;
+        --background: 300 20% 7%;
+        --foreground: 260 20% 99%;
         --card: 300 20% 1%;
         --card-foreground: 260 20% 97%;
         --popover: 300 20% 1%;
@@ -236,6 +239,12 @@ small,
     }
 }
 
+fieldset {
+    border: 1px solid hsl(var(--foreground) / 0.675);
+    border-radius: var(--radius);
+    padding: 1rem;
+}
+
 .container {
     width: min(
         calc(100% - var(--container-padding) * 2),
@@ -250,6 +259,7 @@ img {
     font-style: italic;
     font-size: 80%;
     shape-margin: 2rem;
+    object-fit: cover;
 }
 
 svg,
@@ -261,6 +271,13 @@ svg,
 a {
     text-decoration: none;
     font-weight: 700;
+}
+
+a,
+button,
+input[type=submit] { 
+    -webkit-tap-highlight-color: transparent;
+    font-smooth: antialias;
 }
 
 a:hover {
@@ -482,6 +499,8 @@ select:disabled {
     width: 1.5rem;
     height: 1.5rem;
     display: block;
+    pointer-events: none;
+    touch-action: none;
 }
 
 .spin {
@@ -505,4 +524,12 @@ select:disabled {
 
 .grecaptcha-badge { 
     visibility: hidden;
+}
+
+.profile {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    padding: 0;
+    overflow: hidden;
 }

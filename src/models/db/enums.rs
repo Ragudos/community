@@ -42,7 +42,7 @@ pub enum AccountStatus {
     Banned,
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Eq, Type, FromFormField, Clone, Debug)]
+#[derive(Hash, Serialize, Deserialize, PartialEq, Eq, Type, FromFormField, Clone, Debug)]
 #[sqlx(type_name = "communitycategory", rename_all = "lowercase")]
 pub enum CommunityCategory {
     Art,
@@ -78,7 +78,7 @@ impl From<&str> for CommunityCategory {
 
 impl PgHasArrayType for CommunityCategory {
     fn array_type_info() -> sqlx::postgres::PgTypeInfo {
-        sqlx::postgres::PgTypeInfo::with_name("communitycategory")
+        sqlx::postgres::PgTypeInfo::with_name("communitycategory[]")
     }
 }
 

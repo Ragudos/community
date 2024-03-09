@@ -1,6 +1,8 @@
-use rocket::get;
+use std::collections::HashSet;
+
+use rocket::{get, http::{ContentType, Status}};
 use rocket_db_pools::Connection;
-use rocket_dyn_templates::{context, Template};
+use rocket_dyn_templates::{context, Metadata, Template};
 
 use crate::{
     helpers::db::DbConn,
@@ -16,22 +18,32 @@ pub async fn api_endpoint(
     mut db: Connection<DbConn>,
     jwt: UserJWT,
     o: Option<i64>,
-    c: Option<&str>,
-    q: Option<&str>,
+    c: Option<&'_ str>,
+    q: Option<&'_ str>,
+    metadata: Metadata<'_>,
 ) -> Result<ApiResponse, ApiResponse> {
     let offset = match o {
         Some(offset) => offset,
         None => 0,
     };
+
+    if offset.is_negative() {
+        return Err(ApiResponse::NoContent);
+    }
+
     let c = match c {
         Some(c) => {
             if c.is_empty() {
                 None
             } else {
+                println!("c: {:?}", c);
                 let split_values = c.split(',');
                 Some(
                     split_values
                         .map(|s| s.into())
+                        // To remove duplicates
+                        .collect::<HashSet<CommunityCategory>>()
+                        .into_iter()
                         .take(3)
                         .collect::<Vec<CommunityCategory>>(),
                 )
@@ -48,8 +60,8 @@ pub async fn api_endpoint(
                     &offset,
                     &HOMEPAGE_COMMUNITY_LIMIT,
                 )
-                .await?,
-                Community::get_pagination_count(&mut db, HOMEPAGE_COMMUNITY_LIMIT).await?,
+                .await,
+                Community::get_pagination_count(&mut db, HOMEPAGE_COMMUNITY_LIMIT).await,
             )
         } else {
             (
@@ -59,13 +71,13 @@ pub async fn api_endpoint(
                     &HOMEPAGE_COMMUNITY_LIMIT,
                     &q,
                 )
-                .await?,
+                .await,
                 Community::get_pagination_count_filtered_by_display_name(
                     &mut db,
                     HOMEPAGE_COMMUNITY_LIMIT,
                     &q,
                 )
-                .await?,
+                .await,
             )
         };
 
@@ -77,10 +89,10 @@ pub async fn api_endpoint(
             &HOMEPAGE_COMMUNITY_LIMIT,
             &c,
         )
-        .await?;
+        .await;
         let page_count =
             Community::get_pagination_filtered_by_category(&mut db, HOMEPAGE_COMMUNITY_LIMIT, &c)
-                .await?;
+                .await;
 
         (communities, page_count)
     } else if let (Some(q), Some(c)) = (&q, &c) {
@@ -92,13 +104,13 @@ pub async fn api_endpoint(
                     &HOMEPAGE_COMMUNITY_LIMIT,
                     &c,
                 )
-                .await?,
+                .await,
                 Community::get_pagination_filtered_by_category(
                     &mut db,
                     HOMEPAGE_COMMUNITY_LIMIT,
                     &c,
                 )
-                .await?,
+                .await,
             )
         } else {
             (
@@ -109,14 +121,14 @@ pub async fn api_endpoint(
                     &c,
                     &q,
                 )
-                .await?,
+                .await,
                 Community::get_pagination_filtered_by_category_and_display_name(
                     &mut db,
                     HOMEPAGE_COMMUNITY_LIMIT,
                     &c,
                     &q,
                 )
-                .await?,
+                .await,
             )
         };
 
@@ -127,23 +139,43 @@ pub async fn api_endpoint(
             &offset,
             &HOMEPAGE_COMMUNITY_LIMIT,
         )
-        .await?;
-        let page_count = Community::get_pagination_count(&mut db, HOMEPAGE_COMMUNITY_LIMIT).await?;
+        .await;
+        let page_count = Community::get_pagination_count(&mut db, HOMEPAGE_COMMUNITY_LIMIT).await;
 
         (communities, page_count)
     };
 
-    println!("{:?}", communities);
+    // we just unwrap at the end since if either errors, we want to return a 500
+    if communities.is_err() || page_count.is_err() {
+        eprintln!("Error getting communities: {:?}", communities.err());
+
+        let (mime, html) = metadata.render(
+            "partials/components/community/search-error",
+            context! {
+                message: "We experienced an unexpected problem. Please hang tight."
+            },
+        ).unwrap_or((
+            ContentType::HTML,
+            "<div data-with-grid id='section-of-communities'>We experienced an unexpected problem. Please hang tight.</div>".to_string()
+        ));
+
+        return Err(ApiResponse::CustomHTML(
+                Status::InternalServerError,
+                mime,
+                html
+            )
+        );
+    }
 
     Ok(ApiResponse::Template(Template::render(
         "partials/components/community/search-result",
         context! {
-            communities,
+            communities: communities.unwrap(),
             user: jwt,
             offset,
             search: q,
             categories: c,
-            page_count: match page_count.clone() {
+            page_count: match page_count.unwrap().clone() {
                 Some(page_count) => page_count.to_string().parse::<u64>().unwrap(),
                 None => 0
             },

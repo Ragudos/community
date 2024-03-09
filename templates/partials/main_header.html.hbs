@@ -1,5 +1,25 @@
-<header>
+<header class="main-header">
     <nav class="container">
-        <a class="primary big" href="/homepage" title="Community Homepage">Community</a>
+        <a class="big" href="/homepage" title="Community Homepage">Community</a>
+
+        <div data-position="center" class="dropdown" style="height: 40px; width: 40px;">
+            <button data-opener class="profile" aria-haspopup="true" aria-expanded="false" aria-controls="user-dropdown">
+                <img
+                    role="presentation"
+                    src="{{#if user.display_image}}{{user.display_image}}{{else}}https://placehold.co/40{{/if}}"
+                    alt=" "
+                    width="40"
+                    height="40"
+                />
+            </button>
+            <div class="dropdown-content" id="user-dropdown">
+                <div class="dropdown-main">
+                    <div>
+
+                        <button type="button" hx-delete="/auth/logout">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </nav>
 </header>

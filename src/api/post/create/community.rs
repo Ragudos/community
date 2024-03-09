@@ -1,12 +1,11 @@
-use std::{fs::File, io::Read, str::FromStr};
+use std::str::FromStr;
 
-use cloud_storage::{Client, Object};
-use rocket::{form::Form, fs::TempFile, http::Status, post, State};
+use rocket::{form::Form, http::Status, post, State};
 use rocket_db_pools::Connection;
 use sqlx::{types::Uuid, Acquire};
 
 use crate::{
-    controllers::community::forms::CreateCommunity,
+    models::community::forms::CreateCommunity,
     helpers::db::DbConn,
     models::{
         api::ApiResponse, community::schema::Community, rate_limiter::RateLimit,
@@ -14,10 +13,10 @@ use crate::{
     },
 };
 
-struct ReturnOfUpload {
+/* struct ReturnOfUpload {
     object: Object,
     url: String,
-}
+} */
 
 #[post("/community", data = "<community_info>")]
 pub async fn api_endpoint(
@@ -79,6 +78,7 @@ pub async fn api_endpoint(
     Ok(ApiResponse::String(Status::Ok, "Oki"))
 }
 
+/*
 async fn delete_image(bucket_name: &str, file_name: &str) -> Result<(), cloud_storage::Error> {
     let cloud_storage = Client::default();
     cloud_storage
@@ -144,4 +144,4 @@ async fn upload_image(
     );
 
     Ok(ReturnOfUpload { object: res, url })
-}
+} */

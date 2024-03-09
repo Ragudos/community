@@ -4,7 +4,10 @@ use rocket_dyn_templates::{context, Template};
 use crate::models::{api::ApiResponse, seo::metadata::SeoMetadata, users::preferences::Theme};
 
 #[catch(422)]
-pub fn unprocessable_entity(_request: &Request) -> &'static str {
+pub fn unprocessable_entity(request: &Request) -> &'static str {
+    let error_info: &str = request.local_cache(|| "HAha").as_ref();
+    println!("error_info: {:?}", error_info);
+
     "Please check the information you've entered and try again."
 }
 

@@ -1,6 +1,9 @@
-<div data-loading-states id="section-of-communities">
+<div {{#unless (eq (len communities) 0)}}data-with-grid{{/unless}} data-loading-states id="section-of-communities">
     {{#if (eq (len communities) 0)}}
-    <div>0 community found.</div>
+    <p>0 community found.
+        <br>
+        Either there are no communities that match the search query or the specified categories.
+    </p>
     {{/if}}
     {{#each communities}}
     <a title="{{this.display_name}}" target="_blank" rel="noreferrer noopener" href="/community?community_name={{this.display_name}}"  class="card community__preview-container">
@@ -13,6 +16,10 @@
                         alt="{{this.display_name}}'s display image"
                         width="40"
                         height="40"
+                        {{#if (gt @index 4)}}
+                        loading="lazy"
+                        decoding="async"
+                        {{/if}}
                     />
                 </div>
                 <div style="font-size: 1.125rem;">{{this.display_name}}</div>
