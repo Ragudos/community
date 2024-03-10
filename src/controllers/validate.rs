@@ -41,16 +41,6 @@ pub fn validate_display_name<'v>(display_name: &str) -> Result<'v, ()> {
     Ok(())
 }
 
-pub fn validate_255_length_texts<'v>(text: &str) -> Result<'v, ()> {
-    if text.len() > 255 {
-        return Err(Error::validation(
-            "Text can only contain up to 255 characters.",
-        ))?;
-    }
-
-    Ok(())
-}
-
 pub fn validate_honeypot<'v>(honeypot: &str) -> Result<'v, ()> {
     if !honeypot.is_empty() {
         return Err(Error::validation(

@@ -1,6 +1,9 @@
 use std::collections::HashSet;
 
-use rocket::{get, http::{ContentType, Status}};
+use rocket::{
+    get,
+    http::{ContentType, Status},
+};
 use rocket_db_pools::Connection;
 use rocket_dyn_templates::{context, Metadata, Template};
 
@@ -160,11 +163,10 @@ pub async fn api_endpoint(
         ));
 
         return Err(ApiResponse::CustomHTML(
-                Status::InternalServerError,
-                mime,
-                html
-            )
-        );
+            Status::InternalServerError,
+            mime,
+            html,
+        ));
     }
 
     Ok(ApiResponse::Template(Template::render(

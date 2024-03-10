@@ -14,8 +14,8 @@
     --muted-foreground: 259 20% 70%;
     --accent: 322 17% 61%;
     --accent-foreground: 260 20% 3%;
-    --destructive: 0 85% 60%;
-    --destructive-foreground: 260 20% 3%;
+    --destructive: 0 85% 25%;
+    --destructive-foreground: 260 20% 95%;
     --border: 300 20% 20%;
     --input: 300 20% 20%;
     --ring: 321 17% 40%;
@@ -47,8 +47,8 @@
     --muted-foreground: 260 20% 97%;
     --accent: 322 17% 39%;
     --accent-foreground: 260 20% 97%;
-    --destructive: 0 62% 30%;
-    --destructive-foreground: 262 22% 10%;
+    --destructive: 0 62% 75%;
+    --destructive-foreground: 262 22% 5%;
     --border: 300 20% 60%;
     --input: 300 20% 80%;
     --ring: 321 17% 60%;
@@ -73,8 +73,8 @@
         --muted-foreground: 260 20% 97%;
         --accent: 322 17% 39%;
         --accent-foreground: 260 20% 97%;
-        --destructive: 0 62% 30%;
-        --destructive-foreground: 262 22% 10%;
+        --destructive: 0 62% 75%;
+        --destructive-foreground: 262 22% 5%;
         --border: 300 20% 60%;
         --input: 300 20% 80%;
         --ring: 321 17% 60%;
@@ -532,4 +532,8 @@ select:disabled {
     border-radius: 50%;
     padding: 0;
     overflow: hidden;
+}
+
+[data-error] {
+    color: red;
 }

@@ -6,7 +6,7 @@
 		<link rel="stylesheet" href="/build/styles/homepage.min.css">
 		{{> partials/head/htmx-loading}}
 	</head>
-	<body hx-ext="loading-states, response-targets">
+	<body hx-ext="loading-states, response-targets, remove-me">
 		{{> partials/components/noscript}}
 		{{> partials/main_header}}
 		<main class="container">
@@ -48,5 +48,6 @@
 			</section>
 		</main>
 		{{> partials/footer}}
+		{{> partials/components/toast_container}}
 	</body>
 </html>

@@ -1,9 +1,5 @@
 use crate::models::api::ApiResponse;
-use rocket::{
-    http::Header,
-    response::Responder,
-    Response,
-};
+use rocket::{http::Header, response::Responder, Response};
 use std::io::Cursor;
 
 impl<'a> Responder<'a, 'static> for ApiResponse {
@@ -12,12 +8,10 @@ impl<'a> Responder<'a, 'static> for ApiResponse {
             Self::HtmxRefresh(htmx_refresh) => htmx_refresh.respond_to(request),
             Self::HtmxRedirect(htmx_redirect) => htmx_redirect.respond_to(request),
             Self::Redirect(redirect) => redirect.respond_to(request),
-            Self::String(status, string) => {
-                Response::build()
-                    .status(status)
-                    .streamed_body(Cursor::new(string))
-                    .ok()
-            }
+            Self::String(status, string) => Response::build()
+                .status(status)
+                .streamed_body(Cursor::new(string))
+                .ok(),
             Self::StringDynamic(status, string) => Response::build()
                 .status(status)
                 .streamed_body(Cursor::new(string))
@@ -28,7 +22,9 @@ impl<'a> Responder<'a, 'static> for ApiResponse {
                 .streamed_body(Cursor::new(html))
                 .ok(),
             Self::Template(template) => template.respond_to(request),
-            Self::NoContent => Response::build().status(rocket::http::Status::NoContent).ok(),
+            Self::NoContent => Response::build()
+                .status(rocket::http::Status::NoContent)
+                .ok(),
         }
     }
 }

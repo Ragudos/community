@@ -18,7 +18,8 @@
                         height="40"
                         {{#if (gt @index 4)}}
                         loading="lazy"
-                        decoding="async"
+                        {{else}}
+                        loading="eager"
                         {{/if}}
                     />
                 </div>

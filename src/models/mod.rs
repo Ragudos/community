@@ -1,3 +1,5 @@
+use serde::{Deserialize, Serialize};
+
 pub mod api;
 pub mod community;
 pub mod db;
@@ -16,6 +18,24 @@ pub enum Env {
     Development,
     Testing,
     Production,
+}
+
+#[derive(Serialize, Deserialize)]
+pub enum ToastTypes {
+    #[serde(rename = "success")]
+    Success,
+    #[serde(rename = "error")]
+    Error,
+    #[serde(rename = "warning")]
+    Warning,
+    #[serde(rename = "info")]
+    Info
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct Toast {
+    pub message: String,
+    pub r#type: Option<ToastTypes>
 }
 
 pub const JWT_NAME: &str = "Community__jwt";
