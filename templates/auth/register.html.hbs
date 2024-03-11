@@ -4,6 +4,7 @@
 		{{> partials/head}}
 		{{> partials/head/htmx-loading}}
 		{{> partials/head/only-form}}
+		<link rel="stylesheet" href="/build/styles/creation-success.min.css">
 	</head>
 	<body hx-ext="loading-states, response-targets, remove-me">
 		{{> partials/components/noscript}}
@@ -19,18 +20,18 @@
 						<label for="username">Username</label>
 						<div data-error id="username-error"></div>
 					</div>
-					<input aria-errormessage="username-error" type="text" id="user" name="username" maxLength="60" placeholder="John Doe" required>
+					<input aria-errormessage="username-error" autocomplete="name" type="text" id="user" name="username" maxLength="60" placeholder="John Doe" required>
 				</div>
 				<div class="input-group">
 					<div class="label-container">
 						<label for="password">Password</label>
 						<div data-error id="password-error"></div>
 					</div>
-					<input aria-errormessage="password-error" autocapitalize="off" type="password" id="password" name="password.input" minLength="8" maxlength="64" placeholder="********" required>
+					<input aria-errormessage="password-error" autocomplete="new-password" autocapitalize="off" type="password" id="password" name="password" minLength="8" maxlength="64" placeholder="********" required>
 				</div>
 				<div class="input-group">
 					<label for="confirm_password">Confirm your password</label>
-					<input autocapitalize="off" type="password" id="confirm_password" name="password.confirmation" minLength="8" maxlength="64" placeholder="********" required>
+					<input autocapitalize="off" type="password" autocomplete="new-password" id="confirm_password" name="confirm_password" minLength="8" maxlength="64" placeholder="********" required>
 				</div>
 				<div class="input-group">
 					<div class="label-container">

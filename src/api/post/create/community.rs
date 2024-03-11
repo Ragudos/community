@@ -86,7 +86,7 @@ pub async fn api_endpoint<'r>(
     })?;
 
     Ok(ApiResponse::Template(Template::render(
-        "partials/components/community/create_community_success",
+        "partials/components/community/create-community-success",
         context! {
             community_name: &community_info.display_name,
             user: jwt

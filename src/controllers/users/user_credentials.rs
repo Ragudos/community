@@ -24,10 +24,10 @@ impl UserCredentials {
             "#,
             uid
         )
-        .fetch_optional(&mut ***db)
+        .fetch_one(&mut ***db)
         .await?;
 
-        Ok(result.map(|r| r.email))
+        Ok(result.email)
     }
 
     pub async fn get_full_name(

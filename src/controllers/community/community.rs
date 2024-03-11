@@ -157,7 +157,7 @@ impl Community {
         sqlx::query!(
             r#"
             INSERT INTO communities (display_name, description, owner_id)
-            VALUES ($1, $2, (SELECT _id FROM users WHERE uid = $3))
+            VALUES ($1, $2, (SELECT _id FROM users WHERE uid = $3));
             "#,
             display_name,
             description,
