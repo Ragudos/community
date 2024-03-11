@@ -26,6 +26,8 @@ impl<'r> FromRequest<'r> for UserJWT {
             return Outcome::Forward(Status::Unauthorized);
         };
         let Outcome::Success(mut db) = Connection::<DbConn>::from_request(request).await else {
+            request.local_cache(|| Some("Failed to connect to the database."));
+
             return Outcome::Error((
                 Status::InternalServerError,
                 "Failed to connect to the database.",

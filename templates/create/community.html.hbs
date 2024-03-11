@@ -4,101 +4,37 @@
 		{{> partials/head }}
 		{{> partials/head/htmx-loading}}
 		{{> partials/head/cropper}}
-		<link rel="preload" href="/build/styles/checkbox.min.css" as="style">
-		<link rel="stylesheet" href="/build/styles/checkbox.min.css">
+		{{> partials/head/only-form}}
 	</head>
 	<body hx-ext="loading-states, response-targets, remove-me">
 		{{> partials/components/noscript}}
 		{{> partials/main_header }}
 		<main class="container">
 			<div>
-				<form
-					hx-trigger="submit"
-					hx-post="/create/community"
-					id="create-community-form"
-					hx-sync="#create-community-form:drop"
-					method="post"
-					action="/create/community"
-					data-loading-aria-busy
-					hx-target-error="#nothing"
-					hx-swap="outerHTML"
-				>
-					<div class="input-group">
-						<div class="label-container">
-							<label for="community_name">Name</label>
-							<div data-error id="community_name_error"></div>
-						</div>
-						<input aria-errormessage="community_name_error"  placeholder="The Best Community Evah" type="text" name="community_name" id="community_name"  maxlength="20" required>
-					</div>
-					<div class="input-group">
-						<div class="label-container">
-							<label for="description">Description</label>
-							<div data-error id="community_description_error"></div>
-						</div>
-						<textarea aria-errormessage="community_description_error" placeholder="This community is the best!" type="text" name="description" minlength="20" maxlength="100" id="description" required></textarea>
-					</div>
-					<div class="input-group">
-						<div class="label-container">
-							<p>Categories <sub>&#40;Up to 3&#41;</sub></p>
-							<div data-error id="community_categories_error"></div>
-						</div>
-						
-						<fieldset class="category-checkboxes">
-							<div data-checkbox-list data-max="3">
-								<div class="checkbox-wrapper-1">
-									<input value="art" type="checkbox" aria-errormessage="community_categories_error" aria-hidden="true" class="substituted" id="art-check" name="category">
-									<label for="art-check">Art</label>
-								</div>
-								<div class="checkbox-wrapper-1">
-									<input value="music" type="checkbox" aria-errormessage="community_categories_error" aria-hidden="true" class="substituted" id="music-check" name="category">
-									<label for="music-check">Music</label>
-								</div>
-								<div class="checkbox-wrapper-1">
-									<input value="gaming" type="checkbox" aria-errormessage="community_categories_error" aria-hidden="true" class="substituted" id="gaming-check" name="category">
-									<label for="gaming-check">Gaming</label>
-								</div>
-								<div class="checkbox-wrapper-1">
-									<input value="sports" type="checkbox" aria-errormessage="community_categories_error" aria-hidden="true" class="substituted" id="sports-check" name="category">
-									<label for="sports-check">Sports</label>
-								</div>
-								<div class="checkbox-wrapper-1">
-									<input value="science" type="checkbox" aria-errormessage="community_categories_error" aria-hidden="true" class="substituted" id="science-check" name="category">
-									<label for="science-check">Science</label>
-								</div>
-								<div class="checkbox-wrapper-1">
-									<input value="technology" type="checkbox" aria-errormessage="community_categories_error" aria-hidden="true" class="substituted" id="technology-check" name="category">
-									<label for="technology-check">Technology</label>
-								</div>
-								<div class="checkbox-wrapper-1">
-									<input value="literature" type="checkbox" aria-errormessage="community_categories_error" aria-hidden="true" class="substituted" id="literature-check" name="category">
-									<label for="literature-check">Literature</label>
-								</div>
-								<div class="checkbox-wrapper-1"v>
-									<input value="healthandfitness" type="checkbox" aria-errormessage="community_categories_error" aria-hidden="true" class="substituted" id="healthandfitness-check" name="category">
-									<label for="healthandfitness-check">Health &amp; Fitness</label>
-								</div>
-								<div class="checkbox-wrapper-1">
-									<input value="selfimprovement" type="checkbox" aria-errormessage="community_categories_error" aria-hidden="true" class="substituted" id="selfimprovement-check" name="category">
-									<label for="selfimprovement-check">Self Improvement</label>
-								</div>
-								<div class="checkbox-wrapper-1">
-									<input value="academics" type="checkbox" aria-errormessage="community_categories_error" aria-hidden="true" class="substituted" id="academics-check" name="category">
-									<label for="academics-check">Academics</label>
-								</div>
-								<div class="checkbox-wrapper-1">
-									<input value="other" type="checkbox" aria-errormessage="community_categories_error" aria-hidden="true" class="substituted" id="other-check" name="category">
-									<label for="other-check">Other</label>
-								</div>
-							</div>
-						</fieldset>
-					</div>
-					<input type="text" name="honeypot" style="display: none;" aria-hidden="true">
-					<button type="submit" data-loading-disable>
-						<span data-loading-delay="500" data-loading-class="hidden">Create</span>
-						<span data-loading-delay="500"  data-loading>Creating your community...</span>
-					</button>
-				</form>
+				<h1>Create your community</h1>
+				<p>Creating a community is easy. Just fill out the form and you're good to go!</p>
 			</div>
+			<form hx-trigger="submit" hx-post="/create/community" id="create-community-form" hx-sync="#create-community-form:drop" data-loading-aria-busy hx-target-error="#nothing" hx-swap="outerHTML">
+				<div class="input-group">
+					<div class="label-container">
+						<label for="community_name">Name</label>
+						<div data-error id="community_name_error"></div>
+					</div>
+					<input aria-errormessage="community_name_error"  placeholder="The Best Community Evah" type="text" name="community_name" id="community_name"  maxlength="20" required>
+				</div>
+				<div class="input-group">
+					<div class="label-container">
+						<label for="description">Description</label>
+						<div data-error id="community_description_error"></div>
+					</div>
+					<textarea aria-errormessage="community_description_error" placeholder="This community is the best!" type="text" name="description" minlength="20" maxlength="100" id="description" required></textarea>
+				</div>
+				<input type="text" name="honeypot" style="display: none;" aria-hidden="true">
+				<button type="submit" data-loading-disable>
+					<span data-loading-delay="500" data-loading-class="hidden">Create</span>
+					<span data-loading-delay="500"  data-loading>Creating your community...</span>
+				</button>
+			</form>
 		</main>
 		{{> partials/footer }}
 		{{> partials/nothing }}

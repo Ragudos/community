@@ -75,6 +75,30 @@ impl UserCredentials {
         Ok(result.password_hash)
     }
 
+    /// To verify if a user with that name exists whilst getting their password for verification.
+    /// This is to optimize our logic for the /login endpoint
+    pub async fn get_password_hash_by_name(
+        db: &mut Connection<DbConn>,
+        display_name: &str,
+    ) -> Result<Option<String>, sqlx::Error> {
+        let result = sqlx::query!(
+            r#"
+                SELECT password_hash
+                FROM user_credentials
+                WHERE (
+                    SELECT _id
+                    FROM users
+                    WHERE display_name = $1
+                ) = _id;
+            "#,
+            display_name
+        )
+        .fetch_optional(&mut ***db)
+        .await?;
+
+        Ok(result.map(|result| result.password_hash))
+    }
+
     pub async fn create(
         tx: &mut Transaction<'_, Postgres>,
         uid: &Uuid,

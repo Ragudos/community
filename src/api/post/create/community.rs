@@ -1,13 +1,26 @@
 use std::str::FromStr;
 
-use rocket::{form::Form, http::Status, post, State};
+use rocket::{
+    form::{Errors, Form},
+    http::Status,
+    post, State,
+};
 use rocket_db_pools::Connection;
-use rocket_dyn_templates::{context, Metadata};
+use rocket_dyn_templates::{context, Metadata, Template};
 use sqlx::{types::Uuid, Acquire};
 
 use crate::{
+    controllers::errors::{
+        create_community::{get_community_info_or_return_validation_error, render_error},
+        sqlx_error::sqlx_error_to_api_response,
+    },
     helpers::db::DbConn,
-    models::{api::ApiResponse, community::{forms::CreateCommunity, schema::Community}, rate_limiter::RateLimit, users::schema::UserJWT, Toast, ToastTypes},
+    models::{
+        api::ApiResponse,
+        community::{forms::CreateCommunity, schema::Community},
+        rate_limiter::RateLimit,
+        users::schema::UserJWT,
+    },
 };
 
 /* struct ReturnOfUpload {
@@ -15,115 +28,70 @@ use crate::{
     url: String,
 } */
 
-
 #[post("/community", data = "<community_info>")]
-pub async fn api_endpoint(
+pub async fn api_endpoint<'r>(
     mut db: Connection<DbConn>,
     jwt: UserJWT,
-    community_info: Result<Form<CreateCommunity<'_>>, rocket::form::Errors<'_>>,
+    community_info: Result<Form<CreateCommunity<'r>>, Errors<'r>>,
     rate_limit: &State<RateLimit>,
-    metadata: Metadata<'_>
+    metadata: Metadata<'r>,
 ) -> Result<ApiResponse, ApiResponse> {
-    let community_info = community_info.map_err(|errors| {
-        let mut community_name_error: Option<String> = None;
-        let mut description_error: Option<String> = None; 
-        let mut categories_error: Option<String> = None;
-        let mut honeypot_error: Option<Toast> = None;
+    let community_info = get_community_info_or_return_validation_error(&metadata, community_info)?;
 
-        for error in errors.into_iter() {
-            let is_for_name = error.is_for_exactly("community_name");
-            let is_for_description = error.is_for_exactly("description");
-            let is_for_categories = error.is_for_exactly("category");
-            let is_for_honeypot = error.is_for_exactly("honeypot");
+    rate_limit.add_to_limit_or_return(&metadata)?;
 
-            if is_for_name {
-                community_name_error = Some(error.kind.to_string());
-            }
-
-            if is_for_description {
-                description_error = Some(error.kind.to_string());
-            }
-
-            if is_for_categories {
-                categories_error = Some(error.kind.to_string());
-            }
-
-            if is_for_honeypot {
-                honeypot_error = Some(Toast {
-                    message: error.kind.to_string(),
-                    r#type: Some(ToastTypes::Error),
-                });
-            }
+    if Community::is_name_taken(&mut db, &community_info.display_name).await
+        .map_err(|error| {
+            sqlx_error_to_api_response(
+                error,
+                "Failed to create community. Please try again later",
+                &metadata,
+            )
+        })? {
+            return Err(render_error(&metadata, Status::Conflict, Some("Please choose a different name".to_string()), None, None))
         }
 
-        let (mime, html) = metadata.render(
-            "partials/components/community/create-community-errors",
-            context! {
-                community_name_error,
-                description_error,
-                categories_error,
-                toast: honeypot_error
-            }
-        ).unwrap();
-
-        ApiResponse::CustomHTML(
-            Status::BadRequest,
-            mime,
-            html
+    // This is safe because we've already validated the JWT on the request guard.
+    let uid = Uuid::from_str(&jwt.uid).unwrap();
+    let mut tx = db.begin().await.map_err(|err| {
+        sqlx_error_to_api_response(
+            err,
+            "Failed to create community. Please try again later",
+            &metadata,
         )
-    })?.into_inner();
+    })?;
 
-    rate_limit.add_to_limit_or_return(
-        "The server is experiencing high loads of requests. Please try again later.",
-    )?;
-
-    if Community::is_name_taken(&mut db, &community_info.display_name).await? {
-        return Err(ApiResponse::String(
-            Status::Conflict,
-            "Community name is already taken.",
-        ));
-    }
-
-    let mut tx = db.begin().await?;
-
-    let Ok(uid) = Uuid::from_str(&jwt.uid) else {
-        return Err(ApiResponse::String(
-            Status::InternalServerError,
-            "Failed to create community.",
-        ));
-    };
+    // We use tx despite there being only one query because we want to ensure that we
+    // are consistent in using transactions in INSERT operations.
     Community::create(
         &mut tx,
         &community_info.display_name,
         &community_info.description,
         &uid,
     )
-    .await?;
-
-    let Ok(_) = Community::create(
-        &mut tx,
-        &community_info.display_name,
-        &community_info.description,
-        &uid,
-    )
     .await
-    else {
-        return Err(ApiResponse::String(
-            Status::InternalServerError,
-            "Failed to create community.",
-        ));
-    };
+    .map_err(|error| {
+        sqlx_error_to_api_response(
+            error,
+            "Failed to create community. Please try again later",
+            &metadata,
+        )
+    })?;
+    tx.commit().await.map_err(|error| {
+        sqlx_error_to_api_response(
+            error,
+            "Failed to create community. Please try again later",
+            &metadata,
+        )
+    })?;
 
-    let Ok(_) = tx.commit().await else {
-        return Err(ApiResponse::String(
-            Status::InternalServerError,
-            "Failed to create community.",
-        ));
-    };
-
-    println!("Transaction committed");
-
-    Ok(ApiResponse::String(Status::Ok, "Oki"))
+    Ok(ApiResponse::Template(Template::render(
+        "partials/components/community/create_community_success",
+        context! {
+            community_name: &community_info.display_name,
+            user: jwt
+        },
+    )))
 }
 
 /*

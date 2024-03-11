@@ -200,7 +200,7 @@ small,
     font-size: 1.125em;
 }
 
-@media only screen and (min-width: 769px) {
+@media only screen and (min-width: 1024px) {
     h1 {
         font-size: 3.815rem;
     }
@@ -292,13 +292,20 @@ textarea {
 }
 
 button,
-input[type="submit"] {
+input[type=submit] {
     cursor: pointer;
+}
 
+button,
+input[type="submit"],
+a.btn-primary,
+a.btn-secondary,
+a.btn-destructive,
+a.btn-accent {
     font-size: 0.875rem;
     font-weight: 600;
 
-    padding: 0.5rem 1rem;
+    padding: 0.25rem 0.75rem;
 
     display: inline-flex;
     align-items: center;
@@ -323,6 +330,26 @@ a.destructive {
 
 a.accent {
     color: hsl(var(--accent));
+}
+
+a.btn-primary {
+    background-color: hsl(var(--primary) / var(--_bg-opacity, 1));
+    color: hsl(var(--primary-foreground));
+}
+
+a.btn-secondary {
+    background-color: hsl(var(--secondary) / var(--_bg-opacity, 1));
+    color: hsl(var(--secondary-foreground));
+}
+
+a.btn-destructive {
+    background-color: hsl(var(--destructive) / var(--_bg-opacity, 1));
+    color: hsl(var(--destructive-foreground));
+}
+
+a.btn-accent {
+    background-color: hsl(var(--accent) / var(--_bg-opacity, 1));
+    color: hsl(var(--accent-foreground));
 }
 
 button.primary,
@@ -350,9 +377,20 @@ input[type="submit"].accent {
 }
 
 button:hover,
-input[type="submit"]:hover {
+input[type="submit"]:hover,
+a.btn-primary:hover,
+a.btn-secondary:hover,
+a.btn-destructive:hover,
+a.btn-accent:hover {
     --_bg-opacity: 0.87;
     transform: scale(1.025);
+}
+
+a.btn-primary:hover,
+a.btn-secondary:hover,
+a.btn-destructive:hover,
+a.btn-accent:hover  {
+    text-decoration: none;
 }
 
 button:focus-visible,

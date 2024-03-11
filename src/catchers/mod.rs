@@ -1,7 +1,7 @@
 use rocket::{catch, http::Status, Request};
 use rocket_dyn_templates::{context, Template};
 
-use crate::models::{api::ApiResponse, seo::metadata::SeoMetadata, users::preferences::Theme};
+use crate::models::{api::ApiResponse, seo::metadata::SeoMetadata, users::preferences::Theme, Toast, ToastTypes};
 
 #[catch(422)]
 pub fn unprocessable_entity(request: &Request) -> &'static str {
@@ -43,10 +43,17 @@ pub fn internal_server_error(request: &Request) -> ApiResponse {
         // Means the request was made by htmx or the client. So, errors
         // are handled by our toaster.
         if is_htmx == "true" {
-            return ApiResponse::String(
-                Status::InternalServerError,
-                "An error occurred while processing your request",
-            );
+            return ApiResponse::Template(
+                Template::render(
+                    "partials/components/toast",
+                    context! {
+                        toast: Toast {
+                            message: "An error occured while processing your request.".to_string(),
+                            r#type: Some(ToastTypes::Error),
+                        }
+                    },
+                )
+            )
         }
     }
 

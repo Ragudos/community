@@ -1,7 +1,10 @@
 #[macro_use]
 extern crate rocket;
 
-use std::sync::atomic::AtomicU32;
+use std::sync::{
+    atomic::{AtomicBool, AtomicU32},
+    RwLock,
+};
 
 use rocket::{
     self as rocket_mod,
@@ -54,8 +57,6 @@ fn rocket_from_config(figment: Figment) -> Rocket<Build> {
                 api::get::auth::redirect,
                 api::get::auth::login::page,
                 api::get::auth::register::page,
-                api::get::auth::root::page,
-                api::get::auth::deny_welcome_page
             ],
         )
         .mount(
@@ -85,7 +86,8 @@ fn rocket_from_config(figment: Figment) -> Rocket<Build> {
         .attach(handlebars::register())
         .manage(RateLimit {
             capacity: AtomicU32::new(rate_limit_capacity),
-            time_accumulator_started: time::OffsetDateTime::now_utc(),
+            time_accumulator_started: RwLock::new(time::OffsetDateTime::now_utc()),
+            did_time_accumulator_start: AtomicBool::new(false),
             requests: AtomicU32::new(0),
         })
         .manage(Environment {

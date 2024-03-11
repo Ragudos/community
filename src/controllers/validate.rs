@@ -1,14 +1,6 @@
 use rocket::form::{Error, Result};
 
-pub fn validate_password<'v>(password: &str) -> Result<'v, ()> {
-    if password.len() < 8 {
-        return Err(Error::validation(
-            "Password must contain at least 8 characters.",
-        ))?;
-    }
-
-    // Todo: Add more password validation here. Use Regex
-
+pub fn validate_password<'v>(_password: &str) -> Result<'v, ()> {
     Ok(())
 }
 
@@ -25,17 +17,9 @@ pub fn validate_password_with_confirmation<'v>(
     Ok(())
 }
 
-pub fn validate_display_name<'v>(display_name: &str) -> Result<'v, ()> {
-    if display_name.len() > 60 {
-        return Err(Error::validation(
-            "Name can only contain up to 60 characters.",
-        ))?;
-    }
-
+pub fn validate_ascii_text<'v>(display_name: &str) -> Result<'v, ()> {
     if !display_name.chars().all(|c| c.is_alphanumeric()) {
-        return Err(Error::validation(
-            "Name can only contain alphanumeric characters.",
-        ))?;
+        return Err(Error::validation("No special characters are allowed."))?;
     }
 
     Ok(())

@@ -3,38 +3,57 @@
 	<head>
 		{{> partials/head}}
 		{{> partials/head/htmx-loading}}
+		{{> partials/head/only-form}}
 	</head>
-	<body hx-ext="loading-states">
+	<body hx-ext="loading-states, response-targets, remove-me">
 		{{> partials/components/noscript}}
 		{{> partials/main_header}}
 		<main class="container">
-			<form class="container" data-withcaptcha="true" id="register-form" hx-sync="#register-form:drop" hx-post="/auth/register" hx-trigger="submit" method="post" action="/auth/register">
+			<div>
+				<h1>Welcome to Community</h1>
+				<p>Begin your journey in socializing and register your details on the form.</p>
+			</div>
+			<form data-loading-aria-busy hx-target-error="#nothing" hx-swap="outerHTML" id="register-form" hx-sync="#register-form:drop" hx-post="/auth/register" hx-trigger="submit">
 				<div class="input-group">
-					<label for="username">Username</label>
-					<input autocomplete="off" autocapitalize="off" type="text" id="user" name="username" maxLength="60" placeholder="John Doe" required>
+					<div class="label-container">
+						<label for="username">Username</label>
+						<div data-error id="username-error"></div>
+					</div>
+					<input aria-errormessage="username-error" type="text" id="user" name="username" maxLength="60" placeholder="John Doe" required>
 				</div>
 				<div class="input-group">
-					<label for="password">Password</label>
-					<input autocomplete="off" autocapitalize="off" type="password" id="password" name="password.input" minLength="8" placeholder="********" required>
+					<div class="label-container">
+						<label for="password">Password</label>
+						<div data-error id="password-error"></div>
+					</div>
+					<input aria-errormessage="password-error" autocapitalize="off" type="password" id="password" name="password.input" minLength="8" maxlength="64" placeholder="********" required>
 				</div>
 				<div class="input-group">
-					<label for="confirm_password">Password</label>
-					<input autocomplete="off" autocapitalize="off"type="password" id="confirm_password" name="password.confirmation" minLength="8" placeholder="********" required>
+					<label for="confirm_password">Confirm your password</label>
+					<input autocapitalize="off" type="password" id="confirm_password" name="password.confirmation" minLength="8" maxlength="64" placeholder="********" required>
 				</div>
 				<div class="input-group">
-					<label for="gender">Gender</label>
-					<select id="gender" name="gender" required>
+					<div class="label-container">
+						<label for="gender">Gender</label>
+						<div data-error id="gender-error"></div>
+					</div>
+					<select id="gender" name="gender" aria-errormessage="gender-error" required>
 						<option selected value="" disabled>Choose your gender</option>
 						<option value="male">Male</option>
 						<option value="female">Female</option>
 						<option value="other">Other</option>
-						<option value="notspecified">Rather not say</option>
+						<option value="unknown">Rather not say</option>
 					</select>
 				</div>
-				<input value="" type="text" name="honeypot" style="display: none;">
-				<button type="submit">Register</button>
+				<input value="" type="text" name="honeypot" style="display: none;" aria-hidden="true">
+				<small>You already have an account? <a data-replace href="/auth/login" rel="noreferrer noopener">Sign in</a></small>
+				<button type="submit" data-loading-disable>
+					<span data-loading-delay="250" data-loading-class="hidden">Sign up</span>
+					<span data-loading-delay="250" data-loading>Creating your account...</span>
+				</button>
 			</form>
 		</main>
 		{{> partials/components/toast_container}}
+		{{> partials/nothing }}
 	</body>
 </html>

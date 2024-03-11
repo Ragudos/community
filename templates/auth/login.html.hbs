@@ -3,26 +3,40 @@
 	<head>
 		{{> partials/head}}		
 		{{> partials/head/htmx-loading}}
+		{{> partials/head/only-form}}
 	</head>
-	<body hx-ext="loading-states">
+	<body hx-ext="loading-states, response-targets, remove-me">
 		{{> partials/components/noscript}}
 		{{> partials/main_header}}
 		<main class="container">
-			<form data-withcaptcha="true" hx-sync="this" hx-post="/auth/login" hx-trigger="submit" method="post" action="/auth/login">
+			<div>
+				<h1>Welcome back!</h1>
+				<p>Please enter your information on the form to access your communities.</p>
+			</div>
+			<form hx-target-error="#nothing"  hx-sync="this" hx-post="/auth/login" hx-trigger="submit" method="post" action="/auth/login">
 				<div class="input-group">
-					<label for="username">Username</label>
+					<div class="label-container">
+						<label for="username">Username</label>
+						<div data-error id="username-error"></div>
+					</div>
 					<input autocomplete="off" autocapitalize="off"type="text" id="user" name="username" maxLength="60" placeholder="John Doe" required>
 				</div>
 				<div class="input-group">
-					<label for="password">Password</label>
+					<div class="label-container">
+						<label for="password">Password</label>
+						<div data-error id="password-error"></div>
+					</div>
 					<input autocomplete="off" autocapitalize="off"type="password" id="password" name="password" minLength="8" placeholder="********" required>
 				</div>
 				<input value="" type="text" name="honeypot" style="display: none;">
-				<button type="submit">
-					Login
+				<small>You don't have an account? <a data-replace href="/auth/register" rel="noreferrer noopener">Sign up</a></small>
+				<button type="submit" data-loading-disable>
+					<span data-loading-delay="250" data-loading-class="hidden">Sign in</span>
+					<span data-loading-delay="250" data-loading>Signing in...</span>
 				</button>
 			</form>
 		</main>
 		{{> partials/components/toast_container}}
+		{{> partials/nothing }}
 	</body>
 </html>

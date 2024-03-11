@@ -1,9 +1,6 @@
 use std::collections::HashSet;
 
-use rocket::{
-    get,
-    http::{ContentType, Status},
-};
+use rocket::{get, http::Status};
 use rocket_db_pools::Connection;
 use rocket_dyn_templates::{context, Metadata, Template};
 
@@ -152,15 +149,14 @@ pub async fn api_endpoint(
     if communities.is_err() || page_count.is_err() {
         eprintln!("Error getting communities: {:?}", communities.err());
 
-        let (mime, html) = metadata.render(
-            "partials/components/community/search-error",
-            context! {
-                message: "We experienced an unexpected problem. Please hang tight."
-            },
-        ).unwrap_or((
-            ContentType::HTML,
-            "<div data-with-grid id='section-of-communities'>We experienced an unexpected problem. Please hang tight.</div>".to_string()
-        ));
+        let (mime, html) = metadata
+            .render(
+                "partials/components/community/search-error",
+                context! {
+                    message: "We experienced an unexpected problem. Please hang tight."
+                },
+            )
+            .unwrap();
 
         return Err(ApiResponse::CustomHTML(
             Status::InternalServerError,

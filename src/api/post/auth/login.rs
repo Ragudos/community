@@ -1,16 +1,22 @@
-use std::str::FromStr;
-
 use bcrypt::verify;
 use rocket::{
-    form::Form,
+    form::{Errors, Form},
     http::{CookieJar, Status},
     post, State,
 };
 use rocket_db_pools::Connection;
-use sqlx::types::Uuid;
+use rocket_dyn_templates::Metadata;
 
 use crate::{
-    controllers::htmx::redirect::HtmxRedirect,
+    controllers::{
+        errors::{
+            bcrypt_error::bcrypt_error_to_api_response,
+            login_error::{get_login_data_or_return_validation_error, render_error},
+            serde_error::serde_json_error_to_api_response,
+            sqlx_error::sqlx_error_to_api_response,
+        },
+        htmx::redirect::HtmxRedirect,
+    },
     helpers::db::DbConn,
     models::{
         api::ApiResponse,
@@ -23,65 +29,73 @@ use crate::{
 };
 
 #[post("/login", data = "<login_data>", rank = 2)]
-pub async fn api_endpoint(
+pub async fn api_endpoint<'r>(
     mut db: Connection<DbConn>,
-    cookie_jar: &CookieJar<'_>,
-    login_data: Form<LoginFormData<'_>>,
+    cookie_jar: &CookieJar<'r>,
+    login_data: Result<Form<LoginFormData<'r>>, Errors<'r>>,
     rate_limit: &State<RateLimit>,
+    metadata: Metadata<'r>,
 ) -> Result<ApiResponse, ApiResponse> {
-    rate_limit.add_to_limit_or_return(
-        "The server is experiencing high loads of requests. Please try again later.",
-    )?;
+    rate_limit.add_to_limit_or_return(&metadata)?;
 
-    let Ok(user) = UserJWT::get_by_display_name(&mut db, &login_data.display_name).await else {
-        return Err(ApiResponse::String(
+    let login_data = get_login_data_or_return_validation_error(&metadata, login_data)?;
+    let Some(password_hash) =
+        UserCredentials::get_password_hash_by_name(&mut db, &login_data.display_name)
+            .await
+            .map_err(|error| {
+                sqlx_error_to_api_response(
+                    error,
+                    "Something went wrong. Please try again later.",
+                    &metadata,
+                )
+            })?
+    else {
+        return Err(render_error(
+            &metadata,
             Status::BadRequest,
-            "Something went wrong. Please try again.",
-        ));
-    };
-    let Some(user) = user else {
-        return Err(ApiResponse::String(
-            Status::Unauthorized,
-            "Invalid credentials",
-        ));
-    };
-    let Ok(uid) = Uuid::from_str(&user.uid) else {
-        return Err(ApiResponse::String(
-            Status::InternalServerError,
-            "Something went wrong.",
-        ));
-    };
-    let Ok(password) = UserCredentials::get_password_hash(&mut db, &uid).await else {
-        return Err(ApiResponse::String(
-            Status::InternalServerError,
-            "Something went wrong.",
-        ));
-    };
-    let Ok(does_password_match) = verify(login_data.password, &password) else {
-        return Err(ApiResponse::String(
-            Status::InternalServerError,
-            "Something went wrong.",
+            Some("Invalid credentials"),
+            Some("Invalid credentials"),
+            None,
         ));
     };
 
-    if does_password_match == false {
-        return Err(ApiResponse::String(
+    if !verify(login_data.password, &password_hash).map_err(|error| {
+        bcrypt_error_to_api_response(
+            &metadata,
+            error,
+            "We cannot verify your password. Please try again later.",
+        )
+    })? {
+        return Err(render_error(
+            &metadata,
             Status::Unauthorized,
-            "Invalid credentials.",
+            Some("Invalid credentials"),
+            Some("Invalid credentials"),
+            None,
         ));
     }
 
-    let jwt = UserJWT {
-        uid: user.uid,
-        display_name: user.display_name,
-        display_image: user.display_image,
-    };
-    let Ok(cookie) = jwt.to_cookie() else {
-        return Err(ApiResponse::String(
-            Status::InternalServerError,
-            "Something went wrong.",
-        ));
-    };
+    // We unwrap the Option<UserJWT> since we already verified that the user exists when
+    // getting the password.
+    let cookie = UserJWT::get_by_display_name(&mut db, &login_data.display_name)
+        .await
+        .map_err(|error| {
+            sqlx_error_to_api_response(
+                error,
+                "Something went wrong. Please try again later.",
+                &metadata,
+            )
+        })?
+        .unwrap()
+        .to_cookie()
+        .map_err(|error| {
+            serde_json_error_to_api_response(
+                &metadata,
+                error,
+                Status::UnprocessableEntity,
+                "Something went wrong. Please try again later.",
+            )
+        })?;
 
     cookie_jar.add_private(cookie);
     Ok(ApiResponse::HtmxRedirect(HtmxRedirect::to("/homepage")))

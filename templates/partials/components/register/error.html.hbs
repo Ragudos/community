@@ -1,0 +1,18 @@
+{{#if name_error}}
+<div data-error id="username-error" hx-swap-oob="true">
+    <small data-remove-me="5s">{{name_error}}</small>
+</div>
+{{/if}}
+{{#if password_error}}
+<div data-error id="password-error" hx-swap-oob="true">
+    <small data-remove-me="5s">{{password_error}}</small>
+</div>
+{{/if}}
+{{#if gender_error}}
+<div data-error id="gender-error" hx-swap-oob="true">
+    <small data-remove-me="5s">{{gender_error}}</small>
+</div>
+{{/if}}
+{{#if toast}}
+{{> partials/components/toast}}
+{{/if}}

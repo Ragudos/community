@@ -29,13 +29,13 @@ pub enum ToastTypes {
     #[serde(rename = "warning")]
     Warning,
     #[serde(rename = "info")]
-    Info
+    Info,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct Toast {
     pub message: String,
-    pub r#type: Option<ToastTypes>
+    pub r#type: Option<ToastTypes>,
 }
 
 pub const JWT_NAME: &str = "Community__jwt";
