@@ -1,4 +1,8 @@
+use std::str::FromStr;
+
+use rocket::request::FromParam;
 use serde::{Deserialize, Serialize};
+use sqlx::types::Uuid;
 
 pub mod api;
 pub mod community;
@@ -36,6 +40,18 @@ pub enum ToastTypes {
 pub struct Toast {
     pub message: String,
     pub r#type: Option<ToastTypes>,
+}
+
+pub struct StringUuid(pub Uuid);
+
+impl<'a> FromParam<'a> for StringUuid {
+    type Error = &'a str;
+
+    fn from_param(param: &'a str) -> Result<Self, Self::Error> {
+        let uid = Uuid::from_str(param).map_err(|_| "Invalid UUID")?;
+
+        Ok(StringUuid(uid))
+    }
 }
 
 pub const JWT_NAME: &str = "Community__jwt";

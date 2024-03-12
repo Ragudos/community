@@ -19,6 +19,7 @@ handlebars_helper!(num_abbr: |x: isize| {
         format!("{:.1}b", x as f64 / 1_000_000_000.0)
     }
 });
+handlebars_helper!(is_none: |x: Option<Value>| x.is_none());
 handlebars_helper!(add: |x: i64, y: i64| x + y);
 handlebars_helper!(sub: |x: i64, y: i64| x - y);
 handlebars_helper!(modulo: |x: i64, y: i64| x % y);
@@ -182,5 +183,8 @@ pub fn register() -> impl Fairing {
         engines
             .handlebars
             .register_helper("breadcrumbs", Box::new(breadcrumbs_helper));
+        engines
+            .handlebars
+            .register_helper("is_none", Box::new(is_none));
     })
 }

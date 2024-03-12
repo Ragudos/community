@@ -10,11 +10,11 @@ use sqlx::Acquire;
 
 use crate::{
     controllers::errors::{
-            bcrypt_error::bcrypt_error_to_api_response,
-            register_error::{get_register_data_or_return_validation_errors, render_error},
-            serde_error::serde_json_error_to_api_response,
-            sqlx_error::sqlx_error_to_api_response,
-        },
+        bcrypt_error::bcrypt_error_to_api_response,
+        register_error::{get_register_data_or_return_validation_errors, render_error},
+        serde_error::serde_json_error_to_api_response,
+        sqlx_error::sqlx_error_to_api_response,
+    },
     helpers::db::DbConn,
     models::{
         api::ApiResponse,
@@ -124,13 +124,15 @@ pub async fn api_endpoint<'r>(
     })?;
 
     cookie_jar.add_private(cookie);
-    
-    let (mime, html) = metadata.render(
-        "partials/components/register/success",
-        context! {
-            username: &register_data.display_name,
-        }
-    ).unwrap();
+
+    let (mime, html) = metadata
+        .render(
+            "partials/components/register/success",
+            context! {
+                username: &register_data.display_name,
+            },
+        )
+        .unwrap();
 
     Ok(ApiResponse::CustomHTML(Status::Ok, mime, html))
 }

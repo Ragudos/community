@@ -24,6 +24,46 @@ impl UserJWT {
             .build())
     }
 
+    pub async fn get_uid_by_id(
+        db: &mut Connection<DbConn>,
+        id: &i64,
+    ) -> Result<String, sqlx::Error> {
+        let result = sqlx::query!(
+            r#"
+                SELECT uid
+                FROM users
+                WHERE _id = $1;
+            "#,
+            id
+        )
+        .fetch_one(&mut ***db)
+        .await?;
+
+        Ok(result.uid.to_string())
+    }
+
+    pub async fn is_uid_owned_by_id(
+        db: &mut Connection<DbConn>,
+        uid: &Uuid,
+        id: &i64,
+    ) -> Result<bool, sqlx::Error> {
+        let result = sqlx::query!(
+            r#"
+                SELECT EXISTS (
+                    SELECT 1
+                    FROM users
+                    WHERE uid = $1 AND _id = $2
+                ) AS exists
+            "#,
+            uid,
+            id
+        )
+        .fetch_one(&mut ***db)
+        .await?;
+
+        Ok(result.exists.unwrap_or(false))
+    }
+
     pub async fn is_valid(&self, db: &mut Connection<DbConn>) -> Result<bool, sqlx::Error> {
         let Ok(uid) = Uuid::from_str(self.uid.as_str()) else {
             return Ok(false);

@@ -7,7 +7,7 @@ use sqlx::{
 use crate::{
     helpers::db::DbConn,
     models::{
-        community::schema::{Community, CommunityHomepageCard},
+        community::schema::{Community, CommunityHomepageCard, CommunityWithTotalMembers},
         db::enums::CommunityCategory,
     },
 };
@@ -124,9 +124,9 @@ impl Community {
     pub async fn get_by_uid(
         db: &mut Connection<DbConn>,
         uid: &Uuid,
-    ) -> Result<Option<Community>, sqlx::Error> {
+    ) -> Result<Option<CommunityWithTotalMembers>, sqlx::Error> {
         let result = sqlx::query_as!(
-            Community,
+            CommunityWithTotalMembers,
             r#"
             SELECT
             uid,
@@ -136,9 +136,18 @@ impl Community {
             owner_id,
             is_private,
             display_image,
-            cover_image
-            FROM communities
-            WHERE uid = $1
+            cover_image,
+            total_members
+            FROM communities c
+            LEFT JOIN (
+                SELECT _community_id, COALESCE(COUNT(*), 0) AS total_members
+                FROM community_memberships
+                WHERE _community_id = (
+                    SELECT _id FROM communities WHERE uid = $1
+                )
+                GROUP BY _community_id
+            ) cm ON cm._community_id = c._id
+            WHERE uid = $1;
             "#,
             uid
         )
@@ -153,20 +162,21 @@ impl Community {
         display_name: &str,
         description: &str,
         owner_uid: &Uuid,
-    ) -> Result<(), sqlx::Error> {
-        sqlx::query!(
+    ) -> Result<String, sqlx::Error> {
+        let result = sqlx::query!(
             r#"
             INSERT INTO communities (display_name, description, owner_id)
-            VALUES ($1, $2, (SELECT _id FROM users WHERE uid = $3));
+            VALUES ($1, $2, (SELECT _id FROM users WHERE uid = $3))
+            RETURNING uid;
             "#,
             display_name,
             description,
             owner_uid
         )
-        .execute(&mut **tx)
+        .fetch_one(&mut **tx)
         .await?;
 
-        Ok(())
+        Ok(result.uid.to_string())
     }
 
     pub async fn search_all_by_category_and_display_name_and_offset_and_weighted_score(

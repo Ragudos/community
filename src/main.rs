@@ -80,6 +80,13 @@ fn rocket_from_config(figment: Figment) -> Rocket<Build> {
                 api::post::create::community::api_endpoint
             ],
         )
+        .mount(
+            "/community",
+            routes![
+                api::get::community::redirect,
+                api::get::community::uid::about::page
+            ],
+        )
         .mount("/build", FileServer::from("build"))
         .mount("/assets", FileServer::from("assets"))
         .attach(db::stage())

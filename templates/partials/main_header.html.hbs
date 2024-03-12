@@ -2,7 +2,7 @@
     <nav class="container">
         {{#if user}}
             <a class="big" href="/homepage" title="Community Homepage">Community</a>
-            <div data-position="center" class="dropdown" style="height: 40px; width: 40px;">
+            <div data-position="right" class="dropdown" style="height: 40px; width: 40px;">
                 <button data-opener class="profile" aria-haspopup="true" aria-expanded="false" aria-controls="user-dropdown">
                     <img
                         role="presentation"
@@ -14,9 +14,23 @@
                 </button>
                 <div class="dropdown-content" id="user-dropdown">
                     <div class="dropdown-main">
-                        <div>
-
-                            <button type="button" hx-delete="/auth/logout">Logout</button>
+                        <div class="header__dropdown">
+                            <a href="/user/{{user.uid}}" title="My Profile">
+                                <div style="margin-right: 0.25rem;">
+                                    <i role="presentation" class="fa-regular fa-user fa-lg"></i>
+                                </div>
+                                <span>My profile</span>
+                            </a>
+                            <a href="/community" title="My Communities">
+                                <i role="presentation" class="fa-solid fa-building-user fa-lg"></i>
+                                <span>My communities</span>
+                            </a>
+                            <button type="button" hx-delete="/auth/logout" title="Logout">
+                                <div style="margin-right: 0.25rem;">
+                                    <i role="presentation" class="fa-solid fa-right-from-bracket fa-lg"></i>
+                                </div>
+                                <span>Logout</span>
+                            </button>
                         </div>
                     </div>
                 </div>

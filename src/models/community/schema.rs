@@ -29,6 +29,19 @@ pub struct Community {
     pub cover_image: Option<String>,
 }
 
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct CommunityWithTotalMembers {
+    pub uid: String,
+    pub display_name: String,
+    pub categories: Option<Vec<CommunityCategory>>,
+    pub description: String,
+    pub owner_id: i64,
+    pub is_private: bool,
+    pub display_image: Option<String>,
+    pub cover_image: Option<String>,
+    pub total_members: Option<i64>,
+}
+
 /// Combined table for community and total of community_memberships
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct CommunityHomepageCard {

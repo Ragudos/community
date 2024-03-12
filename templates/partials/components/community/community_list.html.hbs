@@ -6,7 +6,7 @@
     </p>
     {{/if}}
     {{#each communities}}
-    <a title="{{this.display_name}}" target="_blank" rel="noreferrer noopener" href="/community?community_name={{this.display_name}}"  class="card community__preview-container">
+    <a title="{{this.display_name}}" target="_blank" rel="noreferrer noopener" href="/community/{{this.uid}}/about"  class="card community__preview-container">
         <div role="presentation" style="background-image: url({{this.cover_image}})" class="with-bg-image community__preview-cover-image"></div>
         <div class="card-child">
             <div class="community__preview-name-img-container">

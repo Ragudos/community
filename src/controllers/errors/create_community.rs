@@ -66,5 +66,5 @@ pub fn get_community_info_or_return_validation_error<'r>(
                 honeypot_error,
             )
         })?
-    .into_inner())
+        .into_inner())
 }

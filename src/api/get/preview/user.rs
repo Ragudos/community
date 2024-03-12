@@ -1,21 +1,35 @@
 use rocket::{get, http::Status};
 use rocket_db_pools::Connection;
-use rocket_dyn_templates::{context, Template};
+use rocket_dyn_templates::{context, Metadata, Template};
 
 use crate::{
     helpers::db::DbConn,
-    models::{api::ApiResponse, users::schema::UserJWT},
+    models::{api::ApiResponse, users::schema::UserJWT, StringUuid, Toast, ToastTypes},
 };
 
-#[get("/user?<user_id>")]
+#[get("/user/<user_id>")]
 pub async fn api_endpoint(
     mut db: Connection<DbConn>,
     _jwt: UserJWT,
-    user_id: &str,
+    user_id: StringUuid,
+    metadata: Metadata<'_>,
 ) -> Result<ApiResponse, ApiResponse> {
-    let user_info = UserJWT::get_by_display_name(&mut db, &user_id).await?;
+    let StringUuid(user_id) = user_id;
+    let user_info: Option<UserJWT> = UserJWT::get_by_uid(&mut db, &user_id).await?;
     let Some(user_info) = user_info else {
-        return Err(ApiResponse::String(Status::NotFound, "User not found."));
+        let (mime, html) = metadata
+            .render(
+                "partials/components/toast",
+                context! {
+                    toast: Toast {
+                        message: "User not found.".to_string(),
+                        r#type: Some(ToastTypes::Error)
+                    }
+                },
+            )
+            .unwrap();
+
+        return Err(ApiResponse::CustomHTML(Status::NotFound, mime, html));
     };
 
     Ok(ApiResponse::Template(Template::render(

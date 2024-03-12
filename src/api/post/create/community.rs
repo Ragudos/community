@@ -40,16 +40,24 @@ pub async fn api_endpoint<'r>(
 
     rate_limit.add_to_limit_or_return(&metadata)?;
 
-    if Community::is_name_taken(&mut db, &community_info.display_name).await
+    if Community::is_name_taken(&mut db, &community_info.display_name)
+        .await
         .map_err(|error| {
             sqlx_error_to_api_response(
                 error,
                 "Failed to create community. Please try again later",
                 &metadata,
             )
-        })? {
-            return Err(render_error(&metadata, Status::Conflict, Some("Please choose a different name".to_string()), None, None))
-        }
+        })?
+    {
+        return Err(render_error(
+            &metadata,
+            Status::Conflict,
+            Some("Please choose a different name".to_string()),
+            None,
+            None,
+        ));
+    }
 
     // This is safe because we've already validated the JWT on the request guard.
     let uid = Uuid::from_str(&jwt.uid).unwrap();
@@ -63,7 +71,7 @@ pub async fn api_endpoint<'r>(
 
     // We use tx despite there being only one query because we want to ensure that we
     // are consistent in using transactions in INSERT operations.
-    Community::create(
+    let uid = Community::create(
         &mut tx,
         &community_info.display_name,
         &community_info.description,
@@ -89,6 +97,7 @@ pub async fn api_endpoint<'r>(
         "partials/components/community/create-community-success",
         context! {
             community_name: &community_info.display_name,
+            community_uid: &uid,
             user: jwt
         },
     )))

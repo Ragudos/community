@@ -34,3 +34,50 @@
     gap: 2rem;
     justify-content: space-between;
 }
+
+.header__dropdown {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--radius);
+    box-shadow: 0px 2px 4px hsl(var(--foreground) / 0.175);
+    padding: 0.5rem;
+}
+
+.header__dropdown button {
+    border: none;
+}
+
+.header__dropdown a {
+    color: hsl(var(--foreground));
+    display: inline-flex;
+}
+
+.header__dropdown a,
+.header__dropdown button {
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.5rem;
+    padding: 0.5rem;
+}
+
+.header__dropdown a:hover {
+    text-decoration: none;
+}
+
+.header__dropdown button:hover {
+    transform: scale(1);
+}
+
+.header__dropdown > hr {
+    font-size: initial;
+    border: 1px solid hsl(var(--accent) / 0.675);
+    display: initial;
+    color: initial;
+    padding: initial;
+    margin-block: 0;
+}
+
+.header__dropdown > *:hover {
+    background-color: hsl(var(--accent) / 0.5);
+}
