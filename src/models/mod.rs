@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use rocket::request::FromParam;
+use rocket::{request::FromParam, FromForm};
 use serde::{Deserialize, Serialize};
 use sqlx::types::Uuid;
 
@@ -13,6 +13,7 @@ pub mod notifications;
 pub mod rate_limiter;
 pub mod seo;
 pub mod users;
+pub mod query;
 
 pub struct Environment {
     pub environment: Env,
@@ -42,6 +43,7 @@ pub struct Toast {
     pub r#type: Option<ToastTypes>,
 }
 
+#[derive(Debug, Clone)]
 pub struct StringUuid(pub Uuid);
 
 impl<'a> FromParam<'a> for StringUuid {
@@ -56,3 +58,4 @@ impl<'a> FromParam<'a> for StringUuid {
 
 pub const JWT_NAME: &str = "Community__jwt";
 pub const HOMEPAGE_COMMUNITY_LIMIT: i64 = 12;
+pub const COMMUNITY_POST_LIMIT: i64 = 20;

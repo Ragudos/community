@@ -6,10 +6,18 @@ const SITE_NAME: &str = "Community";
 const DESCRIPTION: &str = "Community is a social media platform for communities.";
 
 #[derive(Default, Serialize, Deserialize, Clone)]
+pub struct OpenGraphImage<'r> {
+    pub url: &'r str,
+    pub alt: &'r str,
+    pub width: u32,
+    pub height: u32,
+}
+
+#[derive(Default, Serialize, Deserialize, Clone)]
 pub struct OpenGraphMetadata<'r> {
     pub title: &'r str,
     pub description: &'r str,
-    pub image: &'r str,
+    pub image: Option<OpenGraphImage<'r>>,
     pub url: &'r str,
 }
 

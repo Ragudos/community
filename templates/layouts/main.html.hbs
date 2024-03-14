@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="{{ metadata.language }}" data-theme="{{ metadata.theme }}">
+    <head>
+        {{> partials/head/main}}
+    </head>
+    <body hx-ext="loading-states, response-targets, remove-me, head-support">
+    {{> @partial-block}}
+    <ol id="toast-container" aria-label="Notifcations"></ol>
+    <!-- Used when doing OOB in error responses -->
+    <div id="nothing" hidden></div>
+    {{#if (eq metadata.env "development")}}
+    <script>!function(){let e,t=document.createElement("div");function n(){document.getElementById("screen_size_indicator").innerText=`${window.innerWidth}px`}t.id="screen_size_indicator",t.style.position="fixed",t.style.bottom="0",t.style.right="0",t.style.backgroundColor="hsl(var(--foreground))",t.style.color="hsl(var(--background))",document.body.appendChild(t),window.addEventListener("resize",()=>{clearTimeout(e),e=setTimeout(n,1e3)})}();</script>
+    {{/if}}
+    </body>
+</html>

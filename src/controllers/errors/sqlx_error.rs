@@ -5,17 +5,17 @@ use crate::models::{api::ApiResponse, Toast, ToastTypes};
 
 pub fn sqlx_error_to_api_response<'r>(
     error: sqlx::Error,
-    message: &'r str,
+    message: Option<&'r str>,
     metadata: &Metadata<'r>,
 ) -> ApiResponse {
     eprintln!("SQLX Error: {:?}", error);
 
     let (mime, html) = metadata
         .render(
-            "partials/components/toast",
+            "partials/toast",
             context! {
                 toast: Toast {
-                    message: message.to_string(),
+                    message: message.unwrap_or("Something went wrong. Please try again later.").to_string(),
                     r#type: Some(ToastTypes::Error),
                 }
             },

@@ -30,6 +30,20 @@ pub struct Community {
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct CommunityOfUser {
+    pub uid: String,
+    pub display_name: String,
+    pub categories: Option<Vec<CommunityCategory>>,
+    pub description: String,
+    pub is_private: bool,
+    pub display_image: Option<String>,
+    pub cover_image: Option<String>,
+    pub total_members: Option<i64>,
+    pub joined_at: OffsetDateTime,
+    pub role: UserRole,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct CommunityWithTotalMembers {
     pub uid: String,
     pub display_name: String,
@@ -69,4 +83,12 @@ pub struct CommunityJoinRequest {
     pub _created_at: OffsetDateTime,
     pub reason: String,
     pub user_uid: String,
+}
+
+/// Since we will repeat this pattern where we check if the user is a member or owner of a community, we can create a request guard for it.
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct CommunityPreview {
+    pub owner_uid: String,
+    pub community_uid: String,
+    pub is_viewer_outsider: bool,
 }

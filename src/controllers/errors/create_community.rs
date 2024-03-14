@@ -15,7 +15,7 @@ pub fn render_error<'r>(
 ) -> ApiResponse {
     let (mime, html) = metadata
         .render(
-            "partials/components/community/create-community-errors",
+            "partials/community/creation_error",
             context! {
                 community_name_error,
                 description_error,

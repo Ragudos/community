@@ -24,6 +24,31 @@ impl UserTable {
         Ok(result.exists.map_or(false, |s| s))
     }
 
+    /// To limit the number of communities a user can create
+    pub async fn does_own_community(
+        db: &mut Connection<DbConn>,
+        uid: &Uuid,
+    ) -> Result<bool, sqlx::Error> {
+        let result = sqlx::query!(
+            r#"
+                SELECT EXISTS (
+                    SELECT 1
+                    FROM communities
+                    WHERE owner_id = (
+                        SELECT _id
+                        FROM users
+                        WHERE uid = $1
+                    )
+                ) AS exists
+            "#,
+            uid
+        )
+        .fetch_one(&mut ***db)
+        .await?;
+
+        Ok(result.exists.map_or(false, |s| s))
+    }
+
     /// Returns the uid
     pub async fn create(
         tx: &mut Transaction<'_, Postgres>,

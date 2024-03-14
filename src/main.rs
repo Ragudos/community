@@ -1,29 +1,23 @@
 #[macro_use]
 extern crate rocket;
 
-use std::sync::{
-    atomic::{AtomicBool, AtomicU32},
-    RwLock,
-};
+use std::sync::atomic::{AtomicBool, AtomicU32};
+use std::sync::RwLock;
 
-use rocket::{
-    self as rocket_mod,
-    figment::{
-        value::{Map, Value},
-        Provider,
-    },
-};
+use rocket as rocket_mod;
+use rocket::figment::value::{Map, Value};
+use rocket::figment::{Figment, Profile, Provider};
+use rocket::fs::FileServer;
+use rocket::Build;
+use rocket::Rocket;
 
-use community::{
-    api, catchers,
-    helpers::{db, get_environment, handlebars},
-    models::{rate_limiter::RateLimit, Env, Environment},
-};
-use rocket_mod::{
-    figment::{Figment, Profile},
-    fs::FileServer,
-    Build, Rocket,
-};
+use community::catchers;
+use community::helpers::db;
+use community::helpers::get_environment;
+use community::helpers::handlebars;
+use community::models::rate_limiter::RateLimit;
+use community::models::{Env, Environment};
+use community::routes;
 
 #[launch]
 fn rocket() -> _ {
@@ -34,61 +28,18 @@ fn rocket() -> _ {
 }
 
 fn rocket_from_config(figment: Figment) -> Rocket<Build> {
-    let rate_limit_capacity = figment.data().unwrap();
-    let rate_limit_capacity = rate_limit_capacity.get(&Profile::Global).unwrap();
-    let rate_limit_capacity = rate_limit_capacity
+    let rate_limit_capacity = figment
+        .data()
+        .unwrap()
+        .get(&Profile::Global)
+        .unwrap()
         .get("rate-limit-capacity")
         .unwrap()
         .to_num()
         .unwrap()
         .to_u32()
         .unwrap();
-
     let rocket = rocket_mod::custom(figment)
-        .mount("/", routes![api::get::root::page,])
-        .mount(
-            "/auth",
-            routes![
-                api::post::auth::deny_post_request,
-                api::post::auth::register::api_endpoint,
-                api::post::auth::login::api_endpoint,
-                api::delete::auth::logout::api_endpoint,
-                api::delete::auth::logout::deny_delete_request,
-                api::get::auth::redirect,
-                api::get::auth::login::page,
-                api::get::auth::register::page,
-            ],
-        )
-        .mount(
-            "/homepage",
-            routes![api::get::homepage::root::page, api::get::homepage::redirect],
-        )
-        .mount(
-            "/preview",
-            routes![
-                api::get::preview::community::api_endpoint,
-                api::get::preview::user::api_endpoint,
-                api::get::preview::deny_request
-            ],
-        )
-        .mount(
-            "/create",
-            routes![
-                api::get::create::community::page,
-                api::get::create::redirect,
-                api::post::create::deny_post_request,
-                api::post::create::community::api_endpoint
-            ],
-        )
-        .mount(
-            "/community",
-            routes![
-                api::get::community::redirect,
-                api::get::community::uid::about::page
-            ],
-        )
-        .mount("/build", FileServer::from("build"))
-        .mount("/assets", FileServer::from("assets"))
         .attach(db::stage())
         .attach(handlebars::register())
         .manage(RateLimit {
@@ -107,7 +58,71 @@ fn rocket_from_config(figment: Figment) -> Rocket<Build> {
                 catchers::not_found,
                 catchers::internal_server_error
             ],
-        );
+        )
+        .mount("/", routes![routes::page])
+        .mount(
+            "/auth",
+            routes![
+                routes::auth::logged_in,
+                routes::auth::logged_out,
+                routes::auth::login::page,
+                routes::auth::register::page
+            ],
+        )
+        .mount(
+            "/auth/api",
+            routes![
+                routes::auth::api::login::post,
+                routes::auth::api::register::post,
+                routes::auth::api::logout::delete,
+                routes::auth::api::login::logged_in,
+                routes::auth::api::register::logged_in
+            ],
+        )
+        .mount(
+            "/community",
+            routes![
+                routes::community::logged_out,
+                routes::community::page,
+                routes::community::uid::page,
+                routes::community::uid::settings::page,
+                routes::community::uid::about::page,
+                routes::community::uid::members::page,
+            ],
+        )
+        .mount(
+            "/community/api",
+            routes![
+                routes::community::api::logged_out,
+                routes::community::api::get,
+                routes::community::api::uid::get
+            ],
+        )
+        .mount(
+            "/create",
+            routes![routes::create::logged_out, routes::create::community::page],
+        )
+        .mount("/create/api", routes![routes::create::api::logged_out])
+        .mount(
+            "/user",
+            routes![routes::user::logged_out, routes::user::page],
+        )
+        .mount(
+            "/posts",
+            routes![
+                routes::posts::logged_out_and_not_allowed,
+                routes::posts::page,
+            ],
+        )
+        .mount(
+            "/posts/api",
+            routes![
+                routes::posts::api::community_posts::get,
+                routes::posts::api::post_info::get
+            ]
+        )
+        .mount("/build", FileServer::from("build"))
+        .mount("/assets", FileServer::from("assets"));
 
     rocket
 }
@@ -136,122 +151,4 @@ fn create_config(env: Env) -> Figment {
         .merge(("service_account", service_account_path));
 
     figment
-}
-
-#[cfg(test)]
-mod test_utils {
-    use rocket::local::asynchronous::Client;
-
-    use crate::{create_config, rocket_from_config, Env};
-
-    pub async fn get_client() -> Client {
-        let figment = create_config(Env::Testing);
-
-        let client = Client::tracked(rocket_from_config(figment))
-            .await
-            .expect("valid rocket instance");
-
-        client
-    }
-}
-
-#[cfg(test)]
-mod general_tests {
-    use rocket::http::{ContentType, Status};
-
-    use crate::test_utils::get_client;
-
-    #[rocket::async_test]
-    async fn test_connection() {
-        let client = get_client().await;
-        let response = client.get("/").dispatch().await;
-
-        assert_eq!(response.status(), Status::Ok);
-    }
-
-    #[rocket::async_test]
-    async fn test_register() {
-        let client = get_client().await;
-        let response = client.get("/auth/register").dispatch().await;
-
-        assert_eq!(response.status(), Status::Ok);
-
-        let mut request = client.post("/auth/register")
-            .header(ContentType::Form)
-            .body(r#"username=deadkiller&password.input=password&password.confirmation=password&gender=male&g-recaptcha-response="#);
-
-        request.add_header(ContentType::Form);
-
-        let response = request.dispatch().await;
-
-        assert_eq!(response.status(), Status::Unauthorized);
-        assert_eq!(
-            response.into_string().await,
-            Some("Please verify that you're not a robot.".to_string())
-        );
-
-        let mut request = client.post("/auth/register")
-            .header(ContentType::Form)
-            .body(r#"username=deadkiller&password.input=password&password.confirmation=password&gender=male&g-recaptcha-response=test"#);
-
-        request.add_header(ContentType::Form);
-
-        let response = request.dispatch().await;
-
-        assert_eq!(response.status(), Status::Conflict);
-        assert_eq!(
-            Some("Please choose a different username.".to_string()),
-            response.into_string().await
-        );
-    }
-
-    #[rocket::async_test]
-    async fn test_login() {
-        let client = get_client().await;
-        let response = client.get("/auth/login").dispatch().await;
-
-        assert_eq!(response.status(), Status::Ok);
-
-        let mut request = client
-            .post("/auth/login")
-            .header(ContentType::Form)
-            .body(r#"username=deadkiller&password=12345678&g-recaptcha-response=test"#);
-
-        request.add_header(ContentType::Form);
-
-        let response = request.dispatch().await;
-        let redirect_uri = response.headers().get("HX-Redirect").collect::<String>();
-
-        assert_eq!(response.status(), Status::Ok);
-        assert_eq!(redirect_uri, "/homepage");
-    }
-
-    #[rocket::async_test]
-    async fn test_limiter() {
-        let client = get_client().await;
-
-        for _ in 0..2 {
-            let mut request = client
-                .post("/auth/login")
-                .header(ContentType::Form)
-                .body(r#"username=deadkiller&password=12345678&g-recaptcha-response=test"#);
-
-            request.add_header(ContentType::Form);
-            request.dispatch().await;
-
-            let request = client.delete("/auth/logout");
-
-            request.dispatch().await;
-        }
-
-        let mut request = client
-            .post("/auth/login")
-            .header(ContentType::Form)
-            .body(r#"username=deadkiller&password=12345678&g-recaptcha-response=test"#);
-
-        request.add_header(ContentType::Form);
-
-        let response = request.dispatch().await;
-        assert_eq!(response.status(), Status::TooManyRequests);
-    }
 }

@@ -7,7 +7,9 @@ use sqlx::{
 use crate::{
     helpers::db::DbConn,
     models::{
-        community::schema::{Community, CommunityHomepageCard, CommunityWithTotalMembers},
+        community::schema::{
+            Community, CommunityHomepageCard, CommunityOfUser, CommunityWithTotalMembers,
+        },
         db::enums::CommunityCategory,
     },
 };
@@ -31,6 +33,50 @@ impl Community {
         .await?;
 
         Ok(result.exists)
+    }
+
+    pub async fn get_communities_of_user_by_uid(
+        db: &mut Connection<DbConn>,
+        uid: &Uuid,
+        limit: &i64,
+        offset: &i64,
+        categories: &Vec<CommunityCategory>,
+        display_name: &str,
+    ) -> Result<Vec<CommunityOfUser>, sqlx::Error> {
+        let result = sqlx::query_as!(
+            CommunityOfUser,
+            r#"
+            SELECT
+            uid,
+            display_name,
+            categories AS "categories: _",
+            display_image,
+            cover_image,
+            description,
+            is_private,
+            total_members,
+            joined_at,
+            role AS "role: _"
+            FROM communities c
+            LEFT JOIN (
+                SELECT _community_id, COALESCE(COUNT(*), 0) AS total_members, _created_at AS joined_at, role
+                FROM community_memberships
+                WHERE _user_id = (SELECT _id FROM users WHERE uid = $1)
+
+                GROUP BY _community_id, _created_at, role
+            ) cm ON cm._community_id = c._id
+            WHERE categories @> $2 AND similarity(display_name, $3) > 0.1
+            ORDER BY joined_at DESC
+            LIMIT $4 OFFSET $5
+            "#,
+            uid,
+            categories as &Vec<CommunityCategory>,
+            display_name,
+            limit,
+            offset
+        ).fetch_all(&mut ***db).await?;
+
+        Ok(result)
     }
 
     pub async fn get_pagination_filtered_by_category_and_display_name(

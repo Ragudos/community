@@ -1,10 +1,7 @@
 # How the APIs work for this web app
 
-## Posts
+For the cycle of each request for a page:
 
-- Visibility:
-    - Public: Anyone can see the post
-    - Private: Only the user can see the post
-    - Followers: Only the user's followers can see the post
-    - Community: Only the user's community can see the post
-
+1. Initially load the page with static elements, which are those that do not require a query to the database.
+2. Using HTMX, the initial markup will include htmx attributes for the container if they
+require to have content in them that's dynamic. Their initial content will be skeleton loaders.

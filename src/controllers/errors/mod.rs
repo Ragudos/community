@@ -1,4 +1,3 @@
-pub mod api;
 pub mod bcrypt_error;
 pub mod create_community;
 pub mod login_error;

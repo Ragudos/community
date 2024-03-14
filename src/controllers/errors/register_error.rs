@@ -13,7 +13,7 @@ pub fn render_error<'r>(
 ) -> ApiResponse {
     let (mime, html) = metadata
         .render(
-            "partials/components/register/error",
+            "partials/auth/register_error",
             context! {
                 name_error,
                 password_error,

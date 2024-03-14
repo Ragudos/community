@@ -1,5 +1,5 @@
 use crate::models::api::ApiResponse;
-use rocket::{http::Header, response::Responder, Response};
+use rocket::{http::{Header, Status}, response::Responder, Response};
 use std::io::Cursor;
 
 impl<'a> Responder<'a, 'static> for ApiResponse {
@@ -25,6 +25,22 @@ impl<'a> Responder<'a, 'static> for ApiResponse {
             Self::NoContent => Response::build()
                 .status(rocket::http::Status::NoContent)
                 .ok(),
+            Self::Created(resource_uri, html) => {
+                let mut response = Response::build();
+
+                response
+                    .header(Header::new("Location", resource_uri))
+                    .status(Status::Created);
+
+                if let Some((content_type, html)) = html {
+                    response
+                        .header(Header::new("Content-Type", content_type.to_string()))
+                        .streamed_body(Cursor::new(html))
+                        .ok()
+                } else {
+                    response.ok()
+                }
+            }
         }
     }
 }

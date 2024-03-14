@@ -45,19 +45,7 @@ impl RateLimit {
             return Err(ApiResponse::CustomHTML(Status::TooManyRequests, mime, html));
         }
 
-        if self
-            .time_accumulator_started
-            .read()
-            .unwrap()
-            .saturating_add(Duration::seconds(30))
-            < OffsetDateTime::now_utc()
-        {
-            self.requests.swap(0, Ordering::Relaxed);
-            self.did_time_accumulator_start
-                .swap(false, Ordering::Relaxed);
-        } else {
-            self.requests.fetch_add(1, Ordering::Relaxed);
-        }
+        self.requests.fetch_add(1, Ordering::Relaxed);
 
         Ok(())
     }
