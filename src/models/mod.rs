@@ -10,10 +10,10 @@ pub mod db;
 pub mod errors;
 pub mod messaging;
 pub mod notifications;
+pub mod query;
 pub mod rate_limiter;
 pub mod seo;
 pub mod users;
-pub mod query;
 
 pub struct Environment {
     pub environment: Env,

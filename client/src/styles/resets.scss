@@ -1,0 +1,276 @@
+@use "sass:color";
+@use "./functions" as *;
+@use "./mixins" as *;
+@use "./variables" as *;
+
+*,
+::before,
+::after {
+    box-sizing: inherit;
+}
+
+html {
+    box-sizing: border-box;
+
+    text-rendering: optimizeSpeed;
+    @include font-size(16);
+}
+
+html:focus-within {
+    scroll-behavior: smooth;
+}
+
+body,
+h1,
+h2,
+h3,
+h4,
+p,
+ul:not([role=list]),
+ol:not([role=list]),
+li,
+figure,
+figcaption,
+blockquote,
+dl,
+dd,
+button,
+a,
+input,
+select,
+textarea {
+    margin: 0;
+}
+
+body,
+fieldset,
+legend,
+caption,
+label,
+blockquote,
+pre {
+    font-size: 100%;
+    font-weight: normal;
+    vertical-align: baseline;
+}
+
+blockquote,
+fieldset,
+legend,
+caption,
+button,
+input,
+textarea,
+select,
+a {
+    outline: transparent;
+    background: transparent;
+}
+
+blockquote,
+fieldset,
+legend,
+caption,
+button,
+input,
+textarea,
+select,
+hr {
+    border: none;
+}
+
+body,
+ul:not([role=list]),
+ol:not([role=list]),
+blockquote,
+q,
+figure,
+fieldset,
+legend,
+caption,
+dl,
+dd,
+li,
+hr {
+    padding: 0;
+}
+
+main,
+article,
+aside,
+figure,
+footer,
+header,
+nav,
+section,
+details,
+summary,
+hr {
+    display: block;
+}
+
+blockquote,
+q {
+    quotes: none;
+}
+
+blockquote:before,
+blockquote:after,
+q:before,
+q:after {
+    content: '';
+    content: none;
+}
+
+hr {
+    height: 1px;
+    border-top: 1px solid currentColor;
+    margin: 1rem 0;
+}
+
+del {
+    text-decoration: line-through;
+}
+
+table {
+    border-spacing: 0;
+    border-collapse: separate;
+}
+
+table,
+th,
+td {
+    text-align: left;
+}
+
+th {
+    font-weight: 700;
+    vertical-align: bottom;
+}
+
+td {
+    font-weight: normal;
+}
+
+td,
+td img {
+    vertical-align: top;
+}
+
+ul:not([role=list]),
+ol:not([role=list]) {
+    list-style: none;
+}
+
+img {
+    border: 0;
+    max-width: 100%;
+    shape-margin: 2rem;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+img,
+input,
+select {
+    vertical-align: middle;
+}
+
+input[type=radio] {
+    vertical-align: text-bottom;
+}
+
+input[type=checkbox] {
+    vertical-align: bottom;
+}
+
+strong,
+mark {
+    font-weight: 700;
+}
+
+pre {
+    white-space: pre-line;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    text-wrap: balance;
+}
+
+mark,
+img {
+    font-style: italic;
+}
+
+p {
+    text-wrap: pretty;
+}
+
+small {
+    font-size: 80%;
+}
+
+pre,
+code,
+kbd,
+samp {
+    font-family: monospace, sans-serif;
+}
+
+button,
+input[type=file],
+input[type=submit] {
+    cursor: pointer;
+}
+
+a {
+    text-decoration: none;
+}
+
+a,
+button,
+input,
+textarea,
+select {
+    color: inherit;
+    font-size: inherit;
+}
+
+a,
+button,
+input[type=submit] {
+    -webkit-tap-highlight-color: transparent;
+    line-height: normal;
+    overflow: visible;
+
+    -webkit-appearance: button;
+    appearance: button;
+    font-weight: 600;
+    
+    &::-moz-focus-inner {
+        border: 0;
+        padding: 0;
+    }
+}
+
+[hidden] {
+    display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+    }
+}

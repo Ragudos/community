@@ -1,6 +1,10 @@
 use std::convert::Infallible;
 
-use rocket::{async_trait, request::{FromRequest, Outcome}, Request};
+use rocket::{
+    async_trait,
+    request::{FromRequest, Outcome},
+    Request,
+};
 
 pub mod redirect;
 pub mod refresh;

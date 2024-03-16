@@ -1,5 +1,9 @@
 use crate::models::api::ApiResponse;
-use rocket::{http::{Header, Status}, response::Responder, Response};
+use rocket::{
+    http::{Header, Status},
+    response::Responder,
+    Response,
+};
 use std::io::Cursor;
 
 impl<'a> Responder<'a, 'static> for ApiResponse {

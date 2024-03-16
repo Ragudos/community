@@ -1,0 +1,30 @@
+/** === COLOR THEMES FOR DARK AND LIGHT MODE  ===  **/
+$themes: (
+    light: (
+        text: hsl(10, 60%, 5%),
+        background: hsl(9, 47%, 96%),
+        primary: hsl(5, 57%, 54%),
+        primary-foreground: hsl(10, 60%, 4%),
+        secondary: hsl(85, 57%, 72%),
+        secondary-foreground: hsl(10, 60%, 4%),
+        accent: hsl(112, 57%, 61%),
+        accent-foregroubd: hsl(10, 60%, 4%),
+        destructive: hsl(0, 85%, 60%),
+        destructive-foreground: hsl(10, 60%, 4%),
+        border: hsl(9, 47%, 20%),
+        input: hsl(9, 47%, 20%),
+        ring: hsl(112, 57%, 40%)
+    ),
+    dark: (
+        text: hsl(10, 60%, 95%),
+        background: hsl(9, 47%, 4%),
+        primary: hsl(5, 57%, 46%),
+        secondary: hsl(85, 57%, 28%),
+        accent: hsl(112, 57%, 39%),
+        destructive: hsl(0, 62%, 40%),
+        destructive-foreground: hsl(10, 61%, 10%),
+        border: hsl(9, 47%, 20%),
+        input: hsl(9, 47%, 80%),
+        ring: hsl(112, 57%, 60%)
+    ),
+);

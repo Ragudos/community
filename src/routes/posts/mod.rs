@@ -1,8 +1,8 @@
 use rocket::get;
 
 use rocket::http::CookieJar;
-use rocket_dyn_templates::Template;
 use rocket_dyn_templates::context;
+use rocket_dyn_templates::Template;
 
 use crate::controllers::htmx::IsBoosted;
 use crate::models::seo::metadata::SeoMetadata;

@@ -1,5 +1,5 @@
-use rocket::http::CookieJar;
 use rocket::get;
+use rocket::http::CookieJar;
 use rocket_dyn_templates::context;
 use rocket_dyn_templates::Template;
 
@@ -14,5 +14,8 @@ pub fn page<'r>(cookie_jar: &CookieJar<'r>, user: UserJWT, is_boosted: IsBoosted
     let theme = Theme::from_cookie_jar(cookie_jar);
     let metadata = SeoMetadata::build().theme(theme).finalize();
 
-    Template::render("pages/create/community", context! { metadata, user, is_boosted })
+    Template::render(
+        "pages/create/community",
+        context! { metadata, user, is_boosted },
+    )
 }

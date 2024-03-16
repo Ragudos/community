@@ -35,7 +35,11 @@ jobs:
       run: chmod +x scripts/__test-utils__/ci_migrations.sh && scripts/__test-utils__/ci_migrations.sh
     - name: Build
       run: cargo build --verbose
-    - name: Run tests
+    - name: Format
+      run: cargo fmt
+    - name: Run quick tests
       run: cargo test --verbose
+    - name: Run slow tests
+      run: cargo test --verbose -- --ignored
     - name: Run clippy
       run: cargo clippy

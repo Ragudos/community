@@ -1,5 +1,5 @@
-use rocket::http::CookieJar;
 use rocket::get;
+use rocket::http::CookieJar;
 use rocket::FromForm;
 use rocket_dyn_templates::context;
 use rocket_dyn_templates::Template;
@@ -19,10 +19,18 @@ pub struct MemberFilter {
 /// page is the owner or member of the community or not.
 /// Also do the t filter which stands for type, and it can be either `members`, `admins`, `online`.
 #[get("/<_>/members?<t..>")]
-pub fn page<'r>(cookie_jar: &CookieJar<'r>, user: UserJWT, is_boosted: IsBoosted, t: Option<UserRole>) -> Template {
+pub fn page<'r>(
+    cookie_jar: &CookieJar<'r>,
+    user: UserJWT,
+    is_boosted: IsBoosted,
+    t: Option<UserRole>,
+) -> Template {
     let IsBoosted(is_boosted) = is_boosted;
     let theme = Theme::from_cookie_jar(cookie_jar);
     let metadata = SeoMetadata::build().theme(theme).finalize();
 
-    Template::render("pages/community/members", context! { metadata, user, is_boosted })
+    Template::render(
+        "pages/community/members",
+        context! { metadata, user, is_boosted },
+    )
 }

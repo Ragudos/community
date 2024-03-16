@@ -1,5 +1,5 @@
-use rocket::http::CookieJar;
 use rocket::get;
+use rocket::http::CookieJar;
 use rocket_dyn_templates::context;
 use rocket_dyn_templates::Template;
 
@@ -9,8 +9,8 @@ use crate::models::users::preferences::Theme;
 use crate::models::users::schema::UserJWT;
 
 pub mod about;
-pub mod settings;
 pub mod members;
+pub mod settings;
 
 /// TODO: Community Preview here with community's uid, owner's uid, and whether the user viewing this
 /// page is the owner or member of the community or not.
@@ -20,5 +20,8 @@ pub fn page<'r>(cookie_jar: &CookieJar<'r>, user: UserJWT, is_boosted: IsBoosted
     let theme = Theme::from_cookie_jar(cookie_jar);
     let metadata = SeoMetadata::build().theme(theme).finalize();
 
-    Template::render("pages/community/uid", context! { metadata, user, is_boosted })
+    Template::render(
+        "pages/community/uid",
+        context! { metadata, user, is_boosted },
+    )
 }

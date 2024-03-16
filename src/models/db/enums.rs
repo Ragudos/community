@@ -1,8 +1,8 @@
+use rocket::FromFormField;
 use serde::Deserialize;
 use serde::Serialize;
 use sqlx::postgres::PgHasArrayType;
 use sqlx::prelude::Type;
-use rocket::FromFormField;
 
 #[derive(Serialize, Deserialize, PartialEq, Eq, Type, FromFormField, Clone, Debug)]
 #[sqlx(type_name = "gender", rename_all = "lowercase")]

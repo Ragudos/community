@@ -129,8 +129,11 @@ impl<'a> FromRequest<'a> for CommunityPreview {
                         eprintln!("Sqlx Error: {:?}", err);
                         request.local_cache(|| Some("Failed to fetch community preview."));
 
-                        return Outcome::Error((Status::InternalServerError, "Failed to fetch community preview."));
-                    },
+                        return Outcome::Error((
+                            Status::InternalServerError,
+                            "Failed to fetch community preview.",
+                        ));
+                    }
                 }
             }
             Outcome::Error(err) => Outcome::Error(err),

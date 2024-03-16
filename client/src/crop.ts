@@ -1,5 +1,5 @@
 import Cropper from "cropperjs";
-import { getTheme } from "./utils";
+import { getTheme } from "./lib/utils";
 // Also implement drop listener
 
 const elts = document.querySelectorAll("[data-attach-img]");

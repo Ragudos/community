@@ -1,0 +1,8 @@
+{{#> layouts/main}}
+    {{#*inline "additional_head_content"}}
+        <link rel="preload" href="/assets/fonts/Roboto/Roboto-Bold.ttf" as="font" type="font/ttf" crossorigin="anonymous" />
+        <link rel="preload" href="/build/styles/forms.min.css" as="style" />
+        <link rel="stylesheet" href="/build/styles/forms.min.css" />
+    {{/inline}}
+    {{> @partial-block}}
+{{/layouts/main}}

@@ -8,7 +8,10 @@ pub mod uid;
 
 /// For displaying possible communities to join
 #[get("/?<list_query..>")]
-pub fn get<'r>(user: UserJWT, list_query: Option<ListQuery<'r>>) -> Result<ApiResponse, ApiResponse> {
+pub fn get<'r>(
+    user: UserJWT,
+    list_query: Option<ListQuery<'r>>,
+) -> Result<ApiResponse, ApiResponse> {
     todo!("Implement me!")
 }
 

@@ -1,4 +1,4 @@
-use rocket::{form::Form, http::Status};
+use rocket::{form::{error::ErrorKind, Form}, http::Status};
 use rocket_dyn_templates::{context, Metadata};
 
 use crate::models::{api::ApiResponse, users::form::RegisterFormData, Toast, ToastTypes};
@@ -38,21 +38,42 @@ pub fn get_register_data_or_return_validation_errors<'r>(
             let mut honeypot_error: Option<Toast> = None;
 
             for error in errors.into_iter() {
-                let is_for_name = error.is_for_exactly("display_name");
+                let is_for_name = error.is_for_exactly("username");
                 let is_for_password = error.is_for_exactly("password");
                 let is_for_gender = error.is_for_exactly("gender");
                 let is_for_honeypot = error.is_for_exactly("honeypot");
 
                 if is_for_name {
-                    name_error = Some(error.kind.to_string());
+                    match error.kind {
+                        ErrorKind::Missing => {
+                            name_error = Some("Username is required".to_string());
+                        }
+                        _ => {
+                            name_error = Some(error.kind.to_string());
+                        }
+                    }
                 }
 
                 if is_for_password {
-                    password_error = Some(error.kind.to_string());
+                    match error.kind {
+                        ErrorKind::Missing => {
+                            password_error = Some("Password is required".to_string());
+                        }
+                        _ => {
+                            password_error = Some(error.kind.to_string());
+                        }
+                    }
                 }
 
                 if is_for_gender {
-                    gender_error = Some(error.kind.to_string());
+                    match error.kind {
+                        ErrorKind::Missing => {
+                            gender_error = Some("Gender is required".to_string())
+                        },
+                        _ => {
+                            gender_error = Some(error.kind.to_string());
+                        }
+                    }
                 }
 
                 if is_for_honeypot {
@@ -65,7 +86,7 @@ pub fn get_register_data_or_return_validation_errors<'r>(
 
             render_error(
                 metadata,
-                Status::BadRequest,
+                Status::UnprocessableEntity,
                 name_error.as_deref(),
                 password_error.as_deref(),
                 gender_error.as_deref(),

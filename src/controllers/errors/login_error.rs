@@ -1,5 +1,5 @@
 use rocket::{
-    form::{Errors, Form},
+    form::{error::ErrorKind, Errors, Form},
     http::Status,
 };
 use rocket_dyn_templates::{context, Metadata};
@@ -38,16 +38,30 @@ pub fn get_login_data_or_return_validation_error<'r>(
             let mut honeypot_error: Option<Toast> = None;
 
             for error in errors.into_iter() {
-                let is_for_name = error.is_for_exactly("display_name");
+                let is_for_name = error.is_for_exactly("username");
                 let is_for_password = error.is_for_exactly("password");
                 let is_for_honeypot = error.is_for_exactly("honeypot");
 
                 if is_for_name {
-                    name_error = Some(error.kind.to_string());
+                    match error.kind {
+                        ErrorKind::Missing => {
+                            name_error = Some("Username is required".to_string());
+                        },
+                        _ => {
+                            name_error = Some(error.kind.to_string());
+                        }
+                    }
                 }
 
                 if is_for_password {
-                    password_error = Some(error.kind.to_string());
+                    match error.kind {
+                        ErrorKind::Missing => {
+                            password_error = Some("Password is required".to_string());
+                        },
+                        _ => {
+                            password_error = Some(error.kind.to_string());
+                        }
+                    }
                 }
 
                 if is_for_honeypot {
@@ -60,7 +74,7 @@ pub fn get_login_data_or_return_validation_error<'r>(
 
             render_error(
                 metadata,
-                Status::BadRequest,
+                Status::UnprocessableEntity,
                 name_error.as_deref(),
                 password_error.as_deref(),
                 honeypot_error,

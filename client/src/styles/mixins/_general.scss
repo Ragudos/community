@@ -1,0 +1,69 @@
+@use "./box" as *;
+@use "../variables/sizes" as *;
+
+@mixin cover_background {
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+}
+
+@mixin pseudo(
+    $width: 100%,
+    $height: 100%,
+    $display: inline-block,
+    $position: absolute,
+    $content: "",
+) {
+    content: $content;
+    display: $display;
+    position: $position;
+    @include box($width, $height);
+}
+
+@mixin fade($type) {
+    @if $type == "hide" {
+        visibility: hidden;
+        opacity: 0;
+    } @else if $type == "show" {
+        visibility: visible;
+        opacity: 1;
+    }
+
+    will-change: visibility, opacity;
+    transition-property: visibility, opacity;
+    transition-duration: $transition_duration;
+}
+
+@mixin layered-shadow($shadow-color: hsl(0 0% 0% / 0.075), $shadow: clamp(0px, 5vw + 0.1px, 8px) clamp(0px, 2.5vw + 0.1px, 16px) clamp(0px, 2.5vw + 0.1px, 16px)) {
+    box-shadow:
+        0px 1px 1px $shadow-color,
+        0px 2px 2px $shadow-color,
+        0px 4px 4px $shadow-color,
+        0px 8px 8px $shadow-color,
+        $shadow $shadow-color,
+    ;
+}
+
+@mixin s-tablet {
+    @media (max-width: #{$tablet * 1px}) {
+        @content;
+    }
+}
+
+@mixin s-mobile {
+    @media (min-width: #{$mobile * 1px}) {
+        @content;
+    }
+}
+
+@mixin s-large {
+    @media (min-width: #{$large * 1px}) {
+        @content;
+    }
+}
+
+@mixin s-desktop {
+    @media (min-width: #{$desktop * 1px}) {
+        @content;
+    }
+}

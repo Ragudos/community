@@ -6,7 +6,6 @@ use time::{Duration, OffsetDateTime};
 
 use crate::models::{api::ApiResponse, rate_limiter::RateLimit, Toast, ToastTypes};
 
-/// To be tested.
 impl RateLimit {
     pub fn add_to_limit_or_return<'r>(&self, metadata: &Metadata<'r>) -> Result<(), ApiResponse> {
         if self.requests.load(Ordering::Relaxed) >= self.capacity.load(Ordering::Relaxed) {
@@ -33,7 +32,7 @@ impl RateLimit {
             }
 
             let (mime, html) = metadata.render(
-                "partials/components/toast",
+                "partials/toast",
                 context! {
                     toast: Toast {
                         message: format!("The server is experiencing high loads of requests. Please try again in {}s.", time_before_acceptance),

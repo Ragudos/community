@@ -1,14 +1,17 @@
 pub mod auth;
-pub mod user;
+pub mod comments;
 pub mod community;
 pub mod create;
 pub mod posts;
-pub mod comments;
+pub mod user;
 
 use rocket::{get, http::CookieJar};
 use rocket_dyn_templates::{context, Template};
 
-use crate::models::{seo::metadata::SeoMetadata, users::{preferences::Theme, schema::UserJWT}};
+use crate::models::{
+    seo::metadata::SeoMetadata,
+    users::{preferences::Theme, schema::UserJWT},
+};
 
 #[get("/")]
 pub fn page<'r>(cookie_jar: &CookieJar<'r>, user: Option<UserJWT>) -> Template {

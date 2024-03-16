@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="{{ metadata.language }}" data-theme="{{ metadata.theme }}">
     <head>
-        {{> partials/head }}
+        {{> partials/head/main }}
         <meta name="robots" content="noindex, nofollow">
     </head>
     <body>
@@ -9,7 +9,7 @@
             <h1>500 Internal Server Error</h1>
         </header>
         <main>
-            <p>Sorry, the page you are looking for could not be found.</p>
+            <p>{{message}}</p>
         </main>
     </body>
 </html>

@@ -1,0 +1,17 @@
+{{#if name_error}}
+    <span data-errored class="error" id="username-error" hx-swap-oob="true">
+        <small>{{name_error}}</small>
+    </span>
+{{else}}
+    <span class="error" id="username-error" hx-swap-oob="true"></span>
+{{/if}}
+{{#if password_error}}
+    <span data-errored class="error" id="password-error" hx-swap-oob="true">
+        <small>{{password_error}}</small>
+    </span>
+{{else}}
+    <span class="error" id="password-error" hx-swap-oob="true"></span>
+{{/if}}
+{{#if toast}}
+    {{> partials/toast}}
+{{/if}}

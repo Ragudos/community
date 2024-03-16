@@ -1,0 +1,48 @@
+{{#> layouts/auth}}
+    <div class="auth-form-wrapper">
+        <div class="auth-form-container">
+            <h1>Community</h1>
+            <p>Create your account, and start your journey.</p>
+            <br>
+            <p><small>Already have an account? <a class="link" hx-target-error="body" href="/auth/login">Sign in</a></small></p>
+            <hr>
+            <form class="auth-form" hx-target-error="#nothing" hx-sync="this" hx-post="/auth/api/register" hx-trigger="submit" method="post" action="/auth/api/register">
+                <div class="input-group">
+                    <span class="error" id="username-error"></span>
+                    <input type="text" name="username" id="username" placeholder="john doe" pattern="[a-zA-z0-9À-ž\s]+" autocomplete="username" spellcheck="false" autocapitalize="none" minlength="3" maxlength="60"  required aria-errormessage="username-error" />
+                    <label class="label" for="username">Username</label>
+                </div>
+                <div class="input-group">
+                    <span class="error" id="password-error"></span>
+                    <input type="password" name="password" id="password" placeholder="********" spellcheck="false" autocapitalize="none" autocomplete="current-password" minlength="8" maxlength="64" required aria-errormessage="password-error" />
+                    <label class="label" for="password">Password</label>
+                </div>
+                <div class="input-group">
+                    <span class="error" id="password-error"></span>
+                    <div>
+                        <input type="radio" name="gender" value="unknown" id="unknown-gi" />
+                        <label for="unknown-gi">Rather not say</label>
+                    </div>
+                    <div>
+                        <input type="radio" name="gender" value="other" id="other-gi" />
+                        <label for="other-gi">Other</label>
+                    </div>
+                    <div>
+                        <input type="radio" name="gender" value="female" id="female-gi" />
+                        <label for="female-gi">Female</label>
+                    </div>
+                    <div>
+                        <input type="radio" name="gender" value="male" id="male-gi" />
+                        <label for="male-gi">Male</label>
+                    </div>
+                    <div class="label">Gender</div>
+                </div>
+                <input name="honeypot" value="" hidden />
+                <div style="display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 1rem; align-items: center;">
+                    <a class="link" hx-target-error="body" href="/auth/forgot-password">Forgot password?</a>
+                    <button type="submit" class="primary">Sign up</button>
+                </div>
+            </form>
+        </div>
+    </div>
+{{/layouts/auth}}

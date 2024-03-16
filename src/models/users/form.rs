@@ -5,7 +5,7 @@ use crate::controllers::validate::{
 };
 use crate::models::db::enums::Gender;
 
-#[derive(FromForm)]
+#[derive(FromForm, Debug)]
 pub struct RegisterFormData<'a> {
     #[field(validate = len(1..=60))]
     #[field(validate = validate_ascii_text())]
@@ -20,7 +20,7 @@ pub struct RegisterFormData<'a> {
     pub honeypot: &'a str,
 }
 
-#[derive(FromForm)]
+#[derive(FromForm, Debug)]
 pub struct LoginFormData<'a> {
     #[field(validate = len(1..=60))]
     #[field(validate = validate_ascii_text())]
