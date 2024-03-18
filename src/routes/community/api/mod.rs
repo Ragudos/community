@@ -1,8 +1,9 @@
 use rocket::get;
+use rocket::http::Status;
 
-use crate::models::api::ApiResponse;
 use crate::models::query::ListQuery;
 use crate::models::users::schema::UserJWT;
+use crate::responders::ApiResponse;
 
 pub mod uid;
 
@@ -19,5 +20,5 @@ pub fn get<'r>(
 /// endpoint has forwarded.
 #[get("/<_..>", rank = 2)]
 pub fn logged_out() -> ApiResponse {
-    ApiResponse::NoContent
+    ApiResponse::Status(Status::NoContent)
 }

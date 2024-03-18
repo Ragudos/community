@@ -1,9 +1,9 @@
-use rocket::{catch, http::Status, Request};
+use rocket::{catch, Request};
 use rocket_dyn_templates::{context, Template};
 
-use crate::models::{
-    api::ApiResponse, seo::metadata::SeoMetadata, users::preferences::Theme, Toast, ToastTypes,
-};
+use crate::models::seo::metadata::SeoMetadata;
+use crate::models::users::preferences::Theme;
+use crate::models::{Toast, ToastTypes};
 
 #[catch(422)]
 pub fn unprocessable_entity(request: &Request) -> &'static str {
@@ -14,38 +14,28 @@ pub fn unprocessable_entity(request: &Request) -> &'static str {
 }
 
 #[catch(404)]
-pub fn not_found(request: &Request) -> ApiResponse {
-    if let Some(is_htmx) = request.headers().get_one("Hx-Request") {
-        // Means the request was made by htmx or the client. So, errors
-        // are handled by our toaster.
-        if is_htmx == "true" {
-            return ApiResponse::String(Status::NotFound, "Resource not found");
-        }
-    }
-
-    // Else, it's just a url that doesn't exist.
-
+pub fn not_found(request: &Request) -> Template {
     let theme = Theme::from_cookie_jar(request.cookies());
     let metadata = SeoMetadata::build()
         .theme(theme)
         .title("404 Not Found")
         .finalize();
 
-    ApiResponse::Template(Template::render(
+    Template::render(
         "catchers/404",
         context! {
             metadata,
         },
-    ))
+    )
 }
 
 #[catch(500)]
-pub fn internal_server_error(request: &Request) -> ApiResponse {
+pub fn internal_server_error(request: &Request) -> Template {
     if let Some(is_htmx) = request.headers().get_one("Hx-Request") {
         // Means the request was made by htmx or the client. So, errors
         // are handled by our toaster.
         if is_htmx == "true" {
-            return ApiResponse::Template(Template::render(
+            return Template::render(
                 "partials/components/toast",
                 context! {
                     toast: Toast {
@@ -53,7 +43,7 @@ pub fn internal_server_error(request: &Request) -> ApiResponse {
                         r#type: Some(ToastTypes::Error),
                     }
                 },
-            ));
+            );
         }
     }
 
@@ -65,10 +55,10 @@ pub fn internal_server_error(request: &Request) -> ApiResponse {
         .title("500 Internal Server Error")
         .finalize();
 
-    ApiResponse::Template(Template::render(
+    Template::render(
         "catchers/500",
         context! {
             metadata,
         },
-    ))
+    )
 }

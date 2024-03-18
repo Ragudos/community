@@ -1,3 +1,4 @@
+workspace = { members = ["crud_macro"] }
 [package]
 name = "community"
 version = "0.1.0"
@@ -6,6 +7,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+crud_macro = { path = "./crud_macro" }
 bcrypt = "0.15.0"
 rocket = { version = "0.5.0", features = ["secrets", "json"] }
 rocket_dyn_templates = { version = "0.1.0", features = ["handlebars"] }
@@ -20,4 +22,4 @@ reqwest = "0.11.24"
 cloud-storage = "0.11.1"
 rocket_csrf_token = "0.3.5"
 mockall = "0.12.1"
-rocket_async_compression = "0.5.1"
+futures = "0.3.30"

@@ -5,7 +5,7 @@ use rocket_dyn_templates::Metadata;
 use crate::auth_uri;
 use crate::controllers::htmx::redirect::HtmxRedirect;
 use crate::controllers::htmx::IsHTMX;
-use crate::models::api::ApiResponse;
+use crate::responders::ApiResponse;
 use crate::routes::auth::login;
 
 pub mod community;

@@ -7,10 +7,10 @@ use rocket_dyn_templates::Template;
 use crate::auth_uri;
 use crate::controllers::htmx::redirect::HtmxRedirect;
 use crate::controllers::htmx::IsBoosted;
-use crate::models::api::ApiResponse;
 use crate::models::seo::metadata::SeoMetadata;
 use crate::models::users::preferences::Theme;
 use crate::models::users::schema::UserJWT;
+use crate::responders::ApiResponse;
 use crate::routes::auth::login;
 
 // TODO: Implement to get the uid from the URL

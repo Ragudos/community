@@ -1,8 +1,7 @@
 use rocket::get;
 
 use crate::models::users::schema::UserJWT;
-
-use crate::models::api::ApiResponse;
+use crate::responders::ApiResponse;
 
 #[get("/<_>/<_>")]
 pub async fn get<'r>(user: UserJWT) -> Result<ApiResponse, ApiResponse> {

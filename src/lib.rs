@@ -1,6 +1,7 @@
 use std::sync::atomic::{AtomicBool, AtomicU32};
 use std::sync::RwLock;
 
+use controllers::rate_limiter::RateLimiter;
 use rocket;
 use rocket::figment::value::{Map, Value};
 use rocket::figment::{Figment, Profile, Provider};
@@ -8,18 +9,18 @@ use rocket::fs::FileServer;
 use rocket::Build;
 use rocket::Rocket;
 use rocket::{catchers as rocket_catchers, routes as rocket_routes};
-use rocket_async_compression::Compression;
 
+use crate::env::{Env, Environment};
 use crate::helpers::db;
 use crate::helpers::get_environment;
 use crate::helpers::handlebars;
-use crate::models::rate_limiter::RateLimit;
-use crate::models::{Env, Environment};
 
 pub mod catchers;
 pub mod controllers;
+pub mod env;
 pub mod helpers;
 pub mod models;
+pub mod responders;
 pub mod routes;
 
 pub fn rocket_from_config(figment: Figment) -> Rocket<Build> {
@@ -34,14 +35,13 @@ pub fn rocket_from_config(figment: Figment) -> Rocket<Build> {
         .unwrap()
         .to_u32()
         .unwrap();
-    let rate_limiter = RateLimit {
+    let rate_limiter = RateLimiter {
         capacity: AtomicU32::new(rate_limit_capacity),
         time_accumulator_started: RwLock::new(time::OffsetDateTime::now_utc()),
         did_time_accumulator_start: AtomicBool::new(false),
         requests: AtomicU32::new(0),
     };
     let rocket = rocket::custom(figment)
-        .attach(Compression::fairing())
         .attach(db::stage())
         .attach(handlebars::register())
         .manage(rate_limiter)
@@ -99,7 +99,10 @@ pub fn rocket_from_config(figment: Figment) -> Rocket<Build> {
             "/create",
             rocket_routes![routes::create::logged_out, routes::create::community::page],
         )
-        .mount("/create/api", rocket_routes![routes::create::api::logged_out])
+        .mount(
+            "/create/api",
+            rocket_routes![routes::create::api::logged_out],
+        )
         .mount(
             "/user",
             rocket_routes![routes::user::logged_out, routes::user::page],

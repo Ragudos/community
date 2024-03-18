@@ -151,23 +151,16 @@ impl UserMetadata {
     pub async fn create(
         tx: &mut Transaction<'_, Postgres>,
         uid: &Uuid,
-        occupation: Option<&Occupation>,
-        gender: Option<&Gender>,
-        biography: Option<&str>,
     ) -> Result<(), sqlx::Error> {
         let _ = sqlx::query!(
             r#"
                 INSERT INTO user_metadata
-                (_id, occupation, gender, biography)
+                (_id)
                 VALUES (
-                    (SELECT _id FROM users WHERE uid = $1),
-                    $2, $3, $4
+                    (SELECT _id FROM users WHERE uid = $1)
                 );
             "#,
             uid,
-            occupation as Option<&Occupation>,
-            gender as Option<&Gender>,
-            biography
         )
         .execute(&mut **tx)
         .await?;

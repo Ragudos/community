@@ -1,9 +1,9 @@
 mod utils;
 
-use utils::get_client;
 use rocket::async_test;
-use rocket::local::asynchronous::{Client, LocalResponse};
 use rocket::http::{ContentType, Status};
+use rocket::local::asynchronous::{Client, LocalResponse};
+use utils::get_client;
 
 async fn fill_up_limiter<'r>(client: &'r Client) -> LocalResponse<'r> {
     for _ in 0..2 {

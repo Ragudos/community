@@ -7,6 +7,7 @@
 ::before,
 ::after {
     box-sizing: inherit;
+    word-wrap: break-word;
 }
 
 html {
@@ -258,6 +259,16 @@ input[type=submit] {
         border: 0;
         padding: 0;
     }
+}
+
+input {
+    -webkit-appearance: textfield;
+    appearance: textfield;
+}
+
+textarea {
+    -webkit-appearance: textarea;
+    appearance: textarea;
 }
 
 [hidden] {

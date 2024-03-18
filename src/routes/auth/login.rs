@@ -11,7 +11,7 @@ use crate::models::users::preferences::Theme;
 pub fn page<'r>(cookie_jar: &CookieJar<'r>, is_boosted: IsBoosted) -> Template {
     let IsBoosted(is_boosted) = is_boosted;
     let theme = Theme::from_cookie_jar(cookie_jar);
-    let metadata = SeoMetadata::build().theme(theme).finalize();
+    let metadata = SeoMetadata::build().theme(theme).title("Sign In to Community").finalize();
 
     Template::render("pages/auth/login", context! { metadata, is_boosted })
 }

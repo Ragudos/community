@@ -1,0 +1,17 @@
+.container {
+    width: min(calc(100% - #{$padding-inline * 2}), var(--_max-width, #{$max-content-width}));
+    margin-inline: auto;
+}
+
+.min-h-screen {
+    min-height: 100dvh;
+}
+
+.flex {
+    display: flex;
+}
+
+.ce-wrapper {
+    display: grid;
+    place-items: center;
+}

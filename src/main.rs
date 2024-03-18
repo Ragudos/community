@@ -1,5 +1,5 @@
-use community::{create_config,rocket_from_config};
 use community::helpers::get_environment;
+use community::{create_config, rocket_from_config};
 
 #[macro_use]
 extern crate rocket;

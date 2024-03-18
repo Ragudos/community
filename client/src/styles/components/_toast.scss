@@ -1,0 +1,59 @@
+#toast-container {
+    position: fixed;
+    inset: 0;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 98%;
+    height: 98%;
+    z-index: 999;
+    pointer-events: none;
+    touch-action: none;
+    justify-content: flex-start;
+    align-items: flex-end;
+
+    .toaster {
+        padding: 1rem;
+        border: 1px solid;
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        width: min(100%, 25rem);
+        backdrop-filter: blur(1rem);
+        border-radius: $radius;
+    }
+}
+
+ @include themify($themes) {
+    .toaster {
+        border-color: color_in_theme("border");
+        background-color: rgba(color_in_theme("background"), 0.87);
+        color: color_in_theme("text");
+        @include layered-shadow(rgba(color_in_theme("text"), 0.075), 2);
+    }
+
+    .toaster[data-type=error] {
+        background-color: rgba(color_in_theme("destructive"), 0.87);
+        color: color_in_theme("destructive-foreground");
+        @include layered-shadow(rgba(color_in_theme("destructive"), 0.075), 2);
+    }
+
+    .toaster[data-type=warning] {
+        background-color: rgba(color_in_theme("warning"), 0.87);
+        color: color_in_theme("warning-foreground");
+        @include layered-shadow(rgba(color_in_theme("warning"), 0.075), 2);
+    }
+
+    .toaster[data-type=info] {
+        background-color: rgba(color_in_theme("info"), 0.87);
+        color: color_in_theme("info-foreground");
+        @include layered-shadow(rgba(color_in_theme("warning"), 0.075), 2);
+    }
+
+    .toaster[data-type=success] {
+        background-color: rgba(color_in_theme("success"), 0.87);
+        color: color_in_theme("success-foreground");
+        @include layered-shadow(rgba(color_in_theme("success"), 0.075), 2);
+    }
+}

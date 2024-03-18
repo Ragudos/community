@@ -1,27 +1,23 @@
 use bcrypt::{hash, DEFAULT_COST};
 use rocket::form::{Errors, Form};
-use rocket::http::{CookieJar, Status};
+use rocket::http::{CookieJar, Header, Status};
 use rocket::response::Redirect;
 use rocket::{post, State};
 use rocket_db_pools::Connection;
-use rocket_dyn_templates::{context, Metadata};
+use rocket_dyn_templates::{context, Template};
 use sqlx::Acquire;
 
 use crate::community_uri;
-use crate::controllers::errors::bcrypt_error::bcrypt_error_to_api_response;
-use crate::controllers::errors::register_error::{
-    get_register_data_or_return_validation_errors, render_error,
-};
-use crate::controllers::errors::serde_error::serde_json_error_to_api_response;
-use crate::controllers::errors::sqlx_error::sqlx_error_to_api_response;
+use crate::controllers::errors::{extract_data_or_return_response, ValidationError};
 use crate::controllers::htmx::redirect::HtmxRedirect;
 use crate::controllers::htmx::IsHTMX;
+use crate::controllers::rate_limiter::{RateLimiter, RateLimiterTrait};
+use crate::env::{Env, Environment};
 use crate::helpers::db::DbConn;
-use crate::models::api::ApiResponse;
 use crate::models::query::ListQuery;
-use crate::models::rate_limiter::RateLimit;
 use crate::models::users::form::RegisterFormData;
 use crate::models::users::schema::{UserCredentials, UserJWT, UserMetadata, UserTable};
+use crate::responders::{ApiResponse, HeaderCount};
 use crate::routes::community;
 
 /// We do nothing if the user is logged in.
@@ -39,80 +35,57 @@ pub fn logged_in(_user: UserJWT, is_htmx: IsHTMX) -> ApiResponse {
 pub async fn post<'r>(
     mut db: Connection<DbConn>,
     cookie_jar: &CookieJar<'r>,
-    template_metadata: Metadata<'r>,
-    is_htmx: IsHTMX,
-    rate_limiter: &State<RateLimit>,
+    rate_limiter: &State<RateLimiter>,
     register_data: Result<Form<RegisterFormData<'r>>, Errors<'r>>,
+    env: &State<Environment>
 ) -> Result<ApiResponse, ApiResponse> {
-    rate_limiter.add_to_limit_or_return(&template_metadata)?;
+    rate_limiter.add_to_limit_or_return()?;
 
     let register_data =
-        get_register_data_or_return_validation_errors(&template_metadata, register_data)?;
-    let is_name_taken = UserTable::is_name_taken(&mut db, &register_data.display_name)
-        .await
-        .map_err(|error| sqlx_error_to_api_response(error, None, &template_metadata))?;
+        extract_data_or_return_response(register_data, "partials/auth/register_error")?;
 
-    if is_name_taken {
-        return Err(render_error(
-            &template_metadata,
-            Status::UnprocessableEntity,
-            Some("Please choose a different username"),
-            None,
-            None,
-            None,
-        ));
+    if UserTable::is_name_taken(&mut db, &register_data.display_name).await? {
+        return Err(ApiResponse::Render {
+            status: Status::UnprocessableEntity,
+            template: Some(Template::render(
+                "partials/auth/register_error",
+                context! { errors: vec![ ValidationError { field: Some("username".to_string()), message: "Please choose a different username".to_string() } ] },
+            )),
+            headers: None,
+        });
     }
+    let hashed_password = hash(register_data.password, DEFAULT_COST)?;
+    let mut tx = db.begin().await?;
+    let user_uid = UserTable::create(&mut tx, &register_data.display_name).await?;
 
-    let hashed_password = hash(register_data.password, DEFAULT_COST)
-        .map_err(|error| bcrypt_error_to_api_response(&template_metadata, error, None))?;
-    let mut tx = db
-        .begin()
-        .await
-        .map_err(|error| sqlx_error_to_api_response(error, None, &template_metadata))?;
-    let user_uid = UserTable::create(&mut tx, &register_data.display_name)
-        .await
-        .map_err(|error| sqlx_error_to_api_response(error, None, &template_metadata))?;
-
-    UserMetadata::create(&mut tx, &user_uid, None, Some(&register_data.gender), None)
-        .await
-        .map_err(|error| sqlx_error_to_api_response(error, None, &template_metadata))?;
-    UserCredentials::create(&mut tx, &user_uid, None, &hashed_password, None, None)
-        .await
-        .map_err(|error| sqlx_error_to_api_response(error, None, &template_metadata))?;
+    UserMetadata::create(&mut tx, &user_uid).await?;
+    UserCredentials::create(&mut tx, &user_uid, None, &hashed_password, None, None).await?;
 
     let cookie = UserJWT {
         uid: user_uid.to_string(),
         display_name: register_data.display_name.to_string(),
         display_image: None,
     }
-    .to_cookie()
-    .map_err(|error| {
-        serde_json_error_to_api_response(
-            &template_metadata,
-            error,
-            Status::InternalServerError,
-            None,
-        )
-    })?;
+    .to_cookie()?;
 
-    tx.commit()
-        .await
-        .map_err(|error| sqlx_error_to_api_response(error, None, &template_metadata))?;
-    cookie_jar.add(cookie);
+    if let Env::Production = env.environment {
+        tx.commit().await?;
+    } else {
+        eprintln!("Rolling back transaction in development");
+        tx.rollback().await?;
+    }
+
+    cookie_jar.add_private(cookie);
 
     let resource_uri = format!("/user/{}", user_uid);
+    let header = Header::new("Location", resource_uri);
 
-    match is_htmx {
-        IsHTMX(true) => {
-            let (mime, html) = template_metadata
-                .render(
-                    "partials/auth/register_success",
-                    context! { username: &register_data.display_name },
-                )
-                .unwrap();
-
-            Ok(ApiResponse::Created(resource_uri, Some((mime, html))))
-        }
-        IsHTMX(false) => Ok(ApiResponse::Created(resource_uri, None)),
-    }
+    Ok(ApiResponse::Render {
+        status: Status::Created,
+        template: Some(Template::render(
+            "partials/auth/register_success",
+            context! { username: register_data.display_name },
+        )),
+        headers: Some(HeaderCount::One(header)),
+    })
 }

@@ -1,29 +1,17 @@
 use std::str::FromStr;
 
-use rocket::{request::FromParam, FromForm};
+use rocket::request::FromParam;
 use serde::{Deserialize, Serialize};
 use sqlx::types::Uuid;
 
-pub mod api;
 pub mod community;
 pub mod db;
 pub mod errors;
 pub mod messaging;
 pub mod notifications;
 pub mod query;
-pub mod rate_limiter;
 pub mod seo;
 pub mod users;
-
-pub struct Environment {
-    pub environment: Env,
-}
-
-pub enum Env {
-    Development,
-    Testing,
-    Production,
-}
 
 #[derive(Serialize, Deserialize)]
 pub enum ToastTypes {

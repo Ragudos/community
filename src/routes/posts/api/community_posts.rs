@@ -2,8 +2,7 @@ use rocket::get;
 
 use crate::models::query::ListQuery;
 use crate::models::users::schema::UserJWT;
-
-use crate::models::api::ApiResponse;
+use crate::responders::ApiResponse;
 
 /// Get all posts in a community.
 #[get("/<_>?<list_query..>")]

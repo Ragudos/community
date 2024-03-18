@@ -3,9 +3,9 @@ use rocket::response::Redirect;
 
 use crate::controllers::htmx::redirect::HtmxRedirect;
 use crate::controllers::htmx::IsBoosted;
-use crate::models::api::ApiResponse;
 use crate::models::query::ListQuery;
 use crate::models::users::schema::UserJWT;
+use crate::responders::ApiResponse;
 use crate::routes::community;
 use crate::{auth_uri, community_uri};
 

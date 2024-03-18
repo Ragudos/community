@@ -4,7 +4,7 @@ use rocket::response::Redirect;
 use crate::auth_uri;
 use crate::controllers::htmx::redirect::HtmxRedirect;
 use crate::controllers::htmx::IsBoosted;
-use crate::models::api::ApiResponse;
+use crate::responders::ApiResponse;
 use crate::routes::auth::login;
 
 pub mod api;

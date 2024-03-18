@@ -13,7 +13,14 @@ $themes: (
         destructive-foreground: hsl(10, 60%, 4%),
         border: hsl(9, 47%, 20%),
         input: hsl(9, 47%, 20%),
-        ring: hsl(112, 57%, 40%)
+        ring: hsl(112, 57%, 40%),
+        link: hsl(220, 77%, 24%),
+        warning: hsl(40, 57%, 54%),
+        warning-forground: hsl(10, 60%, 4%),
+        info: hsl(220, 57%, 54%),
+        info-foreground: hsl(10, 60%, 4%),
+        success: hsl(120, 57%, 54%),
+        success-foreground: hsl(10, 60%, 4%)
     ),
     dark: (
         text: hsl(10, 60%, 95%),
@@ -25,6 +32,13 @@ $themes: (
         destructive-foreground: hsl(10, 61%, 10%),
         border: hsl(9, 47%, 20%),
         input: hsl(9, 47%, 80%),
-        ring: hsl(112, 57%, 60%)
+        ring: hsl(112, 57%, 60%),
+        link: hsl(220, 77%, 84%),
+        warning: hsl(40, 57%, 46%),
+        warning-foreground: hsl(10, 60%, 95%),
+        info: hsl(220, 57%, 16%), 
+        info-foreground: hsl(10, 60%, 95%),
+        success: hsl(120, 57%, 16%),
+        success-foreground: hsl(10, 60%, 95%)
     ),
 );
