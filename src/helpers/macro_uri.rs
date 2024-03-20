@@ -18,3 +18,10 @@ macro_rules! community_uri {
         rocket::uri!("/community", $($t)*)
     }
 }
+
+#[macro_export]
+macro_rules! discover_uri {
+    ($($t:tt)*) => {
+        rocket::uri!("/discover", $($t)*)
+    }
+}

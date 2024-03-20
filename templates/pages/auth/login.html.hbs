@@ -1,28 +1,15 @@
-{{#> layouts/auth}}
-    <div class="min-h-screen ce-wrapper">
-        <div class="general-card auth-form-container container" style="--_max-width: 30rem;">
-            <span class="title-sm">Sign in to your account.</span>
-            <form data-loading-aria-busy data-loading-delay="50" data-loading-path="/auth/api/login" class="auth-form" hx-target-error="#nothing" hx-sync="this, a" hx-post="/auth/api/login" hx-trigger="submit" method="post" action="/auth/api/login">
-                <div class="input-group">
-                    <span class="error" id="username-error"></span>
-                    <input type="text" name="username" id="username" pattern="[a-zA-z0-9À-ž\s]+" autocomplete="username" spellcheck="false" autocapitalize="none" maxlength="60"  required aria-errormessage="username-error" />
-                    <label class="label" for="username">Username</label>
-                </div>
-                <div class="input-group">
-                    <span class="error" id="password-error"></span>
-                    <input type="password" name="password" id="password" spellcheck="false" autocapitalize="none" autocomplete="list" minlength="8" maxlength="64" required aria-errormessage="password-error" />
-                    <div style="justify-content: space-between; flex-wrap: wrap;" class="label-container">
-                        <label class="label" for="password">Password</label>
-                        <small><a class="link" hx-target-error="body" href="/auth/forgot-password">Forgot password?</a></small>
-                    </div>
-                </div>
-                <input aria-hidden="true" name="honeypot" value="" hidden />
-                <button data-loading-disable type="submit" class="primary">
-                    <span data-loading-class="hidden">Sign in</span>
-                    <span data-loading>Signing in... <span data-loading data-loading-class="spin" class="spinner"></span></span>
-                </button>
-            </form>
-            <div style="text-align: center;"><small>Don't have an account? <a  class="link" hx-target-error="body" href="/auth/register">Sign up</a></small></div>
+{{#if is_boosted}}
+    <head>
+        {{> partials/head/main}}
+        {{> partials/auth/head}}
+    </head>
+    {{> partials/auth/login}}
+{{else}}
+    {{#> layouts/auth}}
+        <div class="min-h-screen ce-wrapper">
+            <div id="form-container"class="general-card container" style="--_max-content-width: 30rem;">
+                {{> partials/auth/login}}
+            </div>
         </div>
-    </div>
-{{/layouts/auth}}
+    {{/layouts/auth}}
+{{/if}}

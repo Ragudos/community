@@ -1,0 +1,14 @@
+<ul class="with-link-active-indicator" id="list-of-community-links" {{#if oobswap}}hx-swap-oob="true"{{/if}}>
+    <li>
+        <a id="community-link" {{#if (eq current_page "community")}}aria-current="page"{{/if}} hx-target="main" hx-target-error="main" href="/community/{{community_uid}}">Community</a>
+    </li>
+    <li>
+        <a id="members-link" {{#if (eq current_page "members")}}aria-current="page"{{/if}} hx-target="main" hx-target-error="main" href="/community/{{community_uid}}/members">Members</a>
+    </li>
+    <li>
+        <a id="about-link" {{#if (eq current_page "about")}}aria-current="page"{{/if}} hx-target="main" hx-target-error="main" href="/community/{{community_uid}}/about">About</a>
+    </li>
+    <li>
+        <a id="settings-link" {{#if (eq current_page "settings")}}aria-current="page"{{/if}} hx-target="main" hx-target-error="main" href="/community/{{community_uid}}/settings">Settings</a>
+    </li>
+</ul>

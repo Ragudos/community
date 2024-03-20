@@ -4,7 +4,7 @@ use rocket::{
     Response,
 };
 
-/// Refresh the page.
+#[derive(Debug)]
 pub struct HtmxRefresh;
 
 impl<'a> Responder<'a, 'static> for HtmxRefresh {

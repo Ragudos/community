@@ -6,8 +6,8 @@ use crate::controllers::htmx::IsBoosted;
 use crate::models::query::ListQuery;
 use crate::models::users::schema::UserJWT;
 use crate::responders::ApiResponse;
-use crate::routes::community;
-use crate::{auth_uri, community_uri};
+use crate::routes::discover;
+use crate::{auth_uri, discover_uri};
 
 pub mod api;
 pub mod login;
@@ -17,9 +17,9 @@ pub mod register;
 pub fn logged_in(_user: UserJWT, is_boosted: IsBoosted) -> ApiResponse {
     match is_boosted {
         IsBoosted(true) => {
-            ApiResponse::HtmxRedirect(HtmxRedirect::to(community_uri!(community::page(_))))
+            ApiResponse::HtmxRedirect(HtmxRedirect::to(discover_uri!(discover::page(_))))
         }
-        IsBoosted(false) => ApiResponse::Redirect(Redirect::to(community_uri!(community::page(_)))),
+        IsBoosted(false) => ApiResponse::Redirect(Redirect::to(discover_uri!(discover::page(_)))),
     }
 }
 

@@ -3,7 +3,7 @@ use rocket::{
     response::{Responder, Result},
     Response,
 };
-
+#[derive(Debug)]
 pub struct HtmxRedirect(Status, Option<Reference<'static>>);
 
 impl HtmxRedirect {

@@ -7,27 +7,27 @@ use rocket_db_pools::Connection;
 use rocket_dyn_templates::{context, Template};
 use sqlx::Acquire;
 
-use crate::community_uri;
 use crate::controllers::errors::{extract_data_or_return_response, ValidationError};
 use crate::controllers::htmx::redirect::HtmxRedirect;
 use crate::controllers::htmx::IsHTMX;
 use crate::controllers::rate_limiter::{RateLimiter, RateLimiterTrait};
+use crate::discover_uri;
 use crate::env::{Env, Environment};
 use crate::helpers::db::DbConn;
 use crate::models::query::ListQuery;
 use crate::models::users::form::RegisterFormData;
 use crate::models::users::schema::{UserCredentials, UserJWT, UserMetadata, UserTable};
 use crate::responders::{ApiResponse, HeaderCount};
-use crate::routes::community;
+use crate::routes::discover;
 
 /// We do nothing if the user is logged in.
 #[post("/register")]
 pub fn logged_in(_user: UserJWT, is_htmx: IsHTMX) -> ApiResponse {
     match is_htmx {
         IsHTMX(true) => {
-            ApiResponse::HtmxRedirect(HtmxRedirect::to(community_uri!(community::page(_))))
+            ApiResponse::HtmxRedirect(HtmxRedirect::to(discover_uri!(discover::page(_))))
         }
-        IsHTMX(false) => ApiResponse::Redirect(Redirect::to(community_uri!(community::page(_)))),
+        IsHTMX(false) => ApiResponse::Redirect(Redirect::to(discover_uri!(discover::page(_)))),
     }
 }
 
@@ -37,7 +37,7 @@ pub async fn post<'r>(
     cookie_jar: &CookieJar<'r>,
     rate_limiter: &State<RateLimiter>,
     register_data: Result<Form<RegisterFormData<'r>>, Errors<'r>>,
-    env: &State<Environment>
+    env: &State<Environment>,
 ) -> Result<ApiResponse, ApiResponse> {
     rate_limiter.add_to_limit_or_return()?;
 

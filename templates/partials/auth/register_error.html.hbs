@@ -6,7 +6,7 @@
 {{#each errors}}
     {{#if (eq field "username")}}
         <span data-loading-class-remove="errored" class="error errored" id="username-error" hx-swap-oob="true">
-            <small>{{message}}</small>
+            <small data-loading-class="hidden">{{message}}</small>
         </span>
     {{else}}
         {{#if (eq field "password")}}

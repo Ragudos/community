@@ -5,11 +5,13 @@ use rocket_dyn_templates::Template;
 use crate::controllers::htmx::redirect::HtmxRedirect;
 use crate::controllers::htmx::refresh::HtmxRefresh;
 
+#[derive(Debug)]
 pub enum HeaderCount {
     One(Header<'static>),
     Many(Vec<Header<'static>>),
 }
 
+#[derive(Debug)]
 pub enum ApiResponse {
     Status(Status),
     HtmxRedirect(HtmxRedirect),

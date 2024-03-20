@@ -1,30 +1,15 @@
-{{#> layouts/auth}}
-    <div id="register-form-container" class="min-h-screen ce-wrapper">
-        <div class="general-card auth-form-container container" style="--_max-width: 30rem;">
-            <span class="title-sm">Create your account.</span>
-            <form data-loading-delay="50" data-loading-aria-busy hx-target="#register-form-container" class="auth-form" hx-target-error="#nothing" hx-sync="this, a" hx-post="/auth/api/register" hx-trigger="submit" method="post" action="/auth/api/register">
-                <div class="input-group">
-                    <span class="error" id="username-error"></span>
-                    <input type="text" name="username" id="username" pattern="[a-zA-z0-9À-ž\s]+" autocomplete="name" spellcheck="false" autocapitalize="none" maxlength="60" required aria-errormessage="username-error" />
-                    <label class="label" for="username">Username</label>
-                </div>
-                <div class="input-group">
-                    <span class="error" id="password-error"></span>
-                    <input type="password" name="password" id="password" spellcheck="false" autocapitalize="none" autocomplete="list" minlength="8" maxlength="64" required aria-errormessage="password-error" />
-                    <label class="label" for="password">Password</label>
-                </div>
-                <div class="input-group">
-                    <span class="error" id="confirm-password-error"></span>
-                    <input type="password" name="confirm_password" id="confirm-password" spellcheck="false" autocapitalize="none" autocomplete="current-password" minlength="8" maxlength="64" required aria-errormessage="confirm-password-error" />
-                    <label class="label" for="confirm-password">Confirm Password</label>
-                </div>
-                <input aria-hidden="true" name="honeypot" value="" hidden />
-                <button data-loading-disable type="submit" class="primary">
-                    <span data-loading-class="hidden">Sign up</span>
-                    <span data-loading>Signing up... <span data-loading-class="spin" class="spinner"></span></span>
-                </button>
-            </form>
-            <div style="text-align: center;"><small>Already have an account? <a class="link" href="/auth/login">Sign in</a></small></div>
+{{#if is_boosted}}
+    <head>
+        {{> partials/head/main}}
+        {{> partials/auth/head}}
+    </head>
+    {{> partials/auth/register}}
+{{else}}
+    {{#> layouts/auth}}
+        <div class="min-h-screen ce-wrapper">
+            <div id="form-container" class="general-card container" style="--_max-content-width: 30rem;">
+                {{> partials/auth/register}}
+            </div>
         </div>
-    </div>
-{{/layouts/auth}}
+    {{/layouts/auth}}
+{{/if}}

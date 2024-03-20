@@ -6,25 +6,25 @@ use rocket::{post, State};
 use rocket_db_pools::Connection;
 use rocket_dyn_templates::{context, Template};
 
-use crate::community_uri;
 use crate::controllers::errors::{extract_data_or_return_response, ValidationError};
 use crate::controllers::htmx::redirect::HtmxRedirect;
 use crate::controllers::htmx::IsHTMX;
 use crate::controllers::rate_limiter::{RateLimiter, RateLimiterTrait};
+use crate::discover_uri;
 use crate::helpers::db::DbConn;
 use crate::models::query::ListQuery;
 use crate::models::users::form::LoginFormData;
 use crate::models::users::schema::{UserCredentials, UserJWT};
 use crate::responders::ApiResponse;
-use crate::routes::community;
+use crate::routes::discover;
 
 #[post("/login")]
 pub fn logged_in(_user: UserJWT, is_htmx: IsHTMX) -> ApiResponse {
     match is_htmx {
         IsHTMX(true) => {
-            ApiResponse::HtmxRedirect(HtmxRedirect::to(community_uri!(community::page(_))))
+            ApiResponse::HtmxRedirect(HtmxRedirect::to(discover_uri!(discover::page(_))))
         }
-        IsHTMX(false) => ApiResponse::Redirect(Redirect::to(community_uri!(community::page(_)))),
+        IsHTMX(false) => ApiResponse::Redirect(Redirect::to(discover_uri!(discover::page(_)))),
     }
 }
 
@@ -32,8 +32,8 @@ pub fn logged_in(_user: UserJWT, is_htmx: IsHTMX) -> ApiResponse {
 pub async fn post<'r>(
     mut db: Connection<DbConn>,
     cookie_jar: &CookieJar<'r>,
-    is_htmx: IsHTMX,
     rate_limiter: &State<RateLimiter>,
+    is_htmx: IsHTMX,
     login_data: Result<Form<LoginFormData<'r>>, Errors<'r>>,
 ) -> Result<ApiResponse, ApiResponse> {
     rate_limiter.add_to_limit_or_return()?;
@@ -96,11 +96,13 @@ pub async fn post<'r>(
     );
 
     match is_htmx {
-        IsHTMX(true) => Ok(ApiResponse::HtmxRedirect(HtmxRedirect::to(community_uri!(
-            community::page(_)
-        )))),
-        IsHTMX(false) => Ok(ApiResponse::Redirect(Redirect::to(community_uri!(
-            community::page(_)
+        IsHTMX(true) => Ok(ApiResponse::Render {
+            status: Status::Ok,
+            template: Some(Template::render("partials/auth/login_success", context! {})),
+            headers: None,
+        }),
+        IsHTMX(false) => Ok(ApiResponse::Redirect(Redirect::to(discover_uri!(
+            discover::page(_)
         )))),
     }
 }

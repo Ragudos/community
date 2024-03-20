@@ -13,7 +13,7 @@
 				<h1>Welcome back!</h1>
 				<p>Please enter your information on the form to access your communities.</p>
 			</div>
-			<form hx-target-error="#nothing"  hx-sync="this" hx-post="/auth/login" hx-trigger="submit" method="post" action="/auth/login">
+			<form hx-target="body" hx-target-error="#nothing"  hx-sync="this" hx-post="/auth/login" hx-trigger="submit" method="post" action="/auth/login">
 				<div class="input-group">
 					<div class="label-container">
 						<label for="username">Username</label>

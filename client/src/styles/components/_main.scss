@@ -1,3 +1,7 @@
+:root {
+    --max-content-width: #{$max-content-width};
+}
+
 body {
     --_min-height: calc(100dvh - 4rem);
     font-family: "Roboto", system-ui, sans-serif;
@@ -320,4 +324,13 @@ button.icon {
         border-color: rgba(color_in_theme("text"), 0.075);
         border-right-color: rgba(color_in_theme("text"), 0.87);
     }
+
+}
+
+svg {
+	fill: currentColor;
+}
+
+.background {
+    @include cover_background
 }

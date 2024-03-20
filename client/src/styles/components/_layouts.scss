@@ -1,10 +1,10 @@
 .container {
-    width: min(calc(100% - #{$padding-inline * 2}), var(--_max-width, #{$max-content-width}));
+    width: min(calc(100% - #{$padding-inline * 2}), var(--_max-content-width, var(--max-content-width)));
     margin-inline: auto;
 }
 
 .min-h-screen {
-    min-height: 100dvh;
+    min-height: calc(100dvh - 4rem);
 }
 
 .flex {
@@ -14,4 +14,18 @@
 .ce-wrapper {
     display: grid;
     place-items: center;
+}
+
+.flex-col {
+	@include flex-column;
+	gap: $general-gap;
+}
+
+.auto-grid {
+    --_default-content-width: clamp(10rem, 0.25rem + 5vw, 20rem);
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(var(--_content-width, var(--_default-content-width)), 1fr));
+    place-items: center;
+    gap: $general-gap;
+    width: 100%;
 }

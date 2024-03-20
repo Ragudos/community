@@ -1,8 +1,11 @@
 use std::str::FromStr;
 
 use rocket::request::FromParam;
+use rocket_dyn_templates::Template;
 use serde::{Deserialize, Serialize};
 use sqlx::types::Uuid;
+
+use crate::responders::ApiResponse;
 
 pub mod community;
 pub mod db;
@@ -35,12 +38,10 @@ pub struct Toast {
 pub struct StringUuid(pub Uuid);
 
 impl<'a> FromParam<'a> for StringUuid {
-    type Error = &'a str;
+    type Error = ApiResponse;
 
     fn from_param(param: &'a str) -> Result<Self, Self::Error> {
-        let uid = Uuid::from_str(param).map_err(|_| "Invalid UUID")?;
-
-        Ok(StringUuid(uid))
+        Ok(StringUuid(Uuid::from_str(param)?))
     }
 }
 

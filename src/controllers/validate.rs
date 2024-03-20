@@ -18,7 +18,10 @@ pub fn validate_password_with_confirmation<'v>(
 }
 
 pub fn validate_ascii_text<'v>(display_name: &str) -> Result<'v, ()> {
-    if !display_name.chars().all(|c| c.is_alphanumeric()) {
+    if !display_name
+        .chars()
+        .all(|c| c.is_alphanumeric() || c.is_whitespace())
+    {
         return Err(Error::validation("No special characters are allowed."))?;
     }
 

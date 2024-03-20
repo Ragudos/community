@@ -1,5 +1,4 @@
-use community::models::Env;
-use community::{create_config, rocket_from_config};
+use community::{create_config, env::Env, rocket_from_config};
 use rocket::local::asynchronous::Client;
 
 pub async fn get_client() -> Client {

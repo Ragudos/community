@@ -1,0 +1,21 @@
+{{#if is_boosted}}
+    <head>
+        {{> partials/head/main}}
+        {{> partials/community/head}}
+    </head>
+    {{#if includeheader}}
+        <header id="header" hx-swap-oob="true">
+            {{> partials/head/logged_in}}
+        </header>
+        <aside id="community-header" hx-swap-oob="true">
+            {{> partials/community/header}}
+        </aside>
+    {{else}}
+        {{> partials/community/header_content oobswap=true}}
+    {{/if}}
+    {{> partials/community/about}}
+{{else}}
+    {{#> layouts/community}}
+        {{> partials/community/about}}
+    {{/layouts/community}}
+{{/if}}

@@ -81,18 +81,20 @@ pub fn rocket_from_config(figment: Figment) -> Rocket<Build> {
             rocket_routes![
                 routes::community::logged_out,
                 routes::community::page,
-                routes::community::uid::page,
-                routes::community::uid::settings::page,
-                routes::community::uid::about::page,
-                routes::community::uid::members::page,
+                routes::community::about::page,
+                routes::community::members::page,
+                routes::community::settings::page
             ],
         )
         .mount(
-            "/community/api",
+            "/discover",
+            rocket_routes![routes::discover::page, routes::discover::logged_out],
+        )
+        .mount(
+            "/discover/api",
             rocket_routes![
-                routes::community::api::logged_out,
-                routes::community::api::get,
-                routes::community::api::uid::get
+                routes::discover::api::get,
+                routes::discover::api::logged_out
             ],
         )
         .mount(
@@ -109,15 +111,14 @@ pub fn rocket_from_config(figment: Figment) -> Rocket<Build> {
         )
         .mount(
             "/posts",
-            rocket_routes![
-                routes::posts::logged_out_and_not_allowed,
-                routes::posts::page,
-            ],
+            rocket_routes![routes::posts::logged_out, routes::posts::page,],
         )
         .mount(
             "/posts/api",
             rocket_routes![
                 routes::posts::api::community_posts::get,
+                routes::posts::api::malformed_uid,
+                routes::posts::api::logged_out,
                 routes::posts::api::post_info::get
             ],
         )

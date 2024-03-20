@@ -1,12 +1,6 @@
 {{#> layouts/main}}
     {{#*inline "additional_head_content"}}
-        <link rel="preload" href="/build/styles/forms.min.css" as="style" />
-        <link rel="stylesheet" href="/build/styles/forms.min.css" />
-    {{/inline}}
-    {{#*inline "header"}}
-        <header>
-            
-        </header>
+        {{> partials/auth/head}}
     {{/inline}}
     {{> @partial-block}}
 {{/layouts/main}}

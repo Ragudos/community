@@ -148,10 +148,7 @@ impl UserMetadata {
         Ok(result.account_status)
     }
 
-    pub async fn create(
-        tx: &mut Transaction<'_, Postgres>,
-        uid: &Uuid,
-    ) -> Result<(), sqlx::Error> {
+    pub async fn create(tx: &mut Transaction<'_, Postgres>, uid: &Uuid) -> Result<(), sqlx::Error> {
         let _ = sqlx::query!(
             r#"
                 INSERT INTO user_metadata

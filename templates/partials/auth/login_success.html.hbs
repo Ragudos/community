@@ -1,0 +1,8 @@
+<head>
+    <meta http-equiv="refresh" content="0" url="/discover" />
+</head>
+<!--Since there's a slight delay from receiving a hx-redirect header, the errors
+are shown for awhile and that's not a good UX. We do it this way instead for the
+client redirect.-->
+<span class="error" id="username-error" hx-swap-oob="true"></span>
+<span class="error" id="password-error" hx-swap-oob="true"></span>

@@ -1,0 +1,14 @@
+{{#> layouts/main}}
+    {{#*inline "additional_head_content"}}
+        {{> partials/community/head}}
+    {{/inline}}
+    {{#*inline "header"}}
+        <header id="header">
+            {{> partials/head/logged_in}}
+        </header>
+        <aside id="community-header">
+            {{> partials/community/header}}
+        </aside>
+    {{/inline}}
+    {{> @partial-block}}
+{{/layouts/main}}

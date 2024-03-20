@@ -1,5 +1,6 @@
 use rocket::get;
 use rocket::http::CookieJar;
+use rocket::http::Status;
 use rocket::response::Redirect;
 use rocket_dyn_templates::context;
 use rocket_dyn_templates::Template;
@@ -13,6 +14,8 @@ use crate::models::users::schema::UserJWT;
 use crate::responders::ApiResponse;
 use crate::routes::auth::login;
 
+pub mod api;
+
 // TODO: Implement to get the uid from the URL
 #[get("/<_>")]
 pub fn page<'r>(cookie_jar: &CookieJar<'r>, user: UserJWT, is_boosted: IsBoosted) -> Template {
@@ -23,21 +26,31 @@ pub fn page<'r>(cookie_jar: &CookieJar<'r>, user: UserJWT, is_boosted: IsBoosted
     Template::render("pages/user", context! { metadata, user, is_boosted })
 }
 
-/// When the uid present does not exist, the route will be forwarded to this fn.
-#[get("/<_>", rank = 2)]
-pub fn page_not_found<'r>(
-    cookie_jar: &CookieJar<'r>,
+#[get("/<_..>", rank = 2)]
+pub fn malformed_uid(
+    cookie_jar: &CookieJar<'_>,
     user: UserJWT,
     is_boosted: IsBoosted,
-) -> Template {
-    let IsBoosted(is_boosted) = is_boosted;
+) -> ApiResponse {
     let theme = Theme::from_cookie_jar(cookie_jar);
     let metadata = SeoMetadata::build().theme(theme).finalize();
+    let IsBoosted(is_boosted) = is_boosted;
 
-    Template::render("pages/user/404", context! { metadata, user, is_boosted })
+    ApiResponse::Render {
+        status: Status::BadRequest,
+        template: Some(Template::render(
+            "partials/user/invalid_uid",
+            context! {
+                user, is_boosted
+            },
+        )),
+        headers: None,
+    }
 }
 
-#[get("/<_..>", rank = 2)]
+/// Just a no content for any request made where the first
+/// endpoint has forwarded.
+#[get("/<_..>", rank = 3)]
 pub fn logged_out(is_boosted: IsBoosted) -> ApiResponse {
     match is_boosted {
         IsBoosted(true) => ApiResponse::HtmxRedirect(HtmxRedirect::to(auth_uri!(login::page))),
