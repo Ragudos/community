@@ -1,14 +1,16 @@
 {{#if is_boosted}}
     <head>
         {{> partials/head/main}}
-        {{> partials/community/head}}
+        <link rel="preload" href="/build/styles/discover.min.css" as="style">
+        <link rel="stylesheet" href="/build/styles/discover.min.css">
     </head>
     <aside id="community-header" hx-swap-oob="true"></aside>
-    {{> partials/community/discover_ic}}
+    {{> partials/discover/initial_state}}
 {{else}}
     {{#> layouts/main}}
         {{#*inline "additional_head_content"}}
-            {{> partials/community/head}}
+            <link rel="preload" href="/build/styles/discover.min.css" as="style">
+            <link rel="stylesheet" href="/build/styles/discover.min.css">
         {{/inline}}
         {{#*inline "header"}}
             <header id="header">
@@ -16,6 +18,6 @@
             </header>
             <aside id="community-header"></aside>
         {{/inline}}
-        {{> partials/community/discover_ic}}
+        {{> partials/discover/initial_state}}
     {{/layouts/main}}
 {{/if}}

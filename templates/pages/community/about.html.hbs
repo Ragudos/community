@@ -1,18 +1,22 @@
 {{#if is_boosted}}
     <head>
         {{> partials/head/main}}
-        {{> partials/community/head}}
+        {{> partials/head/community}}
+        <link rel="stylesheet" href="/build/styles/about_community.min.css">
     </head>
     {{#if includeheader}}
         <aside id="community-header" hx-swap-oob="true">
-            {{> partials/community/header}}
+            {{> partials/headers/community}}
         </aside>
     {{else}}
-        {{> partials/community/header_content oobswap=true}}
+        {{> partials/headers/community_content oobswap=true}}
     {{/if}}
     {{> partials/community/about}}
 {{else}}
     {{#> layouts/community}}
+        {{#*inline "more_head_content"}}
+            <link rel="stylesheet" href="/build/styles/about_community.min.css">
+        {{/inline}}
         {{> partials/community/about}}
     {{/layouts/community}}
 {{/if}}

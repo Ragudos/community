@@ -38,6 +38,12 @@ pub struct UserJWT {
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct UserNameAndImage {
+    pub display_name: String,
+    pub display_image: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct UserMetadata {
     pub occupation: Option<Occupation>,
     pub gender: Gender,

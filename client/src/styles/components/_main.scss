@@ -401,3 +401,31 @@ svg {
         background-color: color_in_theme("harder-background");
     }   
 }
+
+.with-link-active-indicator {
+    a {
+        will-change: opacity, background-color;
+        transition-duration: 500ms;
+        transition-property: opacity, background-color;
+
+        opacity: 0.87;
+
+        &:hover {
+            opacity: 1;
+        }
+    }
+
+    a[aria-current] {
+        opacity: 1;
+    }
+}
+
+@include themify($themes) {
+    .with-link-active-indicator {
+        a:hover,
+        a[aria-current] {
+            background-color: rgba(color_in_theme("accent"), 0.25);
+        }
+    }
+}
+

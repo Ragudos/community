@@ -1,7 +1,7 @@
-<a style="min-width: auto; min-height: auto;" hx-target="main" hx-target-error="body" rel="noreferrer noopener" href="/community/{{community.uid}}/about?includeheader=true" class="community-card">
-    <div role="presentation" style="background-image: url({{community.cover_image}})" class="community-cover-image background"></div>
-    <div class="community-cc">
-        <div class="community-nc">
+<a style="min-width: auto; min-height: auto;" hx-target="main" hx-target-error="body" rel="noreferrer noopener" href="/community/{{community.uid}}/about?includeheader=true" class="discover-card">
+    <div role="presentation" style="background-image: url({{community.cover_image}})" class="discover-cover-image background"></div>
+    <div class="discover-cc">
+        <div class="discover-nc">
             <img
                 src="{{community.display_image}}"
                 alt="{{community.display_name}}'s display image"
@@ -13,10 +13,10 @@
                     loading="eager"
                 {{/if}}
             />
-            <span class="community-name">{{community.display_name}}</span>
+            <span class="discover-name">{{community.display_name}}</span>
         </div>
-        <p class="community-desc">{{community.description}}</p>
-        <div class="community-metadata">
+        <p class="discover-desc">{{community.description}}</p>
+        <div class="discover-metadata">
             <span>{{#if community.is_private}}Private{{else}}Public{{/if}}</span>
             <span>•</span>
             <span>{{(num_abbr community.total_members)}} member/s</span>

@@ -1,5 +1,29 @@
 <section id="about-section">
-    {{community.total_online_members}}
-    {{community.total_members}}
-    {{community.display_name}}
+    <div class="main-about">
+        <div role="presentation" style="background-image: url({{community.cover_image}})" class="background cover-image"></div>
+        <div class="about-metadata">
+            <div>
+                <i class="fa-solid fa-user-group fa-xs"></i>
+                <span style="margin-left: 0.5rem;">
+                    {{#if total_members}}{{(num_abbr total_members)}}{{else}}0{{/if}} member/s
+                </span>
+            </div>
+            <div>
+                {{#if is_private}}
+                    <i class="fa-solid fa-lock fa-xs"></i>
+                    <span style="margin-left: 0.5rem;">Private</span>
+                {{else}}
+                    <i class="fa-solid fa-lock-open fa-xs"></i>
+                    <span style="margin-left: 0.5rem;">Public</span>
+                {{/if}}
+            </div>
+            <div>
+                <div style="width: 4rem; height: 1rem;" hx-target-error="#owner_name" id="owner_name" data-loading-aria-busy hx-get="/user/api/img_name/{{community.owner_uid}}" hx-trigger="revealed" hx-swap="outerHTML" data-loading-class="skeleton shimmer" data-loading-class-remove="hidden" class="hidden" data-loading-delay="50"></div>
+            </div>
+        </div>
+        <div class="about-tc">
+            <h1 class="about-title title-md">{{community.display_name}}</h1>
+            <p class="about-description">{{community.description}}</p>
+        </div>
+    </div>
 </section>

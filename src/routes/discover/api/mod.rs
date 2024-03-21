@@ -64,7 +64,7 @@ pub async fn get<'r>(
     Ok(ApiResponse::Render {
         status: Status::Ok,
         template: Some(Template::render(
-            "partials/community/discover",
+            "partials/discover",
             context! {
                 user,
                 communities,

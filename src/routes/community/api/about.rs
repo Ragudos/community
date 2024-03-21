@@ -1,11 +1,11 @@
 use rocket::get;
-use rocket::http::{Header, Status};
+use rocket::http::Status;
 use rocket_db_pools::Connection;
 use rocket_dyn_templates::{context, Template};
 
 use crate::models::community::schema::CommunityAbout;
 use crate::models::StringUuid;
-use crate::responders::{ApiResponse, HeaderCount};
+use crate::responders::ApiResponse;
 use crate::models::users::schema::UserJWT;
 use crate::helpers::db::DbConn;
 
@@ -17,7 +17,6 @@ pub async fn get(
 ) -> Result<ApiResponse, ApiResponse> {
     let StringUuid(community_uid) = community_uid;
     let community_about = CommunityAbout::get(&mut db, &community_uid).await?;
-    let header = Header::new("Cache-Control", "public, max-age=3600");
 
     Ok(
         ApiResponse::Render {
@@ -31,7 +30,7 @@ pub async fn get(
                     }
                 )
             ),
-            headers: Some(HeaderCount::One(header))
+            headers: None
         }
     )
 }

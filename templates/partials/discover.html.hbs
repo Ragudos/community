@@ -1,0 +1,10 @@
+<div class="discover-grid" {{#if (eq (len communities) 0)}}style="display: initial;"{{/if}} data-loading-states id="section-of-communities">
+    {{#if (eq (len communities) 0)}}
+        <p>
+            0 community found.
+        </p>
+    {{/if}}
+    {{#each communities}}
+        {{> partials/discover/preview_card community=this}}
+    {{/each}}
+</div>

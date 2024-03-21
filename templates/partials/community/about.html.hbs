@@ -1,5 +1,20 @@
 <div class="container">
-    <section hx-swap="outerHTML" hx-trigger="revealed" hx-get="/community/api/{{community_uid}}/about" id="about-section" hx-target-error="#about-section">
-        Loading...
+    <section data-loading-aria-busy data-loading-delay="100" data-loading-states hx-swap="outerHTML" hx-trigger="revealed" hx-get="/community/api/{{community_uid}}/about" id="about-section" hx-target-error="#about-section">
+        <div class="hidden main-about" data-loading-class-remove="hidden">
+            <div class="cover-image" data-loading-class="skeleton shimmer"></div>
+            <div class="about-metadata">
+                <div style="--_delay: 250ms;" data-loading-class="skeleton shimmer"></div>
+                <div style="--_delay: 250ms;" data-loading-class="skeleton shimmer"></div>
+                <div style="--_delay: 250ms;" data-loading-class="skeleton shimmer"></div>
+            </div>
+            <div class="about-tc">
+                <div style="--_delay: 500ms;" class="about-title" data-loading-class="skeleton shimmer"></div>
+                <div style="display: flex; gap: 0.5rem; flex-direction: column;">
+                    <div style="--_delay: 750ms;" class="about-description" data-loading-class="skeleton shimmer"></div>
+                    <div style="--_delay: 750ms;" class="about-description" data-loading-class="skeleton shimmer"></div>
+                    <div style="--_delay: 750ms;" class="about-description" data-loading-class="skeleton shimmer"></div>
+                </div>
+            </div>
+        </div>
     </section>
 </div>

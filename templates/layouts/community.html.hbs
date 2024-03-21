@@ -1,13 +1,15 @@
 {{#> layouts/main}}
     {{#*inline "additional_head_content"}}
-        {{> partials/community/head}}
+        {{> partials/head/community}}
+        {{#> more_head_content}}
+        {{/more_head_content}}
     {{/inline}}
     {{#*inline "header"}}
         <header id="header">
             {{> partials/headers/logged_in}}
         </header>
         <aside id="community-header">
-            {{> partials/community/header}}
+            {{> partials/headers/community}}
         </aside>
     {{/inline}}
     {{> @partial-block}}

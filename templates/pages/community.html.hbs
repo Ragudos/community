@@ -1,14 +1,14 @@
 {{#if is_boosted}}
     <head>
         {{> partials/head/main}}
-        {{> partials/community/head}}
+        {{> partials/head/community}}
     </head>
     {{#if includeheader}}
         <aside id="community-header" hx-swap-oob="true">
-            {{> partials/community/header}}
+            {{> partials/headers/community}}
         </aside>
     {{else}}
-        {{> partials/community/header_content oobswap=true}}
+        {{> partials/headers/community_content oobswap=true}}
     {{/if}}
     {{> partials/community/index}}
 {{else}}

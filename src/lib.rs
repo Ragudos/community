@@ -9,6 +9,7 @@ use rocket::fs::FileServer;
 use rocket::Build;
 use rocket::Rocket;
 use rocket::{catchers as rocket_catchers, routes as rocket_routes};
+use rocket_async_compression::Compression;
 
 use crate::env::{Env, Environment};
 use crate::helpers::db;
@@ -22,8 +23,6 @@ pub mod helpers;
 pub mod models;
 pub mod responders;
 pub mod routes;
-
-struct UpdateOnlineSession;
 
 pub fn rocket_from_config(figment: Figment) -> Rocket<Build> {
     let rate_limit_capacity = figment
@@ -44,6 +43,7 @@ pub fn rocket_from_config(figment: Figment) -> Rocket<Build> {
         requests: AtomicU32::new(0),
     };
     let rocket = rocket::custom(figment)
+        .attach(Compression::fairing())
         .attach(db::stage())
         .attach(handlebars::register())
         .manage(rate_limiter)
@@ -90,11 +90,11 @@ pub fn rocket_from_config(figment: Figment) -> Rocket<Build> {
         )
         .mount(
             "/community/api",
-            rocket_routes! [
+            rocket_routes![
                 routes::community::api::logged_out,
                 routes::community::api::malformed_uri,
                 routes::community::api::about::get
-            ]
+            ],
         )
         .mount(
             "/discover",
@@ -118,6 +118,13 @@ pub fn rocket_from_config(figment: Figment) -> Rocket<Build> {
         .mount(
             "/user",
             rocket_routes![routes::user::logged_out, routes::user::page],
+        )
+        .mount(
+            "/user/api",
+            rocket_routes![
+                routes::user::api::malformed_uri_or_logged_out,
+                routes::user::api::img_name::get
+            ]
         )
         .mount(
             "/posts",

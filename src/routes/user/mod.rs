@@ -26,7 +26,7 @@ pub fn page<'r>(cookie_jar: &CookieJar<'r>, user: UserJWT, is_boosted: IsBoosted
     Template::render("pages/user", context! { metadata, user, is_boosted })
 }
 
-#[get("/<_..>", rank = 2)]
+#[get("/<_..>", rank = 3)]
 pub fn malformed_uid(
     cookie_jar: &CookieJar<'_>,
     user: UserJWT,
@@ -41,7 +41,7 @@ pub fn malformed_uid(
         template: Some(Template::render(
             "partials/user/invalid_uid",
             context! {
-                user, is_boosted
+                user, is_boosted, metadata
             },
         )),
         headers: None,
@@ -50,7 +50,7 @@ pub fn malformed_uid(
 
 /// Just a no content for any request made where the first
 /// endpoint has forwarded.
-#[get("/<_..>", rank = 3)]
+#[get("/<_..>", rank = 4)]
 pub fn logged_out(is_boosted: IsBoosted) -> ApiResponse {
     match is_boosted {
         IsBoosted(true) => ApiResponse::HtmxRedirect(HtmxRedirect::to(auth_uri!(login::page))),
