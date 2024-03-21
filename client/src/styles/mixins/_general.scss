@@ -31,7 +31,7 @@
 
     will-change: visibility, opacity;
     transition-property: visibility, opacity;
-    transition-duration: $transition_duration;
+    transition-duration: 250ms;
 }
 
 @mixin layered-shadow($shadow-color: hsl(0 0% 0% / 0.075), $shadow_size: 4) {

@@ -1,8 +1,9 @@
 /** === COLOR THEMES FOR DARK AND LIGHT MODE  ===  **/
 $themes: (
     light: (
-        text: hsl(10, 60%, 5%),
-        background: hsl(9, 47%, 96%),
+        text: hsl(10, 60%, 6%),
+        background: hsl(9, 47%, 94%),
+        harder-background: hsl(9, 47%, 98%),
         primary: hsl(5, 57%, 54%),
         primary-foreground: hsl(10, 60%, 4%),
         secondary: hsl(85, 57%, 72%),
@@ -20,11 +21,14 @@ $themes: (
         info: hsl(220, 57%, 54%),
         info-foreground: hsl(10, 60%, 4%),
         success: hsl(120, 57%, 54%),
-        success-foreground: hsl(10, 60%, 4%)
+        success-foreground: hsl(10, 60%, 4%),
+        skeleton: hsl(300, 3%, 66%),
+        skeleton-shimmer: hsl(300, 3%, 86%),
     ),
     dark: (
-        text: hsl(10, 60%, 95%),
-        background: hsl(9, 47%, 4%),
+        text: hsl(10, 60%, 94%),
+        background: hsl(9, 47%, 6%),
+        harder-background: hsl(9, 47%, 2%),
         primary: hsl(5, 57%, 46%),
         secondary: hsl(85, 57%, 28%),
         accent: hsl(112, 57%, 39%),
@@ -39,6 +43,8 @@ $themes: (
         info: hsl(220, 57%, 16%), 
         info-foreground: hsl(10, 60%, 95%),
         success: hsl(120, 57%, 16%),
-        success-foreground: hsl(10, 60%, 95%)
+        success-foreground: hsl(10, 60%, 95%),
+        skeleton: hsl(300, 3%, 44%),
+        skeleton-shimmer: hsl(300, 3%, 24%),
     ),
 );

@@ -5,3 +5,12 @@
 @keyframes spin {
     to { transform: rotate(360deg) }
 }
+
+@keyframes fade {
+    from { opacity: 1; }
+    to { opacity: var(--_max-opacity, 0); }
+}
+
+@keyframes shimmer {
+    to { transform: translateX(100%); }
+}

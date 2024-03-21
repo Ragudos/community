@@ -31,7 +31,7 @@ pub fn not_found(request: &Request) -> Template {
 
 #[catch(500)]
 pub fn internal_server_error(request: &Request) -> Template {
-    if let Some(is_htmx) = request.headers().get_one("Hx-Request") {
+    if let Some(is_htmx) = request.headers().get_one("Hx-Toast") {
         // Means the request was made by htmx or the client. So, errors
         // are handled by our toaster.
         if is_htmx == "true" {
@@ -59,6 +59,7 @@ pub fn internal_server_error(request: &Request) -> Template {
         "catchers/500",
         context! {
             metadata,
+            message: "An error occured while processing your request.",
         },
     )
 }

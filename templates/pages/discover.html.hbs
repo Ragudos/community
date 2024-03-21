@@ -1,19 +1,21 @@
-{{#> layouts/main}}
-    {{#*inline "additional_head_content"}}
-        <link rel="preload" href="/build/styles/community.min.css" as="style" />
-        <link rel="stylesheet" href="/build/styles/community.min.css" />
-    {{/inline}}
-    <aside class="container">
-    </aside>
-    <section class="container">
-        <h1 class="sr-only">Discover Communities</h1>
-        <div hx-target-error="#section-of-communities" data-loading-delay="250"  id="section-of-communities" data-loading-states class="community-grid" hx-swap="outerHTML" hx-trigger="revealed" hx-get="/discover/api?{{#if list_query}}{{#if list_query.search}}search={{list_query.search}}&{{/if}}{{#if list_query.category}}category={{list_query.category}}&{{/if}}{{#if list_query.offset}}offset={{list_query.offset}}{{/if}}{{/if}}">
-            <div style="--_delay: 0ms" class="skeleton" data-loading></div>
-            <div style="--_delay: 200ms" class="skeleton" data-loading></div>
-            <div style="--_delay: 400ms" class="skeleton" data-loading></div>
-            <div style="--_delay: 600ms" class="skeleton" data-loading></div>
-            <div style="--_delay: 800ms" class="skeleton" data-loading></div>
-            <div style="--_delay: 1000ms" class="skeleton" data-loading></div>
-        </div>
-    </section>
-{{/layouts/main}}
+{{#if is_boosted}}
+    <head>
+        {{> partials/head/main}}
+        {{> partials/community/head}}
+    </head>
+    <aside id="community-header" hx-swap-oob="true"></aside>
+    {{> partials/community/discover_ic}}
+{{else}}
+    {{#> layouts/main}}
+        {{#*inline "additional_head_content"}}
+            {{> partials/community/head}}
+        {{/inline}}
+        {{#*inline "header"}}
+            <header id="header">
+                {{> partials/headers/logged_in}}
+            </header>
+            <aside id="community-header"></aside>
+        {{/inline}}
+        {{> partials/community/discover_ic}}
+    {{/layouts/main}}
+{{/if}}

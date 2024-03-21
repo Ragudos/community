@@ -39,7 +39,7 @@ pub fn page<'r>(
     )
 }
 
-#[get("/<_..>", rank = 2)]
+#[get("/<_..>", rank = 4)]
 pub fn logged_out(is_boosted: IsBoosted) -> ApiResponse {
     match is_boosted {
         IsBoosted(true) => ApiResponse::HtmxRedirect(HtmxRedirect::to(auth_uri!(login::page))),

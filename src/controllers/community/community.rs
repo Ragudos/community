@@ -8,11 +8,80 @@ use crate::{
     helpers::db::DbConn,
     models::{
         community::schema::{
-            Community, CommunityHomepageCard, CommunityOfUser, CommunityWithTotalMembers,
+            Community, CommunityAbout, CommunityHomepageCard, CommunityOfUser, CommunityWithTotalMembers
         },
         db::enums::CommunityCategory,
     },
 };
+
+impl CommunityAbout {
+    pub async fn get(
+        db: &mut Connection<DbConn>,
+        community_uid: &Uuid,
+    ) -> Result<CommunityAbout, sqlx::Error> {
+        Ok(
+            sqlx::query_as! (
+                CommunityAbout,
+                r#"
+                SELECT
+                uid,
+                display_name,
+                display_image,
+                description,
+                cover_image,
+                categories AS "categories: _",
+                is_private,
+                owner_uid,
+                total_members,
+                total_online_members,
+                total_admins
+                FROM communities c
+                LEFT JOIN (
+                    SELECT
+                    c2._id,
+                    owner_uid,
+                    COALESCE(total_members, 0) AS total_members,
+                    COALESCE(total_online_members, 0) AS total_online_members,
+                    COALESCE(total_admins, 0) AS total_admins
+                    FROM communities c2
+
+                    LEFT JOIN (
+                        SELECT _community_id, _user_id, COALESCE(COUNT(*), 0) AS total_members
+                        FROM community_memberships
+
+                        GROUP BY _community_id, _user_id
+                    ) cm ON c2._id = cm._community_id
+
+                    LEFT JOIN (
+                        SELECT _user_id, COALESCE(COUNT(*), 0) AS total_online_members
+                        FROM online_sessions
+                        WHERE _updated_at > NOW() - INTERVAL '10 minutes'
+
+                        GROUP BY _user_id
+                    ) os ON os._user_id = cm._user_id
+
+                    LEFT JOIN (
+                        SELECT _community_id, COALESCE(COUNT(*), 0) AS total_admins
+                        FROM community_memberships
+                        WHERE role = 'admin'
+                        
+                        GROUP BY _community_id
+                    ) ca ON c2._id = ca._community_id
+
+                    LEFT JOIN (
+                        SELECT _id, uid AS owner_uid
+                        FROM users
+                    ) u ON c2.owner_id = u._id
+
+                    GROUP BY c2._id, owner_uid, total_members, total_online_members, total_admins
+                ) cm ON c._id = cm._id
+                WHERE uid = $1;
+                "#,
+                community_uid
+            ).fetch_one(&mut ***db).await?
+        )
+    }
+}
 
 impl Community {
     pub async fn is_name_taken(

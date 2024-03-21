@@ -9,7 +9,7 @@ pub struct CommunityTable {
     _created_at: String,
     pub uid: String,
     pub display_name: String,
-    pub categories: Vec<CommunityCategory>,
+    pub categories: Option<Vec<CommunityCategory>>,
     pub description: String,
     pub owner_id: i64,
     pub is_private: bool,
@@ -103,4 +103,19 @@ pub struct CommunityPost {
     pub links: Option<Vec<String>>,
     pub images: Option<Vec<String>>,
     pub videos: Option<Vec<String>>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct CommunityAbout {
+    pub owner_uid: String,
+    pub uid: String,
+    pub display_name: String,
+    pub description: String,
+    pub display_image: Option<String>,
+    pub cover_image: Option<String>,
+    pub categories: Option<Vec<CommunityCategory>>,
+    pub is_private: bool,
+    pub total_members: Option<i64>,
+    pub total_online_members: Option<i64>,
+    pub total_admins: Option<i64>,
 }

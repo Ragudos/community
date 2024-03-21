@@ -29,3 +29,8 @@
     gap: $general-gap;
     width: 100%;
 }
+
+.list-of-links {
+    @include flex-center-vert;
+    gap: 0.5rem;
+}

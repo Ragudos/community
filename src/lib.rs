@@ -23,6 +23,8 @@ pub mod models;
 pub mod responders;
 pub mod routes;
 
+struct UpdateOnlineSession;
+
 pub fn rocket_from_config(figment: Figment) -> Rocket<Build> {
     let rate_limit_capacity = figment
         .data()
@@ -85,6 +87,14 @@ pub fn rocket_from_config(figment: Figment) -> Rocket<Build> {
                 routes::community::members::page,
                 routes::community::settings::page
             ],
+        )
+        .mount(
+            "/community/api",
+            rocket_routes! [
+                routes::community::api::logged_out,
+                routes::community::api::malformed_uri,
+                routes::community::api::about::get
+            ]
         )
         .mount(
             "/discover",

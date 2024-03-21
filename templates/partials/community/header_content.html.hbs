@@ -1,6 +1,6 @@
-<ul class="with-link-active-indicator" id="list-of-community-links" {{#if oobswap}}hx-swap-oob="true"{{/if}}>
+<ul class="with-link-active-indicator list-of-links" id="list-of-community-links" {{#if oobswap}}hx-swap-oob="true"{{/if}}>
     <li>
-        <a id="community-link" {{#if (eq current_page "community")}}aria-current="page"{{/if}} hx-target="main" hx-target-error="main" href="/community/{{community_uid}}">Community</a>
+        <a id="community-link" {{#if (eq current_page "community")}}aria-current="page"{{/if}} hx-target="main" hx-target-error="main" href="/community/{{community_uid}}">Home</a>
     </li>
     <li>
         <a id="members-link" {{#if (eq current_page "members")}}aria-current="page"{{/if}} hx-target="main" hx-target-error="main" href="/community/{{community_uid}}/members">Members</a>

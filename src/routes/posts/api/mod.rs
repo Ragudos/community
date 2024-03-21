@@ -30,6 +30,6 @@ pub fn malformed_uid(_user: UserJWT) -> ApiResponse {
 /// Just a no content for any request made where the first
 /// endpoint has forwarded.
 #[get("/<_..>", rank = 3)]
-pub fn logged_out() -> ApiResponse {
-    ApiResponse::Status(Status::NoContent)
+pub fn logged_out() -> Status {
+    Status::NoContent
 }
