@@ -1,7 +1,18 @@
+use std::str::FromStr;
+
 use rocket::form::{Error, Result};
+use sqlx::types::Uuid;
 
 pub fn validate_password<'v>(_password: &str) -> Result<'v, ()> {
     Ok(())
+}
+
+pub fn validate_uuid<'v>(uuid: &str) -> Result<'v, ()> {
+    if Uuid::from_str(uuid).is_ok() {
+        return Ok(());
+    }
+
+    Err(Error::validation("Invalid UUID"))?
 }
 
 pub fn validate_password_with_confirmation<'v>(

@@ -29,7 +29,6 @@ impl CommunityAbout {
                 display_image,
                 description,
                 cover_image,
-                categories AS "categories: _",
                 is_private,
                 owner_uid,
                 total_members,
@@ -84,6 +83,24 @@ impl CommunityAbout {
 }
 
 impl Community {
+    pub async fn is_private(
+        db: &mut Connection<DbConn>,
+        community_uid: &Uuid,
+    ) -> Result<bool, sqlx::Error> {
+        let result = sqlx::query!(
+            r#"
+            SELECT is_private
+            FROM communities
+            WHERE uid = $1;
+            "#,
+            community_uid
+        )
+        .fetch_one(&mut ***db)
+        .await?;
+
+        Ok(result.is_private)
+    }
+
     pub async fn is_name_taken(
         db: &mut Connection<DbConn>,
         name: &str,

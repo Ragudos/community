@@ -113,7 +113,6 @@ pub struct CommunityAbout {
     pub description: String,
     pub display_image: Option<String>,
     pub cover_image: Option<String>,
-    pub categories: Option<Vec<CommunityCategory>>,
     pub is_private: bool,
     pub total_members: Option<i64>,
     pub total_online_members: Option<i64>,

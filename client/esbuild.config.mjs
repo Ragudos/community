@@ -7,7 +7,6 @@ import postcssPresetEnv from "postcss-preset-env";
 await esbuild.build({
     entryPoints: [
         "src/index.ts",
-        "src/crop.ts",
         "src/styles/*.scss",
     ],
     outdir: "../build",
@@ -22,7 +21,8 @@ await esbuild.build({
         ".js": ".min.js",
         ".css": ".min.css",
     },
-    pure: ["console.error", "console.log", "throw"],
+    sourcemap: true,
+    pure: ["console", "throw"],
     platform: "browser",
     plugins: [
         sassPlugin({

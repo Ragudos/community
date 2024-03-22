@@ -5,6 +5,7 @@ use crate::{models::{users::schema::UserJWT, Toast, ToastTypes}, responders::Api
 
 pub mod settings;
 pub mod about;
+pub mod join;
 
 #[get("/<_..>", rank = 2)]
 pub fn malformed_uri(_user: UserJWT) -> ApiResponse {

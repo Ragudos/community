@@ -1,4 +1,9 @@
-import "./dialog";
-import "./scroll_up";
-import "./dropdown";
-import "./checkbox";
+import { initDialog } from "./dialog";
+import { initDropdown } from "./dropdown";
+
+function init() {
+    initDropdown();
+    initDialog();
+}
+
+window.addEventListener("DOMContentLoaded", init);

@@ -1,10 +1,10 @@
 use std::str::FromStr;
 
-use rocket::request::FromParam;
-use rocket_dyn_templates::Template;
+use rocket::{request::FromParam, FromForm};
 use serde::{Deserialize, Serialize};
 use sqlx::types::Uuid;
 
+use crate::controllers::validate::validate_uuid;
 use crate::responders::ApiResponse;
 
 pub mod community;
@@ -36,6 +36,12 @@ pub struct Toast {
 
 #[derive(Debug, Clone)]
 pub struct StringUuid(pub Uuid);
+
+#[derive(FromForm, Debug, Clone)]
+pub struct StringUuidForm {
+    #[field(validate = validate_uuid())]
+    pub community_uid: String,
+}
 
 impl<'a> FromParam<'a> for StringUuid {
     type Error = ApiResponse;

@@ -1,11 +1,24 @@
 <section id="about-section">
     <div class="main-about">
+        <h1 class="about-title title-md">{{community.display_name}}</h1>
         <div role="presentation" style="background-image: url({{community.cover_image}})" class="background cover-image"></div>
         <div class="about-metadata">
             <div>
                 <i class="fa-solid fa-user-group fa-xs"></i>
                 <span style="margin-left: 0.5rem;">
                     {{#if total_members}}{{(num_abbr total_members)}}{{else}}0{{/if}} member/s
+                </span>
+            </div>
+            <div>
+                <i class="fa-solid fa-globe fa-xs"></i>
+                <span style="margin-left: 0.5rem;">
+                    {{#if total_online_members}}{{(num_abbr total_online_members)}}{{else}}0{{/if}} online
+                </span>
+            </div>
+            <div>
+                <i class="fa-solid fa-user-tie fa-xs"></i>
+                <span style="margin-left: 0.5rem;">
+                    {{#if total_admins}}{{(num_abbr total_admins)}}{{else}}0{{/if}} admin/s
                 </span>
             </div>
             <div>
@@ -21,9 +34,22 @@
                 <div style="width: 4rem; height: 1rem;" hx-target-error="#owner_name" id="owner_name" data-loading-aria-busy hx-get="/user/api/img_name/{{community.owner_uid}}" hx-trigger="revealed" hx-swap="outerHTML" data-loading-class="skeleton shimmer" data-loading-class-remove="hidden" class="hidden" data-loading-delay="50"></div>
             </div>
         </div>
-        <div class="about-tc">
-            <h1 class="about-title title-md">{{community.display_name}}</h1>
+        <div class="about-description-container">
             <p class="about-description">{{community.description}}</p>
         </div>
+        {{#if is_private}}
+            <button type="button">
+                Join Now
+            </button>
+            <dialog></dialog>
+        {{else}}
+            <form hx-confirm="Are you sure?" hx-target-error="#nothing" data-loading-aria-busy data-loading-delay="100" hx-post="/community/api/join/public" hx-sync="this">
+                <input type="hidden" readonly name="community_uid" value="{{community.uid}}">
+                <button data-loading-disable class="primary" type="submit">
+                    <span data-loading-class="hidden">Join Now</span>
+                    <span data-loading>Please wait...</span>
+                </button>
+            </form>
+        {{/if}}
     </div>
 </section>

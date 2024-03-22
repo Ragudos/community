@@ -2,7 +2,7 @@
     <div class="container">
         <a href="/discover" hx-target-error="main" hx-target="main">Discover</a>
         <div class="dropdown">
-            <button aria-label="Click to open dropdown of buttons for logout, profile, etc." aria-controls="user-dropdown" aria-expanded="false" class="icon" data-opener>
+            <button class="circle border" aria-label="Click to open dropdown of buttons for logout, profile, etc." aria-controls="user-dropdown" aria-expanded="false" data-opener>
                 <img
                     src="{{#if user.display_image}}{{user.display_image}}{{else}}https://placehold.co/40x40{{/if}}"
                     alt="{{user.display_name}}'s avatar"

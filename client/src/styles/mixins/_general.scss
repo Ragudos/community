@@ -50,6 +50,12 @@
     }
 }
 
+@mixin s-mobilesmall {
+    @media (min-width: $mobilesmall) {
+        @content;
+    }
+}
+
 @mixin s-mobile {
     @media (min-width: $mobile) {
         @content;

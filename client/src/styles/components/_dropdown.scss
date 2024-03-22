@@ -1,0 +1,9 @@
+.dropdown {
+    position: relative;
+}
+
+.dropdown > .dropdown-wrapper {
+    width: max-content;
+    
+    position: absolute;
+}

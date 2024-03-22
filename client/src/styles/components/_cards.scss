@@ -3,10 +3,5 @@
     padding: 2rem;
     border-radius: $radius;
     border: 1px solid;
-}
-
-@include themify($themes) {
-    .general-card {
-        border-color: rgba(color_in_theme("border"), 0.675);
-    }
+    border-color: hsl(var(--border));
 }

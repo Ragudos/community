@@ -1,7 +1,11 @@
-document.addEventListener("DOMContentLoaded", () => {
+export function initDialog() {
     document.querySelectorAll("dialog").forEach((dialog) => {
         dialog.addEventListener("click", (evt) => {
-            for (const el of dialog.querySelectorAll("*")) { 
+            const dialogChildren = dialog.querySelectorAll("*");
+
+            for (let i = 0; i < dialogChildren.length; ++i) { 
+                const el = dialogChildren[i];
+
                 if (el === evt.target) {
                     return;
                 }
@@ -10,4 +14,4 @@ document.addEventListener("DOMContentLoaded", () => {
             dialog.close();
         });
     });
-});
+}

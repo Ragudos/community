@@ -22,38 +22,33 @@
         width: min(100%, 25rem);
         backdrop-filter: blur(1rem);
         border-radius: $radius;
-    }
-}
-
- @include themify($themes) {
-    .toaster {
-        border-color: color_in_theme("border");
-        background-color: rgba(color_in_theme("background"), 0.87);
-        color: color_in_theme("text");
-        @include layered-shadow(rgba(color_in_theme("text"), 0.075), 2);
+        border-color: hsl(var(--border) / var(--_border-opacity, 0.87));
+        background-color: hsl(var(--background) / var(--_background-opacity, 0.87));
+        color: hsl(var(--text) / var(--_text-opacity, 1));
+        @include layered-shadow(hsl(var(--text) / 0.075), 2);
     }
 
     .toaster[data-type=error] {
-        background-color: rgba(color_in_theme("destructive"), 0.87);
-        color: color_in_theme("destructive-foreground");
-        @include layered-shadow(rgba(color_in_theme("destructive"), 0.075), 2);
+        background-color: hsl(var(--destructive), 0.87);
+        color: hsl(var(--destructive-foreground));
+        @include layered-shadow(hsl(var(--destructive), 0.075), 2);
     }
 
     .toaster[data-type=warning] {
-        background-color: rgba(color_in_theme("warning"), 0.87);
-        color: color_in_theme("warning-foreground");
-        @include layered-shadow(rgba(color_in_theme("warning"), 0.075), 2);
+        background-color: hsl(var(--warning), 0.87);
+        color: hsl(var(--warning-foreground));
+        @include layered-shadow(hsl(var(--warning), 0.075), 2);
     }
 
     .toaster[data-type=info] {
-        background-color: rgba(color_in_theme("info"), 0.87);
-        color: color_in_theme("info-foreground");
-        @include layered-shadow(rgba(color_in_theme("warning"), 0.075), 2);
+        background-color: hsl(var(--info), 0.87);
+        color: hsl(var(--info-foreground));
+        @include layered-shadow(hsl(var(--warning), 0.075), 2);
     }
 
     .toaster[data-type=success] {
-        background-color: rgba(color_in_theme("success"), 0.87);
-        color: color_in_theme("success-foreground");
-        @include layered-shadow(rgba(color_in_theme("success"), 0.075), 2);
+        background-color: hsl(var(--success), 0.87);
+        color: hsl(var(--success-foreground));
+        @include layered-shadow(hsl(var(--success), 0.075), 2);
     }
 }

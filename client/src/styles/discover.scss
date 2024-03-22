@@ -43,6 +43,9 @@
 
     font-size: 1rem;
     font-weight: 400;
+
+    background-color: hsl(var(--background));
+    border-color: hsl(var(--border));
 }
 
 .discover-cover-image {
@@ -94,11 +97,4 @@
 
 .discover-grid > *:hover:not(.skeleton) {
     @include layered-shadow(hsl(0 0% 0% / 0.25), 1);
-}
-
-@include themify($themes) {
-    .discover-grid > * {
-        border-color: color_in_theme("border");
-        background-color: color_in_theme("background");
-    }
 }
