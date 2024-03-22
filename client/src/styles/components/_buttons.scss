@@ -154,8 +154,8 @@ a.active-indicator {
     opacity: 0.75;
 
     &:hover {
-        opacity: 1;
-        background-color: hsl(var(--accent) / 0.25);
+        opacity: 0.87;
+        background-color: hsl(var(--accent) / 0.075);
         color: hsl(var(--accent-foreground));
     }
 }

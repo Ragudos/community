@@ -1,8 +1,8 @@
 <div class="header">
     <div class="container">
         <a href="/discover" hx-target-error="main" hx-target="main">Discover</a>
-        <div class="dropdown">
-            <button class="circle border" aria-label="Click to open dropdown of buttons for logout, profile, etc." aria-controls="user-dropdown" aria-expanded="false" data-opener>
+        <details class="dropdown">
+            <summary aria-label="A menu dropdown relevant to the user.">
                 <img
                     src="{{#if user.display_image}}{{user.display_image}}{{else}}https://placehold.co/40x40{{/if}}"
                     alt="{{user.display_name}}'s avatar"
@@ -10,13 +10,25 @@
                     height="40"
                     loading="eager"
                     decoding="sync"
+                    style="border-radius: 50%;"
                 />
-            </button>
+            </summary>
             <div class="dropdown-wrapper" id="user-dropdown">
-                <div class="dropdown-container">
-                    <div class="user-dropdown">
-                        <ul></ul>
-                    </div>
+                <div>
+                    <ul class="user-dropdown">
+                        <li>
+                            <form hx-target="body" hx-target-error="#nothing" data-loading-states data-loading-delay="100" hx-delete="/auth/api/logout" hx-trigger="submit" hx-sync="this, a">
+                                <button data-loading-disable type="submit">
+                                    <i class="fa-solid fa-arrow-right-from-bracket fa-sm"></i>
+                                    <span data-loading-class="hidden">Logout</span>
+                                    <span data-loading-class-remove="hidden" class="hidden">
+                                        Logging out...
+                                        <div class="spinner" data-loading-class="spin"></div>
+                                    </span>
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>

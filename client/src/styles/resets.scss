@@ -6,13 +6,11 @@
 *,
 ::before,
 ::after {
-    box-sizing: inherit;
+    box-sizing: border-box;
     word-wrap: break-word;
 }
 
 html {
-    box-sizing: border-box;
-
     text-rendering: optimizeSpeed;
     @include font-size(16);
 }
@@ -124,6 +122,7 @@ q:after {
 }
 
 hr {
+    box-sizing: content-box;
     height: 1px;
     border-top: 1px solid currentColor;
     margin: 1rem 0;
