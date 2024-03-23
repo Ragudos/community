@@ -18,6 +18,7 @@ impl CommunityAbout {
     pub async fn get(
         db: &mut Connection<DbConn>,
         community_uid: &Uuid,
+        user_id: &Uuid
     ) -> Result<CommunityAbout, sqlx::Error> {
         Ok(
             sqlx::query_as! (
@@ -33,7 +34,8 @@ impl CommunityAbout {
                 owner_uid,
                 total_members,
                 total_online_members,
-                total_admins
+                total_admins,
+                is_viewer_a_member
                 FROM communities c
                 LEFT JOIN (
                     SELECT
@@ -41,7 +43,8 @@ impl CommunityAbout {
                     owner_uid,
                     COALESCE(total_members, 0) AS total_members,
                     COALESCE(total_online_members, 0) AS total_online_members,
-                    COALESCE(total_admins, 0) AS total_admins
+                    COALESCE(total_admins, 0) AS total_admins,
+                    is_viewer_a_member
                     FROM communities c2
 
                     LEFT JOIN (
@@ -72,11 +75,28 @@ impl CommunityAbout {
                         FROM users
                     ) u ON c2.owner_id = u._id
 
-                    GROUP BY c2._id, owner_uid, total_members, total_online_members, total_admins
+                    LEFT JOIN (
+                        SELECT NOT EXISTS (
+                            SELECT 1
+                            FROM community_memberships
+                            WHERE _user_id = (
+                                SELECT _id FROM users WHERE uid = $2
+                            ) AND _community_id = (
+                                SELECT _id FROM communities WHERE uid = $1
+                            )
+                        ) AS is_viewer_a_member,
+                        _community_id
+                        FROM community_memberships
+
+                        GROUP BY is_viewer_a_member, _community_id
+                    ) io ON c2._id = io._community_id
+
+                    GROUP BY c2._id, io.is_viewer_a_member, owner_uid, total_members, total_online_members, total_admins
                 ) cm ON c._id = cm._id
                 WHERE uid = $1;
                 "#,
-                community_uid
+                community_uid,
+                user_id
             ).fetch_one(&mut ***db).await?
         )
     }

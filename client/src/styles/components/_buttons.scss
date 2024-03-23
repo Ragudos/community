@@ -7,8 +7,13 @@ a {
     color: hsl(var(--text) / var(--_text-opacity, 1));
 
     &:focus-visible {
-        box-shadow: 0px 0px 0px 2px hsl(var(--ring-offset, var(--background)) / var(--_ring-offset-opacity, 1)),
-            0px 0px 0px 4px hsl(var(--ring) / var(--_ring-opacity, 1))
+        box-shadow:
+            0px 0px 0px 2px
+                hsl(
+                    var(--ring-offset, var(--background)) /
+                        var(--_ring-offset-opacity, 1)
+                ),
+            0px 0px 0px 4px hsl(var(--ring) / var(--_ring-opacity, 1));
     }
 }
 
@@ -27,7 +32,7 @@ input,
 textarea,
 select {
     border: 1px solid;
-    border-color: hsl(var(--border) / var(--_border-opacity, 0.5));
+    border-color: hsl(var(--border) / var(--_border-opacity, 0.75));
 
     padding: 0.5rem 0.75rem;
 
@@ -37,10 +42,10 @@ select {
 }
 
 button,
-input[type=submit],
+input[type="submit"],
 a {
     @include flex-center(inline-flex);
-    
+
     padding: 0.5rem 1rem;
 
     min-width: 7.5ch;
@@ -53,7 +58,7 @@ a {
     transition-duration: var(--animation-duration);
 
     &:hover {
-        --_background-opacity: 0.75
+        --_background-opacity: 0.75;
     }
 
     &:active {
@@ -74,7 +79,7 @@ a {
     height: $icon;
 
     padding: 0;
-    
+
     border-radius: 50%;
 
     overflow: hidden;
@@ -117,28 +122,28 @@ a {
 }
 
 button.primary,
-input[type=submit].primary,
+input[type="submit"].primary,
 a.primary {
     background-color: hsl(var(--primary) / var(--_background-opacity, 1));
     color: hsl(var(--primary-foreground) / var(--_text-opacity, 1));
 }
 
 button.secondary,
-input[type=submit].secondary,
+input[type="submit"].secondary,
 a.secondary {
     background-color: hsl(var(--secondary) / var(--_background-opacity, 1));
     color: hsl(var(--secondary-foreground) / var(--_text-opacity, 1));
 }
 
 button.accent,
-input[type=submit].accent,
+input[type="submit"].accent,
 a.accent {
     background-color: hsl(var(--accent) / var(--_background-opacity, 1));
     color: hsl(var(--accent-foreground) / var(--_text-opacity, 1));
 }
 
 button.destructive,
-input[type=submit].destructive,
+input[type="submit"].destructive,
 a.destructive {
     background-color: hsl(var(--destructive) / var(--_background-opacity, 1));
     color: hsl(var(--destructive-foreground) / var(--_text-opacity, 1));

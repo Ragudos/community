@@ -4,14 +4,11 @@
 .main-about {
     padding: 1rem;
     max-width: 800px;
-    
-    * {
-        border-radius: $radius;
-    }
 
     .cover-image {
         aspect-ratio: 16/9;
         width: 100%;
+        border-radius: $radius;
 
         @supports not (aspect-ratio: 16/9) {
             height: 15rem;

@@ -13,23 +13,20 @@
 <meta name="og:image:alt" content="{{ metadata.open_graph.image.alt }}" />{{/if}}
 <meta property="og:site_name" content="{{ metadata.site_name }}" />
 <meta name="environment" content="{{ metadata.env }}" />
-<link rel="preload" href="/assets/fonts/Roboto/Roboto-Regular.ttf" as="font" type="font/ttf" crossorigin="anonymous" />
-<link rel="preload" href="/assets/fonts/Roboto/Roboto-Bold.ttf" as="font" type="font/ttf" crossorigin="anonymous" />
 <link rel="preload" href="/build/styles/fonts.min.css" as="style" />
-<link rel="preload" href="/build/styles/resets.min.css" as="style" />
-<link rel="preload" href="/build/styles/main.min.css" as="style" />
 <link rel="stylesheet" href="/build/styles/fonts.min.css" />
+<link rel="preload" href="/build/styles/resets.min.css" as="style" />
 <link rel="stylesheet" href="/build/styles/resets.min.css" />
+<link rel="preload" href="/build/styles/main.min.css" as="style" />
 <link rel="stylesheet" href="/build/styles/main.min.css" />
-<link rel="preload" href="/assets/scripts/htmx.min.js" as="script" />
 <script src="/assets/scripts/htmx.min.js"></script>
-<script defer async src="/assets/scripts/htmx-head.min.js"></script>
-<script defer async src="/assets/scripts/htmx-loading.min.js"></script>
-<script defer async src="/assets/scripts/htmx-response-target.min.js"></script>
-<script defer async src="/assets/scripts/htmx-remove-me.min.js"></script>
+<script src="/assets/scripts/htmx-head.min.js"></script>
+<script src="/assets/scripts/htmx-loading.min.js"></script>
+<script src="/assets/scripts/htmx-response-target.min.js"></script>
+<script src="/assets/scripts/htmx-remove-me.min.js"></script>
 <script hx-head="re-eval" defer async src="https://kit.fontawesome.com/d48ee40b59.js" crossorigin="anonymous"></script>
 <script src="/build/index.min.js" type="module"></script>
-<style>[data-loading]{display:none}</style>
+<style>[data-loading]{display:none}.hidden{display:none !important}</style>
 {{#unless (eq (len stylesheets) 0)}}
 {{#each stylesheets as |stylesheet|}}
 <link rel="stylesheet" href="{{stylesheet}}">

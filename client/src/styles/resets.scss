@@ -25,8 +25,8 @@ h2,
 h3,
 h4,
 p,
-ul:not([role=list]),
-ol:not([role=list]),
+ul:not([role="list"]),
+ol:not([role="list"]),
 li,
 figure,
 figcaption,
@@ -79,8 +79,8 @@ hr {
 }
 
 body,
-ul:not([role=list]),
-ol:not([role=list]),
+ul:not([role="list"]),
+ol:not([role="list"]),
 blockquote,
 q,
 figure,
@@ -117,7 +117,7 @@ blockquote:before,
 blockquote:after,
 q:before,
 q:after {
-    content: '';
+    content: "";
     content: none;
 }
 
@@ -157,8 +157,8 @@ td img {
     vertical-align: top;
 }
 
-ul:not([role=list]),
-ol:not([role=list]) {
+ul:not([role="list"]),
+ol:not([role="list"]) {
     list-style: none;
 }
 
@@ -178,11 +178,11 @@ select {
     vertical-align: middle;
 }
 
-input[type=radio] {
+input[type="radio"] {
     vertical-align: text-bottom;
 }
 
-input[type=checkbox] {
+input[type="checkbox"] {
     vertical-align: bottom;
 }
 
@@ -225,8 +225,8 @@ samp {
 }
 
 button,
-input[type=file],
-input[type=submit] {
+input[type="file"],
+input[type="submit"] {
     cursor: pointer;
 }
 
@@ -245,7 +245,7 @@ select {
 
 a,
 button,
-input[type=submit] {
+input[type="submit"] {
     -webkit-tap-highlight-color: transparent;
     line-height: normal;
     overflow: visible;
@@ -253,7 +253,7 @@ input[type=submit] {
     -webkit-appearance: button;
     appearance: button;
     font-weight: 600;
-    
+
     &::-moz-focus-inner {
         border: 0;
         padding: 0;

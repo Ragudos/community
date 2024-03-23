@@ -5,10 +5,7 @@ import autoprefixer from "autoprefixer";
 import postcssPresetEnv from "postcss-preset-env";
 
 await esbuild.build({
-    entryPoints: [
-        "src/index.ts",
-        "src/styles/*.scss",
-    ],
+    entryPoints: ["src/index.ts", "src/styles/*.scss"],
     outdir: "../build",
     bundle: true,
     legalComments: "inline",
@@ -29,12 +26,12 @@ await esbuild.build({
             async transform(source, resolveDir, filePath) {
                 const { css } = await postcss([
                     autoprefixer,
-                    postcssPresetEnv({ stage: 0 })
-                ]).process(source, { from: filePath })
+                    postcssPresetEnv({ stage: 0 }),
+                ]).process(source, { from: filePath });
 
                 return css;
             },
-        })
+        }),
     ],
-    external: ["*.ttf"]
+    external: ["*.ttf", "*.woff"],
 });

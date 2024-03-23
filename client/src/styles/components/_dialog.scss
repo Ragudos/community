@@ -1,0 +1,55 @@
+dialog {
+    background-color: transparent;
+    border: none;
+    border-radius: 0;
+    width: min(100%, 32.5rem);
+}
+
+dialog > * {
+    width: 100%;
+
+    padding: 2rem;
+
+    position: relative;
+
+    border: 1px solid hsl(var(--border) / var(--_border-opacity, 0.75));
+    border-radius: $radius;
+
+    background-color: hsl(var(--background) / var(--_background-opacity, 0.87));
+    
+    @include layered-shadow(hsl(0 0% 2% / 0.75), 3);
+
+    @include flex-column;
+    gap: 2rem;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+
+        z-index: 1;
+
+        border-radius: inherit;
+        backdrop-filter: blur(1rem);
+    }
+}
+
+dialog > * > * {
+    position: relative;
+    z-index: 2;
+}
+
+dialog textarea {
+    resize: vertical;
+    width: 100%;
+    min-height: 4rem;
+}
+
+dialog .actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}

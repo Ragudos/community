@@ -38,6 +38,7 @@ pub async fn post<'r>(
     rate_limiter: &State<RateLimiter>,
     register_data: Result<Form<RegisterFormData<'r>>, Errors<'r>>,
     env: &State<Environment>,
+    is_htmx: IsHTMX,
 ) -> Result<ApiResponse, ApiResponse> {
     rate_limiter.add_to_limit_or_return()?;
 
@@ -80,12 +81,19 @@ pub async fn post<'r>(
     let resource_uri = format!("/user/{}", user_uid);
     let header = Header::new("Location", resource_uri);
 
-    Ok(ApiResponse::Render {
-        status: Status::Created,
-        template: Some(Template::render(
-            "partials/auth/register_success",
-            context! { username: register_data.display_name },
-        )),
-        headers: Some(HeaderCount::One(header)),
-    })
+    match is_htmx {
+        IsHTMX(true) => {
+            Ok(ApiResponse::Render {
+                status: Status::Created,
+                template: Some(Template::render(
+                    "partials/auth/register_success",
+                    context! { username: register_data.display_name },
+                )),
+                headers: Some(HeaderCount::One(header)),
+            })
+        },
+        IsHTMX(false) => {
+            Ok(ApiResponse::Redirect(Redirect::to(discover_uri!(discover::page(_)))))
+        }
+    }
 }

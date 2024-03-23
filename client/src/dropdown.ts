@@ -14,7 +14,9 @@ function onDocumentClick(evt: MouseEvent) {
     if (evt.target === summary) {
         return;
     } else {
-        const summaryChildren = Array.from(summary?.querySelectorAll("*") ?? []);
+        const summaryChildren = Array.from(
+            summary?.querySelectorAll("*") ?? [],
+        );
 
         for (let i = 0; i < summaryChildren.length; ++i) {
             if (evt.target === summaryChildren[i]) {
@@ -27,16 +29,14 @@ function onDocumentClick(evt: MouseEvent) {
     removeTabIndexFromButtons(getAllButtons(openDropdown));
 }
 
-function removeTabIndexFromButtons(buttons: (HTMLButtonElement | HTMLAnchorElement)[]) {
+function removeTabIndexFromButtons(
+    buttons: (HTMLButtonElement | HTMLAnchorElement)[],
+) {
     for (let idx = 0; idx < buttons.length; ++idx) {
         buttons[idx].removeAttribute("tabindex");
     }
 }
 
 function getAllButtons(el: HTMLElement) {
-    return [
-        ...el.querySelectorAll("button"),
-        ...el.querySelectorAll("a")
-    ]
+    return [...el.querySelectorAll("button"), ...el.querySelectorAll("a")];
 }
-

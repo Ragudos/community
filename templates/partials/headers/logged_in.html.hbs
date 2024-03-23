@@ -17,13 +17,12 @@
                 <div>
                     <ul class="user-dropdown">
                         <li>
-                            <form hx-target="body" hx-target-error="#nothing" data-loading-states data-loading-delay="100" hx-delete="/auth/api/logout" hx-trigger="submit" hx-sync="this, a">
+                            <form hx-replace-url="/auth/login" hx-target="body" hx-target-error="#nothing" data-loading-path="/auth/api/login" data-loading-delay="100" hx-delete="/auth/api/logout" hx-trigger="submit" hx-sync="this, a">
                                 <button data-loading-disable type="submit">
-                                    <i class="fa-solid fa-arrow-right-from-bracket fa-sm"></i>
+                                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
                                     <span data-loading-class="hidden">Logout</span>
                                     <span data-loading-class-remove="hidden" class="hidden">
                                         Logging out...
-                                        <div class="spinner" data-loading-class="spin"></div>
                                     </span>
                                 </button>
                             </form>

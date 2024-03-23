@@ -12,7 +12,7 @@
     $height: 100%,
     $display: inline-block,
     $position: absolute,
-    $content: "",
+    $content: ""
 ) {
     content: $content;
     display: $display;
@@ -36,12 +36,12 @@
 
 @mixin layered-shadow($shadow-color: hsl(0 0% 0% / 0.075), $shadow_size: 4) {
     box-shadow:
-        0px #{0.25 * $shadow_size}px #{0.25 *$shadow_size}px $shadow-color,
+        0px #{0.25 * $shadow_size}px #{0.25 * $shadow_size}px $shadow-color,
         0px #{0.5 * $shadow_size}px #{0.5 * $shadow_size}px $shadow-color,
         0px #{$shadow_size}px #{$shadow_size}px $shadow-color,
         0px #{$shadow_size * 2}px #{$shadow_size * 2}px $shadow-color,
-        #{$shadow_size * 2}px #{$shadow_size * 4}px #{$shadow_size * 6}px $shadow-color,
-    ;
+        #{$shadow_size * 2}px #{$shadow_size * 4}px #{$shadow_size * 6}px
+            $shadow-color;
 }
 
 @mixin s-tablet {

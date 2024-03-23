@@ -9,7 +9,7 @@
     white-space: nowrap;
     border-width: 0;
 }
- 
+
 @import "./main";
 @import "./fonts";
 @import "./layouts";
@@ -17,6 +17,7 @@
 @import "./header";
 @import "./buttons";
 @import "./dropdown";
+@import "./dialog";
 @import "./loaders";
 @import "./toast";
 @import "./animations";

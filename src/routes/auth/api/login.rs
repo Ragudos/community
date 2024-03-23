@@ -33,7 +33,6 @@ pub async fn post<'r>(
     mut db: Connection<DbConn>,
     cookie_jar: &CookieJar<'r>,
     rate_limiter: &State<RateLimiter>,
-    is_htmx: IsHTMX,
     login_data: Result<Form<LoginFormData<'r>>, Errors<'r>>,
 ) -> Result<ApiResponse, ApiResponse> {
     rate_limiter.add_to_limit_or_return()?;
@@ -95,14 +94,7 @@ pub async fn post<'r>(
             .to_cookie()?,
     );
 
-    match is_htmx {
-        IsHTMX(true) => Ok(ApiResponse::Render {
-            status: Status::Ok,
-            template: Some(Template::render("partials/auth/login_success", context! {})),
-            headers: None,
-        }),
-        IsHTMX(false) => Ok(ApiResponse::Redirect(Redirect::to(discover_uri!(
-            discover::page(_)
-        )))),
-    }
+    Ok(ApiResponse::Redirect(Redirect::to(discover_uri!(
+        discover::page(_)
+    ))))
 }

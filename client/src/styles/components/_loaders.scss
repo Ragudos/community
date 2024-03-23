@@ -9,7 +9,7 @@
 }
 
 .skeleton {
-    --_max-opacity: 0.25;
+    --_max-opacity: 0.075;
     animation-duration: 2s;
     animation-iteration-count: infinite;
     animation-delay: var(--_delay, 0ms);
@@ -19,6 +19,11 @@
     height: 1em;
     position: relative;
     overflow: hidden;
+    border-radius: $radius;
+
+    .skeleton {
+        border-radius: calc($radius / 2);
+    }
 }
 
 .skeleton.shimmer {

@@ -1,5 +1,5 @@
 <span class="title-sm">Sign in to your account.</span>
-<form data-loading-delay="50" data-loading-aria-busy hx-target="#nothing" class="auth-form" data-loading-path="/auth/api/login" hx-target-error="#nothing" hx-sync="this, a" hx-post="/auth/api/login" hx-trigger="submit" method="post" action="/auth/api/login">
+<form hx-replace-url="/discovery" data-loading-delay="50" data-loading-aria-busy hx-target="body" class="auth-form" data-loading-path="/auth/api/login" hx-target-error="#nothing" hx-sync="this, a" hx-post="/auth/api/login" hx-trigger="submit" method="post" action="/auth/api/login">
     <div class="input-group">
         <span class="error" id="username-error"></span>
         <input placeholder="johndoe" type="text" name="username" id="username" pattern="[a-zA-z0-9À-ž\s]+" autocomplete="username" spellcheck="false" autocapitalize="none" maxlength="60"  required aria-errormessage="username-error" />

@@ -117,4 +117,5 @@ pub struct CommunityAbout {
     pub total_members: Option<i64>,
     pub total_online_members: Option<i64>,
     pub total_admins: Option<i64>,
+    pub is_viewer_a_member: Option<bool>,
 }

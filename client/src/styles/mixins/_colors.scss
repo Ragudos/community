@@ -2,7 +2,7 @@
 
 @mixin themify($themes) {
     @each $name, $values in $themes {
-        [data-theme=#{$name}] {
+        [data-theme="#{$name}"] {
             $theme_name: $name !global;
             $theme_map: $values !global;
             @content;
@@ -10,14 +10,14 @@
     }
 
     @media (prefers-color-scheme: dark) {
-        [data-theme=system] {
+        [data-theme="system"] {
             $theme_map: map-get($themes, dark) !global;
             @content;
         }
     }
 
     @media (prefers-color-scheme: light) {
-        [data-theme=system] {
+        [data-theme="system"] {
             $theme_map: map-get($themes, light) !global;
             @content;
         }

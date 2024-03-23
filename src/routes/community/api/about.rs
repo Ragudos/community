@@ -1,7 +1,10 @@
+use std::str::FromStr;
+
 use rocket::get;
 use rocket::http::Status;
 use rocket_db_pools::Connection;
 use rocket_dyn_templates::{context, Template};
+use sqlx::types::Uuid;
 
 use crate::models::community::schema::CommunityAbout;
 use crate::models::StringUuid;
@@ -16,7 +19,8 @@ pub async fn get(
     community_uid: StringUuid
 ) -> Result<ApiResponse, ApiResponse> {
     let StringUuid(community_uid) = community_uid;
-    let community_about = CommunityAbout::get(&mut db, &community_uid).await?;
+    let uid = Uuid::from_str(&user.uid)?;
+    let community_about = CommunityAbout::get(&mut db, &community_uid, &uid).await?;
 
     Ok(
         ApiResponse::Render {

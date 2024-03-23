@@ -4,29 +4,29 @@
         <div role="presentation" style="background-image: url({{community.cover_image}})" class="background cover-image"></div>
         <div class="about-metadata">
             <div>
-                <i class="fa-solid fa-user-group fa-xs"></i>
+                <i class="fa-solid fa-user-group fa-sm"></i>
                 <span style="margin-left: 0.5rem;">
                     {{#if total_members}}{{(num_abbr total_members)}}{{else}}0{{/if}} member/s
                 </span>
             </div>
             <div>
-                <i class="fa-solid fa-globe fa-xs"></i>
+                <i class="fa-solid fa-globe fa-sm"></i>
                 <span style="margin-left: 0.5rem;">
                     {{#if total_online_members}}{{(num_abbr total_online_members)}}{{else}}0{{/if}} online
                 </span>
             </div>
             <div>
-                <i class="fa-solid fa-user-tie fa-xs"></i>
+                <i class="fa-solid fa-user-tie fa-sm"></i>
                 <span style="margin-left: 0.5rem;">
                     {{#if total_admins}}{{(num_abbr total_admins)}}{{else}}0{{/if}} admin/s
                 </span>
             </div>
             <div>
                 {{#if is_private}}
-                    <i class="fa-solid fa-lock fa-xs"></i>
+                    <i class="fa-solid fa-lock fa-sm"></i>
                     <span style="margin-left: 0.5rem;">Private</span>
                 {{else}}
-                    <i class="fa-solid fa-lock-open fa-xs"></i>
+                    <i class="fa-solid fa-lock-open fa-sm"></i>
                     <span style="margin-left: 0.5rem;">Public</span>
                 {{/if}}
             </div>
@@ -37,19 +37,45 @@
         <div class="about-description-container">
             <p class="about-description">{{community.description}}</p>
         </div>
-        {{#if is_private}}
-            <button type="button">
-                Join Now
-            </button>
-            <dialog></dialog>
-        {{else}}
-            <form hx-confirm="Are you sure?" hx-target-error="#nothing" data-loading-aria-busy data-loading-delay="100" hx-post="/community/api/join/public" hx-sync="this">
-                <input type="hidden" readonly name="community_uid" value="{{community.uid}}">
-                <button data-loading-disable class="primary" type="submit">
-                    <span data-loading-class="hidden">Join Now</span>
-                    <span data-loading>Please wait...</span>
-                </button>
+        {{> partials/templates/input_with_counter}}
+        <button type="button" class="primary" onclick="openDialog(this)" aria-controls="join-community-dialog">
+            Join Now
+        </button>
+        <dialog id="join-community-dialog">
+            <form hx-target-error="#nothing" data-loading-delay="100" data-loading-path="/community/api/join/private" hx-post="/community/api/join/private" hx-trigger="submit" hx-synx="this, a" action="/community/api/join/private" method="post">
+                <span class="title-md">Send Join Request</span>
+                <div class="input-group">
+                    <input-with-counter data-max-count="255">
+                        <label slot="label" for="reason">
+                            Message
+                        </label>
+                        <textarea slot="input" autofocus name="reason" placeholder="How will you contribute to this community?" maxlength="255" required></textarea>
+                    </input-with-counter>
+                    <span class="error" id="message-error"></span>
+                </div>
+                <div class="actions"> 
+                    <button data-loading-disable type="button" class="secondary" onclick="closeDialog(this)" aria-controls="join-community-dialog">Cancel</button>
+                    <button type="submit" class="primary">
+                        Send
+                    </button>
+                </div>
             </form>
-        {{/if}}
+        </dialog>
+        {{#unless (or (eq community.owner_uid user.uid) is_viewer_a_member)}}
+            {{#if is_private}}
+                <button type="button">
+                    Join Now
+                </button>
+                <dialog></dialog>
+            {{else}}
+                <form hx-confirm="Are you sure?" hx-target-error="#nothing" data-loading-aria-busy data-loading-delay="100" hx-post="/community/api/join/public" hx-sync="this, a">
+                    <input type="hidden" readonly name="community_uid" value="{{community.uid}}">
+                    <button data-loading-disable class="primary" type="submit">
+                        <span data-loading-class="hidden">Join Now</span>
+                        <span data-loading>Please wait...</span>
+                    </button>
+                </form>
+            {{/if}}
+        {{/unless}}
     </div>
 </section>

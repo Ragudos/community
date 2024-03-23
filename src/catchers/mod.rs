@@ -36,7 +36,7 @@ pub fn internal_server_error(request: &Request) -> Template {
         // are handled by our toaster.
         if is_htmx == "true" {
             return Template::render(
-                "partials/components/toast",
+                "partials/toast",
                 context! {
                     toast: Toast {
                         message: "An error occured while processing your request.".to_string(),
