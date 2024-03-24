@@ -19,11 +19,12 @@ pub mod api;
 // We don't do anything with the query here since
 // this will just transfer over the initial query of the URI
 // to the HTML markup for HTMX to handle the AJAX side of things.
-#[get("/?<list_query..>")]
+#[get("/?<isfromauth>&<list_query..>")]
 pub fn page<'r>(
     cookie_jar: &CookieJar<'r>,
     user: UserJWT,
     is_boosted: IsBoosted,
+    isfromauth: Option<bool>,
     list_query: Option<ListQuery<'r>>,
 ) -> Template {
     let IsBoosted(is_boosted) = is_boosted;
@@ -35,7 +36,7 @@ pub fn page<'r>(
 
     Template::render(
         "pages/discover",
-        context! { metadata, user, is_boosted, list_query },
+        context! { metadata, user, is_boosted, isfromauth, list_query },
     )
 }
 

@@ -1,7 +1,7 @@
 use rocket_db_pools::Connection;
-use sqlx::types::Uuid;
 
-use crate::{helpers::db::DbConn, models::users::schema::UserNameAndImage};
+use crate::helpers::db::DbConn;
+use crate::models::users::schema::UserNameAndImage;
 
 pub mod full_user_info;
 pub mod preferences;
@@ -14,18 +14,18 @@ pub mod user_table;
 impl UserNameAndImage {
     pub async fn get(
         db: &mut Connection<DbConn>,
-        uid: &Uuid
+        id: &i64,
     ) -> Result<UserNameAndImage, sqlx::Error> {
-        Ok(
-            sqlx::query_as!(
-                UserNameAndImage,
-                r#"
+        Ok(sqlx::query_as!(
+            UserNameAndImage,
+            r#"
                 SELECT display_name, display_image
                 FROM users
-                WHERE uid = $1
+                WHERE _id = $1
                 "#,
-                uid
-            ).fetch_one(&mut ***db).await?
+            id
         )
+        .fetch_one(&mut ***db)
+        .await?)
     }
 }

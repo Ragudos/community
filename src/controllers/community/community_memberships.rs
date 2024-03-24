@@ -1,60 +1,53 @@
 use rocket_db_pools::Connection;
-use sqlx::types::Uuid;
+use sqlx::{Postgres, Transaction};
 
-use crate::{helpers::db::DbConn, models::community::schema::CommunityMembership};
+use crate::helpers::db::DbConn;
+use crate::models::community::schema::CommunityMembership;
 
 impl CommunityMembership {
-    pub async fn get_total_by_uid(
+    pub async fn get_total(
         db: &mut Connection<DbConn>,
-        uid: &Uuid,
+        id: &i64,
     ) -> Result<Option<i64>, sqlx::Error> {
-        let result = sqlx::query!(
+        Ok(sqlx::query!(
             r#"
-            SELECT COUNT(*)
-            FROM community_memberships
-            WHERE (
-                SELECT _id from communities WHERE uid = $1
-            ) = _community_id;
-            "#,
-            uid
+                SELECT COUNT(*)
+                FROM community_memberships
+                WHERE _community_id = $1
+                "#,
+            id
         )
         .fetch_one(&mut ***db)
-        .await?;
-
-        Ok(result.count)
+        .await?
+        .count)
     }
 
     pub async fn is_user_a_member(
         db: &mut Connection<DbConn>,
-        community_uid: &Uuid,
-        user_uid: &Uuid,
+        community_id: &i64,
+        user_id: &i64,
     ) -> Result<bool, sqlx::Error> {
-        let result = sqlx::query!(
+        Ok(sqlx::query!(
             r#"
-            SELECT EXISTS (
-                SELECT 1
-                FROM community_memberships
-                WHERE (
-                    SELECT _id from communities WHERE uid = $1
-                ) = _community_id
-                AND (
-                    SELECT _id from users WHERE uid = $2
-                ) = _user_id
-            ) AS "exists!"
-            "#,
-            community_uid,
-            user_uid
+                SELECT EXISTS (
+                    SELECT 1
+                    FROM community_memberships
+                    WHERE _community_id = $1
+                    AND _user_id = $2
+                ) AS "exists!"
+                "#,
+            community_id,
+            user_id
         )
         .fetch_one(&mut ***db)
-        .await?;
-
-        Ok(result.exists)
+        .await?
+        .exists)
     }
 
     pub async fn create(
-        db: &mut Connection<DbConn>,
-        community_id: i64,
-        user_id: i64,
+        tx: &mut Transaction<'_, Postgres>,
+        community_id: &i64,
+        user_id: &i64,
     ) -> Result<(), sqlx::Error> {
         sqlx::query!(
             r#"
@@ -64,7 +57,7 @@ impl CommunityMembership {
             community_id,
             user_id
         )
-        .execute(&mut ***db)
+        .execute(&mut **tx)
         .await?;
 
         Ok(())

@@ -1,4 +1,3 @@
-
 CREATE TABLE IF NOT EXISTS post_reactions (
     _user_id BIGINT NOT NULL,
     _post_id BIGINT NOT NULL,

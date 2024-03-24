@@ -22,9 +22,9 @@ use crate::routes::discover;
 pub fn logged_in(_user: UserJWT, is_htmx: IsHTMX) -> ApiResponse {
     match is_htmx {
         IsHTMX(true) => {
-            ApiResponse::HtmxRedirect(HtmxRedirect::to(discover_uri!(discover::page(_))))
+            ApiResponse::HtmxRedirect(HtmxRedirect::to(discover_uri!(discover::page(Some(true), _))))
         }
-        IsHTMX(false) => ApiResponse::Redirect(Redirect::to(discover_uri!(discover::page(_)))),
+        IsHTMX(false) => ApiResponse::Redirect(Redirect::to(discover_uri!(discover::page(Some(true), _)))),
     }
 }
 
@@ -33,16 +33,16 @@ pub async fn post<'r>(
     mut db: Connection<DbConn>,
     cookie_jar: &CookieJar<'r>,
     rate_limiter: &State<RateLimiter>,
-    login_data: Result<Form<LoginFormData<'r>>, Errors<'r>>,
+    login_data: Result<Form<LoginFormData>, Errors<'r>>,
 ) -> Result<ApiResponse, ApiResponse> {
     rate_limiter.add_to_limit_or_return()?;
 
     let login_data = extract_data_or_return_response(login_data, "partials/auth/login_error")?;
 
-    if let Some(password_hash) =
+    if let Some(password_struct) =
         UserCredentials::get_password_hash_by_name(&mut db, &login_data.display_name).await?
     {
-        if !verify(login_data.password, &password_hash)? {
+        if !verify(login_data.password, &password_struct.password_hash)? {
             return Err(ApiResponse::Render {
                 status: Status::UnprocessableEntity,
                 template: Some(Template::render(
@@ -95,6 +95,6 @@ pub async fn post<'r>(
     );
 
     Ok(ApiResponse::Redirect(Redirect::to(discover_uri!(
-        discover::page(_)
+        discover::page(Some(true), _)
     ))))
 }

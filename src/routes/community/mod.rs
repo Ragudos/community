@@ -20,14 +20,15 @@ pub mod members;
 pub mod settings;
 
 // TODO: Implement to get the uid from the URL
-#[get("/<community_uid>?<includeheader>&<list_query..>")]
+#[get("/<community_id>?<shouldboost>&<includeheader>&<list_query..>")]
 pub fn page<'r>(
     cookie_jar: &CookieJar<'r>,
     user: UserJWT,
     is_boosted: IsBoosted,
     includeheader: Option<bool>,
     list_query: Option<ListQuery<'r>>,
-    community_uid: &str,
+    community_id: i64,
+    shouldboost:  Option<bool>
 ) -> Template {
     let IsBoosted(is_boosted) = is_boosted;
     let theme = Theme::from_cookie_jar(cookie_jar);
@@ -35,7 +36,7 @@ pub fn page<'r>(
 
     Template::render(
         "pages/community",
-        context! { includeheader, metadata, user, is_boosted, list_query, community_uid, current_page: "community" },
+        context! { includeheader, metadata, user, is_boosted, list_query, shouldboost, community_id, current_page: "community" },
     )
 }
 

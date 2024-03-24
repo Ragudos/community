@@ -46,34 +46,12 @@
     .about-title {
         margin-bottom: 1rem;
     }
-
-    .about-title.skeleton {
-        width: min(100%, 12rem);
-        height: 2rem;
-    }
-
     .about-description-container {
         margin-block: 2rem;
     }
 
     .about-description {
         max-width: 550px;
-    }
-
-    .about-description.skeleton {
-        height: 1rem;
-
-        &:first-child {
-            width: min(100%, 16rem);
-        }
-
-        &:nth-child(2) {
-            width: min(100%, 20rem);
-        }
-
-        &:last-child {
-            width: min(100%, 24rem);
-        }
     }
 
     .about-metadata {
@@ -83,10 +61,5 @@
         align-items: center;
         flex-wrap: wrap;
         font-size: 80%;
-
-        .skeleton {
-            width: 5rem;
-            height: 1.25rem;
-        }
     }
 }

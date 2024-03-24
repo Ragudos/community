@@ -1,15 +1,12 @@
-use crate::{
-    helpers::db::DbConn,
-    models::{users::schema::UserJWT, JWT_NAME},
-};
-use rocket::{
-    async_trait,
-    http::Status,
-    request::{FromRequest, Outcome},
-    serde::json::from_str,
-    Request,
-};
+use rocket::async_trait;
+use rocket::http::Status;
+use rocket::request::{FromRequest, Outcome, Request};
 use rocket_db_pools::Connection;
+use serde_json::from_str;
+
+use crate::helpers::db::DbConn;
+use crate::models::users::schema::UserJWT;
+use crate::models::JWT_NAME;
 
 #[async_trait]
 impl<'r> FromRequest<'r> for UserJWT {
@@ -34,15 +31,17 @@ impl<'r> FromRequest<'r> for UserJWT {
             ));
         };
 
-        let Ok(is_valid) = jwt.is_valid(&mut db).await else {
-            return Outcome::Error((Status::InternalServerError, "Failed to validate the JWT."));
-        };
+        if let Ok(is_valid) = jwt.verify(&mut db).await {
+            if is_valid {
+                return Outcome::Success(jwt);
+            } else {
+                request.cookies().remove_private(JWT_NAME);
+                return Outcome::Forward(Status::Unauthorized);
+            }
+        } else {
+            request.local_cache(|| Some("Failed to verify the JWT."));
 
-        if !is_valid {
-            request.cookies().remove_private(JWT_NAME);
-            return Outcome::Forward(Status::Unauthorized);
+            return Outcome::Error((Status::InternalServerError, "Failed to verify the JWT."));
         }
-
-        Outcome::Success(jwt)
     }
 }

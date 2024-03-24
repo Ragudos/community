@@ -12,7 +12,6 @@ use crate::controllers::htmx::redirect::HtmxRedirect;
 use crate::controllers::htmx::IsHTMX;
 use crate::controllers::rate_limiter::{RateLimiter, RateLimiterTrait};
 use crate::discover_uri;
-use crate::env::{Env, Environment};
 use crate::helpers::db::DbConn;
 use crate::models::query::ListQuery;
 use crate::models::users::form::RegisterFormData;
@@ -25,9 +24,9 @@ use crate::routes::discover;
 pub fn logged_in(_user: UserJWT, is_htmx: IsHTMX) -> ApiResponse {
     match is_htmx {
         IsHTMX(true) => {
-            ApiResponse::HtmxRedirect(HtmxRedirect::to(discover_uri!(discover::page(_))))
+            ApiResponse::HtmxRedirect(HtmxRedirect::to(discover_uri!(discover::page(Some(true), _))))
         }
-        IsHTMX(false) => ApiResponse::Redirect(Redirect::to(discover_uri!(discover::page(_)))),
+        IsHTMX(false) => ApiResponse::Redirect(Redirect::to(discover_uri!(discover::page(Some(true), _)))),
     }
 }
 
@@ -36,8 +35,7 @@ pub async fn post<'r>(
     mut db: Connection<DbConn>,
     cookie_jar: &CookieJar<'r>,
     rate_limiter: &State<RateLimiter>,
-    register_data: Result<Form<RegisterFormData<'r>>, Errors<'r>>,
-    env: &State<Environment>,
+    register_data: Result<Form<RegisterFormData>, Errors<'r>>,
     is_htmx: IsHTMX,
 ) -> Result<ApiResponse, ApiResponse> {
     rate_limiter.add_to_limit_or_return()?;
@@ -57,43 +55,35 @@ pub async fn post<'r>(
     }
     let hashed_password = hash(register_data.password, DEFAULT_COST)?;
     let mut tx = db.begin().await?;
-    let user_uid = UserTable::create(&mut tx, &register_data.display_name).await?;
+    let user_id = UserTable::create(&mut tx, &register_data.display_name).await?;
 
-    UserMetadata::create(&mut tx, &user_uid).await?;
-    UserCredentials::create(&mut tx, &user_uid, None, &hashed_password, None, None).await?;
+    UserMetadata::create(&mut tx, &user_id).await?;
+    UserCredentials::create(&mut tx, &user_id, None, &hashed_password, None, None).await?;
 
     let cookie = UserJWT {
-        uid: user_uid.to_string(),
+        _id: user_id,
         display_name: register_data.display_name.to_string(),
         display_image: None,
     }
     .to_cookie()?;
 
-    if let Env::Production = env.environment {
-        tx.commit().await?;
-    } else {
-        eprintln!("Rolling back transaction in development");
-        tx.rollback().await?;
-    }
-
+    tx.commit().await?;
     cookie_jar.add_private(cookie);
 
-    let resource_uri = format!("/user/{}", user_uid);
+    let resource_uri = format!("/user/{}", user_id);
     let header = Header::new("Location", resource_uri);
 
     match is_htmx {
-        IsHTMX(true) => {
-            Ok(ApiResponse::Render {
-                status: Status::Created,
-                template: Some(Template::render(
-                    "partials/auth/register_success",
-                    context! { username: register_data.display_name },
-                )),
-                headers: Some(HeaderCount::One(header)),
-            })
-        },
-        IsHTMX(false) => {
-            Ok(ApiResponse::Redirect(Redirect::to(discover_uri!(discover::page(_)))))
-        }
+        IsHTMX(true) => Ok(ApiResponse::Render {
+            status: Status::Created,
+            template: Some(Template::render(
+                "partials/auth/register_success",
+                context! { username: register_data.display_name },
+            )),
+            headers: Some(HeaderCount::One(header)),
+        }),
+        IsHTMX(false) => Ok(ApiResponse::Redirect(Redirect::to(discover_uri!(
+            discover::page(Some(true), _)
+        )))),
     }
 }

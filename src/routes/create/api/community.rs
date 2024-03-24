@@ -1,12 +1,9 @@
-use std::str::FromStr;
-
 use rocket::form::{Errors, Form};
 use rocket::http::{Header, Status};
 use rocket::post;
 use rocket::State;
 use rocket_db_pools::Connection;
 use rocket_dyn_templates::{context, Template};
-use sqlx::types::Uuid;
 use sqlx::Acquire;
 
 use crate::controllers::errors::{extract_data_or_return_response, ValidationError};
@@ -22,7 +19,7 @@ use crate::responders::{ApiResponse, HeaderCount};
 pub async fn post<'r>(
     mut db: Connection<DbConn>,
     user: UserJWT,
-    community_info: Result<Form<CreateCommunity<'r>>, Errors<'r>>,
+    community_info: Result<Form<CreateCommunity>, Errors<'r>>,
     rate_limiter: &State<RateLimiter>,
 ) -> Result<ApiResponse, ApiResponse> {
     let community_info =
@@ -30,9 +27,7 @@ pub async fn post<'r>(
 
     rate_limiter.add_to_limit_or_return()?;
 
-    let user_uid = Uuid::from_str(&user.uid).unwrap();
-
-    if UserTable::does_own_community(&mut db, &user_uid).await? {
+    if UserTable::count_of_owned_communities(&mut db, &user._id).await? > 0 {
         return Err(ApiResponse::Render {
             status: Status::from_code(508).unwrap_or(Status::Unauthorized),
             template: Some(Template::render(
@@ -67,17 +62,17 @@ pub async fn post<'r>(
     }
 
     let mut tx = db.begin().await?;
-    let community_uid = Community::create(
+    let community_id = Community::create(
         &mut tx,
         &community_info.display_name,
         &community_info.description,
-        &user_uid,
+        &user._id,
     )
     .await?;
 
     tx.commit().await?;
 
-    let resource_uri = format!("community/{}/about", community_uid);
+    let resource_uri = format!("community/{}/about", community_id);
     let header = Header::new("Location", resource_uri);
 
     Ok(ApiResponse::Render {

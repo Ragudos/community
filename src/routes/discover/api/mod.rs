@@ -28,38 +28,16 @@ pub async fn get<'r>(
         .unwrap_or(None);
     let categories = list_query
         .as_ref()
-        .map(|list_query| list_query.category.as_ref())
+        .map(|list_query| list_query.category.as_ref().map(Vec::as_slice))
         .unwrap_or(None);
-
-    let communities = if let (Some(query), Some(categories)) = (query, categories) {
-        Community::search_all_by_category_and_display_name_and_offset_and_weighted_score(
-            &mut db,
-            &offset,
-            &HOMEPAGE_COMMUNITY_LIMIT,
-            categories,
-            query,
-        )
-        .await?
-    } else if let (Some(query), None) = (query, categories) {
-        Community::search_all_by_display_name_and_offset_and_weighted_score(
-            &mut db,
-            &offset,
-            &HOMEPAGE_COMMUNITY_LIMIT,
-            query,
-        )
-        .await?
-    } else if let (None, Some(categories)) = (query, categories) {
-        Community::search_all_by_category_and_offset_and_weighted_score(
-            &mut db,
-            &offset,
-            &HOMEPAGE_COMMUNITY_LIMIT,
-            categories,
-        )
-        .await?
-    } else {
-        Community::get_all_by_offset_and_weighted_score(&mut db, &offset, &HOMEPAGE_COMMUNITY_LIMIT)
-            .await?
-    };
+    let communities = Community::get_by_weighted_score(
+        &mut db,
+        &offset,
+        &HOMEPAGE_COMMUNITY_LIMIT,
+        categories,
+        query,
+    )
+    .await?;
 
     Ok(ApiResponse::Render {
         status: Status::Ok,

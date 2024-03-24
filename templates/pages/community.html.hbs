@@ -1,4 +1,4 @@
-{{#if is_boosted}}
+{{#if (or is_boosted shouldboost)}}
     <head>
         {{> partials/head/main}}
         {{> partials/head/community}}

@@ -1,11 +1,4 @@
-use std::str::FromStr;
-
-use rocket::{request::FromParam, FromForm};
 use serde::{Deserialize, Serialize};
-use sqlx::types::Uuid;
-
-use crate::controllers::validate::validate_uuid;
-use crate::responders::ApiResponse;
 
 pub mod community;
 pub mod db;
@@ -32,23 +25,6 @@ pub enum ToastTypes {
 pub struct Toast {
     pub message: String,
     pub r#type: Option<ToastTypes>,
-}
-
-#[derive(Debug, Clone)]
-pub struct StringUuid(pub Uuid);
-
-#[derive(FromForm, Debug, Clone)]
-pub struct StringUuidForm {
-    #[field(validate = validate_uuid())]
-    pub community_uid: String,
-}
-
-impl<'a> FromParam<'a> for StringUuid {
-    type Error = ApiResponse;
-
-    fn from_param(param: &'a str) -> Result<Self, Self::Error> {
-        Ok(StringUuid(Uuid::from_str(param)?))
-    }
 }
 
 pub const JWT_NAME: &str = "Community__jwt";

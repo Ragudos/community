@@ -1,7 +1,6 @@
 CREATE TABLE IF NOT EXISTS posts (
     _id BIGSERIAL PRIMARY KEY,
     _created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    uid UUID NOT NULL DEFAULT uuid_generate_v4() UNIQUE,
     owner_id BIGINT NOT NULL,
     content TEXT NOT NULL,
     caption VARCHAR(255),

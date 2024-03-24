@@ -1,7 +1,6 @@
 CREATE TABLE IF NOT EXISTS users (
     _id BIGSERIAL PRIMARY KEY,
     _created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    uid UUID NOT NULL DEFAULT uuid_generate_v4() UNIQUE,
     display_name VARCHAR(60) UNIQUE NOT NULL,
     display_image TEXT
 );

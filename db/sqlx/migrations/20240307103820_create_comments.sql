@@ -4,7 +4,6 @@ CREATE TABLE IF NOT EXISTS comments (
     _user_id BIGINT NOT NULL,
     _created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     _parent_comment_id BIGINT,
-    uid UUID NOT NULL DEFAULT uuid_generate_v4() UNIQUE,
     content TEXT NOT NULL,
     images TEXT[],
     videos TEXT[],

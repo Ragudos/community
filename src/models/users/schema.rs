@@ -13,7 +13,7 @@ pub struct UserTable {
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct FullUserInfo {
-    pub uid: String,
+    pub _id: i64,
     pub display_name: String,
     pub display_image: Option<String>,
     pub occupation: Option<Occupation>,
@@ -32,7 +32,7 @@ pub struct FullUserInfo {
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct UserJWT {
-    pub uid: String,
+    pub _id: i64,
     pub display_name: String,
     pub display_image: Option<String>,
 }
@@ -64,6 +64,16 @@ pub struct UserCredentials {
 pub struct FullName {
     pub first_name: Option<String>,
     pub last_name: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct EmailStruct {
+    pub email: Option<String>,
+}
+
+#[derive(Clone, Debug)]
+pub struct PasswordStruct {
+    pub password_hash: String,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]

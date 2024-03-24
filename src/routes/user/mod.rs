@@ -16,14 +16,18 @@ use crate::routes::auth::login;
 
 pub mod api;
 
-// TODO: Implement to get the uid from the URL
-#[get("/<_>")]
-pub fn page<'r>(cookie_jar: &CookieJar<'r>, user: UserJWT, is_boosted: IsBoosted) -> Template {
+#[get("/<id>")]
+pub fn page<'r>(
+    cookie_jar: &CookieJar<'r>,
+    user: UserJWT,
+    is_boosted: IsBoosted,
+    id: i64,
+) -> Template {
     let IsBoosted(is_boosted) = is_boosted;
     let theme = Theme::from_cookie_jar(cookie_jar);
     let metadata = SeoMetadata::build().theme(theme).finalize();
 
-    Template::render("pages/user", context! { metadata, user, is_boosted })
+    Template::render("pages/user", context! { metadata, user, is_boosted, id })
 }
 
 #[get("/<_..>", rank = 3)]

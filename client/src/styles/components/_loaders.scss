@@ -26,6 +26,68 @@
     }
 }
 
+.skeleton.skeleton-landscape {
+    aspect-ratio: 16 / 9;
+    width: 100%;
+    height: auto;
+
+    @supports not (aspect-ratio: 16/9) {
+        height: 15rem;
+
+        @include s-mobilesmall {
+            height: 17.5rem;
+        }
+
+        @include s-mobile {
+            height: 20rem;
+        }
+
+        @include s-tablet {
+            height: 25rem;
+        }
+    }
+}
+
+.skeleton.skeleton-xlw {
+    width: min(100%, 24rem);
+}
+
+.skeleton.skeleton-lgw {
+    width: min(100%, 20rem);
+}
+
+.skeleton.skeleton-mdw {
+    width: min(100%, 16rem);
+}
+
+.skeleton.skeleton-smw {
+    width: min(100%, 12rem);
+}
+
+.skeleton.skeleton-xsw {
+    width: min(100%, 8rem);
+}
+
+.skeleton.skeleton-2xsw {
+    width: min(100%, 6rem);
+}
+
+.skeleton.skeleton-xlh {
+    height: 2rem;
+}
+
+.skeleton.skeleton-lgh {
+    height: 1.5rem;
+}
+
+.skeleton.skeleton-mdh {
+    height: 1.25rem;
+}
+
+.skeleton.skeleton-smh {
+    height: 1rem;
+}
+
 .skeleton.shimmer {
     &:after {
         position: absolute;
@@ -44,7 +106,7 @@
 }
 
 .skeleton {
-    background-color: hsl(var(--skeleton));
+    background-color: hsl(var(--skeleton)) !important;
 }
 
 .skeleton.shimmer {

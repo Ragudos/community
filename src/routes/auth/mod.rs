@@ -17,9 +17,9 @@ pub mod register;
 pub fn logged_in(_user: UserJWT, is_boosted: IsBoosted) -> ApiResponse {
     match is_boosted {
         IsBoosted(true) => {
-            ApiResponse::HtmxRedirect(HtmxRedirect::to(discover_uri!(discover::page(_))))
+            ApiResponse::HtmxRedirect(HtmxRedirect::to(discover_uri!(discover::page(Some(true), _))))
         }
-        IsBoosted(false) => ApiResponse::Redirect(Redirect::to(discover_uri!(discover::page(_)))),
+        IsBoosted(false) => ApiResponse::Redirect(Redirect::to(discover_uri!(discover::page(Some(true), _)))),
     }
 }
 

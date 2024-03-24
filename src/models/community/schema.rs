@@ -1,4 +1,5 @@
 use rocket::serde::{Deserialize, Serialize};
+use sqlx::prelude::FromRow;
 use time::OffsetDateTime;
 
 use crate::models::db::enums::{CommunityCategory, UserRole};
@@ -17,9 +18,9 @@ pub struct CommunityTable {
     pub cover_image: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, FromRow, Clone, Debug)]
 pub struct Community {
-    pub uid: String,
+    pub id: i64,
     pub display_name: String,
     pub categories: Option<Vec<CommunityCategory>>,
     pub description: String,
@@ -29,9 +30,10 @@ pub struct Community {
     pub cover_image: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, FromRow, Clone, Debug)]
 pub struct CommunityOfUser {
-    pub uid: String,
+    pub _id: i64,
+    pub _joined_at: OffsetDateTime,
     pub display_name: String,
     pub categories: Option<Vec<CommunityCategory>>,
     pub description: String,
@@ -39,7 +41,6 @@ pub struct CommunityOfUser {
     pub display_image: Option<String>,
     pub cover_image: Option<String>,
     pub total_members: Option<i64>,
-    pub joined_at: OffsetDateTime,
     pub role: UserRole,
 }
 
@@ -57,9 +58,9 @@ pub struct CommunityWithTotalMembers {
 }
 
 /// Combined table for community and total of community_memberships
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, FromRow, Clone, Debug)]
 pub struct CommunityHomepageCard {
-    pub uid: String,
+    pub _id: i64,
     pub display_name: String,
     pub display_image: Option<String>,
     pub cover_image: Option<String>,
@@ -87,17 +88,17 @@ pub struct CommunityJoinRequest {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct CommunityPreview {
-    pub owner_uid: String,
-    pub community_uid: String,
-    pub is_viewer_outsider: bool,
+    pub owner_id: i64,
+    pub community_id: i64,
+    pub is_viewer_outsider: Option<bool>,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, FromRow, Debug, Clone)]
 pub struct CommunityPost {
+    pub _id: i64,
+    pub _created_at: OffsetDateTime,
     pub is_pinned: bool,
-    pub uid: String,
-    pub owner_uid: String,
-    pub community_uid: String,
+    pub owner_id: String,
     pub content: String,
     pub caption: Option<String>,
     pub links: Option<Vec<String>>,
@@ -107,8 +108,10 @@ pub struct CommunityPost {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct CommunityAbout {
-    pub owner_uid: String,
-    pub uid: String,
+    pub _id: i64,
+    pub owner_id: i64,
+    pub owner_display_image: Option<String>,
+    pub owner_display_name: String,
     pub display_name: String,
     pub description: String,
     pub display_image: Option<String>,

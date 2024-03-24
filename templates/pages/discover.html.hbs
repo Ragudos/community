@@ -4,6 +4,11 @@
         <link rel="preload" href="/build/styles/discover.min.css" as="style">
         <link rel="stylesheet" href="/build/styles/discover.min.css">
     </head>
+    {{#if isfromauth}}
+        <header id="header" hx-swap-oob="true">
+            {{> partials/headers/logged_in}}
+        </header>
+    {{/if}}
     <aside id="community-header" hx-swap-oob="true"></aside>
     {{> partials/discover/initial_state}}
 {{else}}

@@ -18,14 +18,14 @@ pub struct MemberFilter {
 /// TODO: Community Preview here with community's uid, owner's uid, and whether the user viewing this
 /// page is the owner or member of the community or not.
 /// Also do the t filter which stands for type, and it can be either `members`, `admins`, `online`.
-#[get("/<community_uid>/members?<includeheader>&<t..>")]
+#[get("/<community_id>/members?<includeheader>&<t..>")]
 pub fn page<'r>(
     cookie_jar: &CookieJar<'r>,
     user: UserJWT,
     is_boosted: IsBoosted,
     includeheader: Option<bool>,
     t: Option<UserRole>,
-    community_uid: &str,
+    community_id: i64,
 ) -> Template {
     let IsBoosted(is_boosted) = is_boosted;
     let theme = Theme::from_cookie_jar(cookie_jar);
@@ -33,6 +33,6 @@ pub fn page<'r>(
 
     Template::render(
         "pages/community/members",
-        context! { metadata, user, is_boosted, includeheader, community_uid, current_page: "members" },
+        context! { metadata, user, is_boosted, includeheader, community_id, current_page: "members" },
     )
 }

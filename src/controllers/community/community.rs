@@ -1,37 +1,54 @@
 use rocket_db_pools::Connection;
-use sqlx::{
-    types::{BigDecimal, Uuid},
-    Postgres, Transaction,
-};
+use sqlx::prelude::FromRow;
+use sqlx::types::BigDecimal;
+use sqlx::{Postgres, QueryBuilder, Transaction};
 
-use crate::{
-    helpers::db::DbConn,
-    models::{
-        community::schema::{
-            Community, CommunityAbout, CommunityHomepageCard, CommunityOfUser, CommunityWithTotalMembers
-        },
-        db::enums::CommunityCategory,
-    },
+use crate::helpers::db::DbConn;
+use crate::models::community::schema::{
+    Community, CommunityAbout, CommunityHomepageCard, CommunityOfUser,
 };
+use crate::models::db::enums::CommunityCategory;
+
+#[derive(FromRow)]
+pub struct CountStruct {
+    pub count: Option<BigDecimal>,
+}
 
 impl CommunityAbout {
+    pub async fn foo(
+        db: &mut Connection<DbConn>,
+        community_id: &i64
+    ) -> Result<Option<i64>, sqlx::Error> {
+        Ok(
+            sqlx::query!(
+                r#"
+                SELECT COUNT(*) AS total_members
+                FROM community_memberships
+                WHERE _community_id = $1
+                "#,
+                community_id
+            ).fetch_one(&mut ***db).await?.total_members
+        )
+    }
+    #[allow(non_snake_case)] // The macro builds what we return as, sqlx_query_as__id, _id being what is returned
     pub async fn get(
         db: &mut Connection<DbConn>,
-        community_uid: &Uuid,
-        user_id: &Uuid
-    ) -> Result<CommunityAbout, sqlx::Error> {
-        Ok(
-            sqlx::query_as! (
-                CommunityAbout,
-                r#"
+        community_id: &i64,
+        user_id: &i64,
+    ) -> Result<Option<CommunityAbout>, sqlx::Error> {
+        Ok(sqlx::query_as!(
+            CommunityAbout,
+            r#"
                 SELECT
-                uid,
+                c._id,
                 display_name,
                 display_image,
                 description,
                 cover_image,
                 is_private,
-                owner_uid,
+                c.owner_id,
+                owner_display_image,
+                owner_display_name,
                 total_members,
                 total_online_members,
                 total_admins,
@@ -40,27 +57,28 @@ impl CommunityAbout {
                 LEFT JOIN (
                     SELECT
                     c2._id,
-                    owner_uid,
-                    COALESCE(total_members, 0) AS total_members,
-                    COALESCE(total_online_members, 0) AS total_online_members,
-                    COALESCE(total_admins, 0) AS total_admins,
+                    owner_display_image,
+                    owner_display_name,
+                    total_members AS total_members,
+                    total_online_members,
+                    total_admins,
                     is_viewer_a_member
                     FROM communities c2
 
                     LEFT JOIN (
-                        SELECT _community_id, _user_id, COALESCE(COUNT(*), 0) AS total_members
-                        FROM community_memberships
+                        SELECT _community_id, COALESCE(COUNT(*), 0) AS total_members, total_online_members
+                        FROM community_memberships cm
 
-                        GROUP BY _community_id, _user_id
+                        LEFT JOIN (
+                            SELECT _user_id, COALESCE(COUNT(*), 0) AS total_online_members
+                            FROM online_sessions
+                            WHERE _updated_at > NOW() - INTERVAL '10 minutes'
+
+                            GROUP BY _user_id
+                        ) os ON os._user_id = cm._user_id
+
+                        GROUP BY _community_id, total_online_members
                     ) cm ON c2._id = cm._community_id
-
-                    LEFT JOIN (
-                        SELECT _user_id, COALESCE(COUNT(*), 0) AS total_online_members
-                        FROM online_sessions
-                        WHERE _updated_at > NOW() - INTERVAL '10 minutes'
-
-                        GROUP BY _user_id
-                    ) os ON os._user_id = cm._user_id
 
                     LEFT JOIN (
                         SELECT _community_id, COALESCE(COUNT(*), 0) AS total_admins
@@ -71,19 +89,17 @@ impl CommunityAbout {
                     ) ca ON c2._id = ca._community_id
 
                     LEFT JOIN (
-                        SELECT _id, uid AS owner_uid
+                        SELECT _id,
+                        display_name AS owner_display_name,
+                        display_image AS owner_display_image
                         FROM users
                     ) u ON c2.owner_id = u._id
 
                     LEFT JOIN (
-                        SELECT NOT EXISTS (
+                        SELECT EXISTS (
                             SELECT 1
                             FROM community_memberships
-                            WHERE _user_id = (
-                                SELECT _id FROM users WHERE uid = $2
-                            ) AND _community_id = (
-                                SELECT _id FROM communities WHERE uid = $1
-                            )
+                            WHERE _user_id = $2 AND _community_id = $1
                         ) AS is_viewer_a_member,
                         _community_id
                         FROM community_memberships
@@ -91,69 +107,77 @@ impl CommunityAbout {
                         GROUP BY is_viewer_a_member, _community_id
                     ) io ON c2._id = io._community_id
 
-                    GROUP BY c2._id, io.is_viewer_a_member, owner_uid, total_members, total_online_members, total_admins
+                    GROUP BY
+                    c2._id,
+                    io.is_viewer_a_member,
+                    owner_display_image,
+                    owner_display_name,
+                    total_members,
+                    total_online_members,
+                    total_admins
                 ) cm ON c._id = cm._id
-                WHERE uid = $1;
+
+                WHERE c._id = $1
                 "#,
-                community_uid,
-                user_id
-            ).fetch_one(&mut ***db).await?
+            community_id,
+            user_id
         )
+        .fetch_optional(&mut ***db)
+        .await?)
     }
 }
 
 impl Community {
     pub async fn is_private(
         db: &mut Connection<DbConn>,
-        community_uid: &Uuid,
+        community_id: &i64,
     ) -> Result<bool, sqlx::Error> {
-        let result = sqlx::query!(
+        Ok(sqlx::query!(
             r#"
-            SELECT is_private
-            FROM communities
-            WHERE uid = $1;
-            "#,
-            community_uid
+                SELECT is_private
+                FROM communities
+                WHERE _id = $1;
+                "#,
+            community_id
         )
         .fetch_one(&mut ***db)
-        .await?;
-
-        Ok(result.is_private)
+        .await?
+        .is_private)
     }
 
     pub async fn is_name_taken(
         db: &mut Connection<DbConn>,
         name: &str,
     ) -> Result<bool, sqlx::Error> {
-        let result = sqlx::query!(
+        Ok(sqlx::query!(
             r#"
-            SELECT EXISTS (
-                SELECT 1
-                FROM communities
-                WHERE display_name = $1
-            ) as "exists!"
-            "#,
+                SELECT EXISTS (
+                    SELECT 1
+                    FROM communities
+                    WHERE display_name = $1
+                ) AS "exists!"
+                "#,
             name
         )
         .fetch_one(&mut ***db)
-        .await?;
-
-        Ok(result.exists)
+        .await?
+        .exists)
     }
 
-    pub async fn get_communities_of_user_by_uid(
+    pub async fn get_communities_of_user(
         db: &mut Connection<DbConn>,
-        uid: &Uuid,
-        limit: &i64,
+        user_id: &i64,
         offset: &i64,
-        categories: &Vec<CommunityCategory>,
-        display_name: &str,
+        limit: &i64,
+        get_owned_by_user: bool,
+        get_joined_by_user: bool,
+        display_name: Option<&str>,
+        categories: Option<&[CommunityCategory]>,
     ) -> Result<Vec<CommunityOfUser>, sqlx::Error> {
-        let result = sqlx::query_as!(
-            CommunityOfUser,
+        let mut query = QueryBuilder::new(
             r#"
             SELECT
-            uid,
+            c._id,
             display_name,
             categories AS "categories: _",
             display_image,
@@ -161,571 +185,279 @@ impl Community {
             description,
             is_private,
             total_members,
-            joined_at,
+            _joined_at,
             role AS "role: _"
             FROM communities c
             LEFT JOIN (
-                SELECT _community_id, COALESCE(COUNT(*), 0) AS total_members, _created_at AS joined_at, role
+                SELECT _community_id,
+                COALESCE(COUNT(*), 0) AS total_members,
+                role AS "role: _"
                 FROM community_memberships
-                WHERE _user_id = (SELECT _id FROM users WHERE uid = $1)
-
-                GROUP BY _community_id, _created_at, role
+                WHERE _user_id = 
+            "#,
+        );
+        query.push_bind(user_id);
+        query.push(
+            r#"
+            GROUP BY _community_id, role
             ) cm ON cm._community_id = c._id
-            WHERE categories @> $2 AND similarity(display_name, $3) > 0.1
-            ORDER BY joined_at DESC
-            LIMIT $4 OFFSET $5
+            LEFT JOIN (
+                SELECT a._created_at AS _joined_at, a._id
+                    CASE
+                        WHEN a.owner_id =
             "#,
-            uid,
-            categories as &Vec<CommunityCategory>,
-            display_name,
-            limit,
-            offset
-        ).fetch_all(&mut ***db).await?;
-
-        Ok(result)
-    }
-
-    pub async fn get_pagination_filtered_by_category_and_display_name(
-        db: &mut Connection<DbConn>,
-        limit: i64,
-        categories: &Vec<CommunityCategory>,
-        display_name: &str,
-    ) -> Result<Option<BigDecimal>, sqlx::Error> {
-        let result = sqlx::query!(
+        );
+        query.push_bind(user_id);
+        query.push(
             r#"
-            SELECT CEIL(COUNT(*)::NUMERIC / $1) AS count
-            FROM communities
-            WHERE categories @> $2
-            AND similarity(display_name, $3) > 0.1
-            AND (display_image IS NOT NULL AND cover_image IS NOT NULL
-            OR (display_image != '' AND cover_image != '' ));
+             THEN a._created_at
+                        ELSE b._created_at
+                    ENS AS _joined_at
+                FROM communities a
+                JOIN community_memberships b ON a._id = b._community_id
+                WHERE b._user_id = 
             "#,
-            BigDecimal::from(limit),
-            categories as &Vec<CommunityCategory>,
-            display_name
-        )
-        .fetch_one(&mut ***db)
-        .await?;
-
-        Ok(result.count)
-    }
-
-    pub async fn get_pagination_filtered_by_category(
-        db: &mut Connection<DbConn>,
-        limit: i64,
-        categories: &Vec<CommunityCategory>,
-    ) -> Result<Option<BigDecimal>, sqlx::Error> {
-        let result = sqlx::query!(
+        );
+        query.push_bind(user_id);
+        query.push(
             r#"
-            SELECT CEIL(COUNT(*)::NUMERIC / $1) AS count
-            FROM communities
-            WHERE categories @> $2
-            AND (display_image IS NOT NULL AND cover_image IS NOT NULL
-            OR (display_image != '' AND cover_image != ''));
+                GROUP BY _joined_at, _id
+            ) j ON j._id = c._id
             "#,
-            BigDecimal::from(limit),
-            categories as &Vec<CommunityCategory>
-        )
-        .fetch_one(&mut ***db)
-        .await?;
+        );
 
-        Ok(result.count)
-    }
-
-    pub async fn get_pagination_count_filtered_by_display_name(
-        db: &mut Connection<DbConn>,
-        limit: i64,
-        display_name: &str,
-    ) -> Result<Option<BigDecimal>, sqlx::Error> {
-        let result = sqlx::query!(
-            r#"
-                SELECT CEIL(COUNT(*)::NUMERIC / $1) AS count
-                FROM communities
-                WHERE similarity(display_name, $2) > 0.1
-                AND (display_image IS NOT NULL AND cover_image IS NOT NULL
-                OR (display_image != '' AND cover_image != ''));
+        if get_joined_by_user && !get_owned_by_user {
+            query.push(
+                r#"
+                WHERE c._id = (
+                    SELECT _community_id
+                    FROM community_memberships
+                    WHERE _user_id = 
                 "#,
-            BigDecimal::from(limit),
-            display_name
-        )
-        .fetch_one(&mut ***db)
-        .await?;
-
-        Ok(result.count)
-    }
-
-    pub async fn get_pagination_count(
-        db: &mut Connection<DbConn>,
-        limit: i64,
-    ) -> Result<Option<BigDecimal>, sqlx::Error> {
-        let result = sqlx::query!(
-            r#"
-                SELECT CEIL(COUNT(*)::NUMERIC / $1) AS count
-                FROM communities
-                WHERE display_image IS NOT NULL AND cover_image IS NOT NULL
-                OR (display_image != '' AND cover_image != '');
+            );
+            query.push_bind(user_id);
+            query.push(")");
+        } else if !get_joined_by_user && get_owned_by_user {
+            query.push(
+                r#"
+                WHERE c.owner_id = 
                 "#,
-            BigDecimal::from(limit)
-        )
-        .fetch_one(&mut ***db)
-        .await?;
+            );
+            query.push_bind(user_id);
+        }
 
-        Ok(result.count)
+        if let Some(display_name) = display_name {
+            query.push(
+                r#"
+                AND similarity(c.display_name,
+                "#,
+            );
+            query.push_bind(display_name);
+            query.push(") > 0.1");
+        }
+
+        if let Some(categories) = categories {
+            query.push(
+                r#"
+                AND categories @> 
+                "#,
+            );
+            query.push_bind(categories);
+        }
+
+        query.push(
+            r#"
+            ORDER BY _joined_at DESC
+            LIMIT 
+            "#,
+        );
+        query.push_bind(limit);
+        query.push(" OFFSET ");
+        query.push_bind(offset);
+
+        Ok(query
+            .build_query_as::<CommunityOfUser>()
+            .fetch_all(&mut ***db)
+            .await?)
     }
 
-    pub async fn get_by_uid(
+    pub async fn get_pagination(
         db: &mut Connection<DbConn>,
-        uid: &Uuid,
-    ) -> Result<Option<CommunityWithTotalMembers>, sqlx::Error> {
-        let result = sqlx::query_as!(
-            CommunityWithTotalMembers,
+        limit: &i64,
+        categories: Option<&[CommunityCategory]>,
+        display_name: Option<&str>,
+    ) -> Result<Option<BigDecimal>, sqlx::Error> {
+        let mut query = QueryBuilder::new(
+            r#"
+            SELECT CEIL(COUNT(*)::NUMERIC / ?) AS count
+            FROM communityies
+            WHERE (
+                (display_name IS NOT NULL AND display_image != '')
+                OR (cover_Image IS NOT NULL AND cover_image != '')
+            )
+            "#,
+        );
+        query.push_bind(limit);
+
+        if let Some(categories) = categories {
+            query.push(
+                r#"
+                AND categories @> 
+                "#,
+            );
+            query.push_bind(categories);
+        }
+
+        if let Some(display_name) = display_name {
+            query.push(
+                r#"
+                AND similarity(display_name,
+                "#,
+            );
+            query.push_bind(display_name);
+            query.push(") > 0.1");
+        }
+
+        Ok(query
+            .build_query_as::<CountStruct>()
+            .fetch_one(&mut ***db)
+            .await?
+            .count)
+    }
+
+    pub async fn get_by_weighted_score(
+        db: &mut Connection<DbConn>,
+        offset: &i64,
+        limit: &i64,
+        categories: Option<&[CommunityCategory]>,
+        display_name: Option<&str>,
+    ) -> Result<Vec<CommunityHomepageCard>, sqlx::Error> {
+        let mut query = QueryBuilder::new(
             r#"
             SELECT
-            uid,
+            c._id,
             display_name,
-            categories as "categories: _",
-            description,
-            owner_id,
-            is_private,
             display_image,
             cover_image,
+            description,
+            is_private,
             total_members
             FROM communities c
             LEFT JOIN (
-                SELECT _community_id, COALESCE(COUNT(*), 0) AS total_members
-                FROM community_memberships
-                WHERE _community_id = (
-                    SELECT _id FROM communities WHERE uid = $1
-                )
-                GROUP BY _community_id
-            ) cm ON cm._community_id = c._id
-            WHERE uid = $1;
-            "#,
-            uid
-        )
-        .fetch_optional(&mut ***db)
-        .await?;
+                SELECT
+                c._id,
+                COALESCE(total_members, 0) AS total_members,
+                SUM(total_members * 0.4) +
+                SUM(posts_count * 0.15) +
+                SUM(post_reactions_count * 0.2) +
+                SUM(comments_count * 0.25) AS weighted_score
+                FROM communities c
 
-        Ok(result)
+                LEFT JOIN (
+                    SELECT _community_id, COALESCE(COUNT(*), 0) AS total_members
+                    FROM community_memberships
+                    
+                    GROUP BY _community_id
+                ) m ON c._id = m._community_id
+
+                LEFT JOIN (
+                    SELECT _community_id, COALESCE(COUNT(*), 0) AS posts_count
+                    FROM community_posts
+
+                    GROUP BY _community_id
+                ) cp ON c._id = cp._community_id
+
+                LEFT JOIN (
+                    SELECT cp._community_id, post_reactions_count
+                    FROM community_posts cp
+
+                    LEFT JOIN (
+                        SELECT pr._post_id, COALESCE(COUNT(*), 0) AS post_reactions_count
+                        FROM post_reactions pr
+
+                        GROUP BY pr._post_id
+                    ) pr ON cp._post_id = pr._post_id
+
+                    GROUP BY cp._community_id, post_reactions_count
+                ) pr ON c._id = pr._community_id
+
+                LEFT JOIN (
+                    SELECT cp._community_id, comments_count
+                    FROM community_posts cp
+
+                    LEFT JOIN (
+                        SELECT co._post_id, COALESCE(COUNT(*), 0) AS comments_count
+                        FROM comments co
+
+                        GROUP BY co._post_id
+                    ) co ON cp._post_id = co._post_id
+
+                    GROUP BY cp._community_id, comments_count
+                ) co ON c._id = co._community_id
+
+                GROUP BY c._id, total_members
+            ) cm ON c._id = cm._id
+            WHERE (
+                (display_image IS NOT NULL AND cover_image IS NOT NULL)
+                OR (display_image != '' AND cover_image != '')
+            )
+            "#,
+        );
+
+        if let Some(categories) = categories {
+            query.push(
+                r#"
+                AND categories @> 
+                "#,
+            );
+            query.push_bind(categories);
+        }
+
+        if let Some(display_name) = display_name {
+            query.push(
+                r#"
+                AND similarity(display_name,
+                "#,
+            );
+            query.push_bind(display_name);
+            query.push(") > 0.1");
+        }
+
+        query.push(
+            r#"
+            ORDER BY COALESCE(cm.weighted_score, 0) DESC, c._created_at DESC
+            LIMIT
+            "#,
+        );
+        query.push_bind(limit);
+        query.push(" OFFSET ");
+        query.push_bind(offset * limit);
+
+        Ok(query
+            .build_query_as::<CommunityHomepageCard>()
+            .fetch_all(&mut ***db)
+            .await?)
     }
 
+    #[allow(non_snake_case)] // The macro builds what we return as, sqlx_query_as__id, _id being what is returned
     pub async fn create(
         tx: &mut Transaction<'_, Postgres>,
         display_name: &str,
         description: &str,
-        owner_uid: &Uuid,
-    ) -> Result<String, sqlx::Error> {
-        let result = sqlx::query!(
+        owner_id: &i64,
+    ) -> Result<i64, sqlx::Error> {
+        Ok(sqlx::query!(
             r#"
-            INSERT INTO communities (display_name, description, owner_id)
-            VALUES ($1, $2, (SELECT _id FROM users WHERE uid = $3))
-            RETURNING uid;
-            "#,
+                INSERT INTO communities (display_name, description, owner_id)
+                VALUES ($1, $2, $3)
+                RETURNING _id;
+                "#,
             display_name,
             description,
-            owner_uid
+            owner_id
         )
         .fetch_one(&mut **tx)
-        .await?;
-
-        Ok(result.uid.to_string())
-    }
-
-    pub async fn search_all_by_category_and_display_name_and_offset_and_weighted_score(
-        db: &mut Connection<DbConn>,
-        offset: &i64,
-        limit: &i64,
-        categories: &Vec<CommunityCategory>,
-        display_name: &str,
-    ) -> Result<Vec<CommunityHomepageCard>, sqlx::Error> {
-        let communities = sqlx::query_as!(
-            CommunityHomepageCard,
-            r#"
-            SELECT
-            uid,
-            display_name,
-            display_image,
-            cover_image,
-            description,
-            is_private,
-            total_members
-            FROM communities c
-            LEFT JOIN (
-                SELECT
-                c._id,
-                members_count AS total_members,
-                SUM(members_count * 0.4) +
-                SUM(posts_count * 0.15) +
-                SUM(post_reactions_count * 0.1) +
-                SUM(comments_reactions_count * 0.1) +
-                SUM(comments_count * 0.25) AS weighted_score
-                FROM communities c
-
-                LEFT JOIN (
-                    SELECT _community_id, COALESCE(COUNT(*), 0) AS members_count
-                    FROM community_memberships
-                    GROUP BY _community_id
-                ) m ON c._id = m._community_id
-
-                LEFT JOIN (
-                    SELECT _community_id, COALESCE(COUNT(*), 0) AS posts_count
-                    FROM community_posts
-                    GROUP BY _community_id
-                ) cp ON c._id = cp._community_id
-
-                LEFT JOIN (
-                    SELECT cp._community_id, post_reactions_count
-                    FROM community_posts cp
-                    LEFT JOIN (
-                        SELECT pr._post_id, COALESCE(COUNT(*), 0) AS post_reactions_count
-                        FROM post_reactions pr
-                        GROUP BY pr._post_id
-                    ) pr ON cp._post_id = pr._post_id
-                    GROUP BY cp._community_id, post_reactions_count
-                ) pr ON c._id = pr._community_id
-
-                LEFT JOIN (
-                    SELECT cp._community_id, comments_count
-                    FROM community_posts cp
-                    LEFT JOIN (
-                        SELECT co._post_id, COALESCE(COUNT(*), 0) AS comments_count
-                        FROM comments co
-                        GROUP BY co._post_id
-                    ) co ON cp._post_id = co._post_id
-                    GROUP BY cp._community_id, comments_count
-                ) co ON c._id = co._community_id
-
-                LEFT JOIN (
-                    SELECT cp._community_id, comments_reactions_count
-                    FROM community_posts cp
-                    LEFT JOIN (
-                        SELECT co._id, co._post_id, comments_reactions_count
-                        FROM comments co
-                        LEFT JOIN (
-                            SELECT cr._comment_id, COALESCE(COUNT(*), 0) AS comments_reactions_count
-                            FROM comment_reactions cr
-                            GROUP BY cr._comment_id
-                        ) cr ON co._id = cr._comment_id
-
-                        GROUP BY co._post_id, co._id, comments_reactions_count
-                    ) co ON cp._post_id = co._post_id
-
-                    GROUP BY cp._community_id, comments_reactions_count
-                ) cr ON c._id = cr._community_id
-
-               GROUP BY c._id, m.members_count
-            ) cm ON c._id = cm._id
-            WHERE
-            categories @> $1 AND similarity(c.display_name, $2) > 0.1
-            AND (display_image IS NOT NULL AND cover_image IS NOT NULL
-            OR (display_image != '' AND cover_image != ''))
-            ORDER BY COALESCE(cm.weighted_score, 0) DESC, c._created_at DESC
-            LIMIT $3 OFFSET $4;
-            "#,
-            categories as &Vec<CommunityCategory>,
-            display_name,
-            limit,
-            offset * limit,
-        )
-        .fetch_all(&mut ***db)
-        .await?;
-
-        Ok(communities)
-    }
-
-    pub async fn search_all_by_category_and_offset_and_weighted_score(
-        db: &mut Connection<DbConn>,
-        offset: &i64,
-        limit: &i64,
-        categories: &Vec<CommunityCategory>,
-    ) -> Result<Vec<CommunityHomepageCard>, sqlx::Error> {
-        let communities = sqlx::query_as!(
-            CommunityHomepageCard,
-            r#"
-            SELECT
-            uid,
-            display_name,
-            display_image,
-            cover_image,
-            description,
-            is_private,
-            total_members
-            FROM communities c
-            LEFT JOIN (
-                SELECT
-                c._id,
-                COALESCE(members_count, 0) AS total_members,
-                SUM(members_count * 0.4) +
-                SUM(posts_count * 0.15) +
-                SUM(post_reactions_count * 0.1) +
-                SUM(comments_reactions_count * 0.1) +
-                SUM(comments_count * 0.25) AS weighted_score
-                FROM communities c
-
-                LEFT JOIN (
-                    SELECT _community_id, COALESCE(COUNT(*), 0) AS members_count
-                    FROM community_memberships
-                    GROUP BY _community_id
-                ) m ON c._id = m._community_id
-
-                LEFT JOIN (
-                    SELECT _community_id, COALESCE(COUNT(*), 0) AS posts_count
-                    FROM community_posts
-                    GROUP BY _community_id
-                ) cp ON c._id = cp._community_id
-
-                LEFT JOIN (
-                    SELECT cp._community_id, post_reactions_count
-                    FROM community_posts cp
-                    LEFT JOIN (
-                        SELECT pr._post_id, COALESCE(COUNT(*), 0) AS post_reactions_count
-                        FROM post_reactions pr
-                        GROUP BY pr._post_id
-                    ) pr ON cp._post_id = pr._post_id
-                    GROUP BY cp._community_id, post_reactions_count
-                ) pr ON c._id = pr._community_id
-
-                LEFT JOIN (
-                    SELECT cp._community_id, comments_count
-                    FROM community_posts cp
-                    LEFT JOIN (
-                        SELECT co._post_id, COALESCE(COUNT(*), 0) AS comments_count
-                        FROM comments co
-                        GROUP BY co._post_id
-                    ) co ON cp._post_id = co._post_id
-                    GROUP BY cp._community_id, comments_count
-                ) co ON c._id = co._community_id
-
-                LEFT JOIN (
-                    SELECT cp._community_id, comments_reactions_count
-                    FROM community_posts cp
-                    LEFT JOIN (
-                        SELECT co._id, co._post_id, comments_reactions_count
-                        FROM comments co
-                        LEFT JOIN (
-                            SELECT cr._comment_id, COALESCE(COUNT(*), 0) AS comments_reactions_count
-                            FROM comment_reactions cr
-                            GROUP BY cr._comment_id
-                        ) cr ON co._id = cr._comment_id
-
-                        GROUP BY co._post_id, co._id, comments_reactions_count
-                    ) co ON cp._post_id = co._post_id
-
-                    GROUP BY cp._community_id, comments_reactions_count
-                ) cr ON c._id = cr._community_id
-
-               GROUP BY c._id, m.members_count
-            ) cm ON c._id = cm._id
-            WHERE
-            categories @> $1
-            AND (display_image IS NOT NULL AND cover_image IS NOT NULL
-            OR (display_image != '' AND cover_image != ''))
-            ORDER BY COALESCE(cm.weighted_score, 0) DESC, c._created_at DESC
-            LIMIT $2 OFFSET $3;
-            "#,
-            categories as &Vec<CommunityCategory>,
-            limit,
-            offset * limit,
-        )
-        .fetch_all(&mut ***db)
-        .await?;
-
-        Ok(communities)
-    }
-
-    pub async fn search_all_by_display_name_and_offset_and_weighted_score(
-        db: &mut Connection<DbConn>,
-        offset: &i64,
-        limit: &i64,
-        display_name: &str,
-    ) -> Result<Vec<CommunityHomepageCard>, sqlx::Error> {
-        let communities = sqlx::query_as!(
-            CommunityHomepageCard,
-            r#"
-            SELECT
-            uid,
-            display_name,
-            display_image,
-            cover_image,
-            description,
-            is_private,
-            total_members
-            FROM communities c
-            LEFT JOIN (
-                SELECT
-                c._id,
-                COALESCE(members_count, 0) AS total_members,
-                SUM(members_count * 0.4) +
-                SUM(posts_count * 0.15) +
-                SUM(post_reactions_count * 0.1) +
-                SUM(comments_reactions_count * 0.1) +
-                SUM(comments_count * 0.25) AS weighted_score
-                FROM communities c
-
-                LEFT JOIN (
-                    SELECT _community_id, COALESCE(COUNT(*), 0) AS members_count
-                    FROM community_memberships
-                    GROUP BY _community_id
-                ) m ON c._id = m._community_id
-
-                LEFT JOIN (
-                    SELECT _community_id, COALESCE(COUNT(*), 0) AS posts_count
-                    FROM community_posts
-                    GROUP BY _community_id
-                ) cp ON c._id = cp._community_id
-
-                LEFT JOIN (
-                    SELECT cp._community_id, post_reactions_count
-                    FROM community_posts cp
-                    LEFT JOIN (
-                        SELECT pr._post_id, COALESCE(COUNT(*), 0) AS post_reactions_count
-                        FROM post_reactions pr
-                        GROUP BY pr._post_id
-                    ) pr ON cp._post_id = pr._post_id
-                    GROUP BY cp._community_id, post_reactions_count
-                ) pr ON c._id = pr._community_id
-
-                LEFT JOIN (
-                    SELECT cp._community_id, comments_count
-                    FROM community_posts cp
-                    LEFT JOIN (
-                        SELECT co._post_id, COALESCE(COUNT(*), 0) AS comments_count
-                        FROM comments co
-                        GROUP BY co._post_id
-                    ) co ON cp._post_id = co._post_id
-                    GROUP BY cp._community_id, comments_count
-                ) co ON c._id = co._community_id
-
-                LEFT JOIN (
-                    SELECT cp._community_id, comments_reactions_count
-                    FROM community_posts cp
-                    LEFT JOIN (
-                        SELECT co._id, co._post_id, comments_reactions_count
-                        FROM comments co
-                        LEFT JOIN (
-                            SELECT cr._comment_id, COAlESCE(COUNT(*), 0) AS comments_reactions_count
-                            FROM comment_reactions cr
-                            GROUP BY cr._comment_id
-                        ) cr ON co._id = cr._comment_id
-
-                        GROUP BY co._post_id, co._id, comments_reactions_count
-                    ) co ON cp._post_id = co._post_id
-
-                    GROUP BY cp._community_id, comments_reactions_count
-                ) cr ON c._id = cr._community_id
-
-               GROUP BY c._id, m.members_count
-            ) cm ON c._id = cm._id
-            WHERE
-            similarity(c.display_name, $1) > 0.1
-            AND (display_image IS NOT NULL AND cover_image IS NOT NULL
-            OR (display_image != '' AND cover_image != ''))
-            ORDER BY COALESCE(cm.weighted_score, 0) DESC, c._created_at DESC
-            LIMIT $2 OFFSET $3;
-            "#,
-            display_name,
-            limit,
-            offset * limit,
-        )
-        .fetch_all(&mut ***db)
-        .await?;
-
-        Ok(communities)
-    }
-
-    pub async fn get_all_by_offset_and_weighted_score(
-        db: &mut Connection<DbConn>,
-        offset: &i64,
-        limit: &i64,
-    ) -> Result<Vec<CommunityHomepageCard>, sqlx::Error> {
-        let communities = sqlx::query_as!(
-            CommunityHomepageCard,
-            r#"
-            SELECT
-            uid,
-            display_name,
-            display_image,
-            cover_image,
-            description,
-            is_private,
-            total_members
-            FROM communities c
-            LEFT JOIN (
-                SELECT
-                c._id,
-                COALESCE(members_count, 0) AS total_members,
-                SUM(members_count * 0.4) +
-                SUM(posts_count * 0.15) +
-                SUM(post_reactions_count * 0.1) +
-                SUM(comments_reactions_count * 0.1) +
-                SUM(comments_count * 0.25) AS weighted_score
-                FROM communities c
-
-                LEFT JOIN (
-                    SELECT _community_id, COALESCE(COUNT(*), 0) AS members_count
-                    FROM community_memberships
-                    GROUP BY _community_id
-                ) m ON c._id = m._community_id
-
-                LEFT JOIN (
-                    SELECT _community_id, COALESCE(COUNT(*), 0) AS posts_count
-                    FROM community_posts
-                    GROUP BY _community_id
-                ) cp ON c._id = cp._community_id
-
-                LEFT JOIN (
-                    SELECT cp._community_id, post_reactions_count
-                    FROM community_posts cp
-                    LEFT JOIN (
-                        SELECT pr._post_id, COALESCE(COUNT(*), 0) AS post_reactions_count
-                        FROM post_reactions pr
-                        GROUP BY pr._post_id
-                    ) pr ON cp._post_id = pr._post_id
-                    GROUP BY cp._community_id, post_reactions_count
-                ) pr ON c._id = pr._community_id
-
-                LEFT JOIN (
-                    SELECT cp._community_id, comments_count
-                    FROM community_posts cp
-                    LEFT JOIN (
-                        SELECT co._post_id, COALESCE(COUNT(*), 0) AS comments_count
-                        FROM comments co
-                        GROUP BY co._post_id
-                    ) co ON cp._post_id = co._post_id
-                    GROUP BY cp._community_id, comments_count
-                ) co ON c._id = co._community_id
-
-                LEFT JOIN (
-                    SELECT cp._community_id, comments_reactions_count
-                    FROM community_posts cp
-                    LEFT JOIN (
-                        SELECT co._id, co._post_id, comments_reactions_count
-                        FROM comments co
-                        LEFT JOIN (
-                            SELECT cr._comment_id, COALESCE(COUNT(*), 0) AS comments_reactions_count
-                            FROM comment_reactions cr
-                            GROUP BY cr._comment_id
-                        ) cr ON co._id = cr._comment_id
-
-                        GROUP BY co._post_id, co._id, comments_reactions_count
-                    ) co ON cp._post_id = co._post_id
-
-                    GROUP BY cp._community_id, comments_reactions_count
-                ) cr ON c._id = cr._community_id
-
-               GROUP BY c._id, m.members_count
-            ) cm ON c._id = cm._id
-            WHERE display_image IS NOT NULL AND cover_image IS NOT NULL
-            OR (display_image != '' AND cover_image != '')
-            ORDER BY COALESCE(cm.weighted_score, 0) DESC, c._created_at DESC
-            LIMIT $1 OFFSET $2;
-            "#,
-            limit,
-            offset * limit
-        )
-        .fetch_all(&mut ***db)
-        .await?;
-
-        Ok(communities)
+        .await?
+        ._id)
     }
 }
