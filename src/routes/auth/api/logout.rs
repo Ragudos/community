@@ -9,5 +9,5 @@ use crate::routes::auth::login;
 #[delete("/logout")]
 pub fn delete(cookie_jar: &CookieJar<'_>) -> Redirect {
     cookie_jar.remove_private(JWT_NAME);
-    Redirect::to(auth_uri!(login::page))
+    Redirect::to(auth_uri!(login::page(Some(true))))
 }

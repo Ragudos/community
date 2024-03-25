@@ -4,7 +4,6 @@ CREATE TABLE IF NOT EXISTS posts (
     owner_id BIGINT NOT NULL,
     content TEXT NOT NULL,
     caption VARCHAR(255),
-    links TEXT[],
     images TEXT[],
     videos TEXT[],
     is_pinned BOOLEAN NOT NULL DEFAULT false,

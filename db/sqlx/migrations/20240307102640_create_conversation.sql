@@ -12,7 +12,6 @@ CREATE TABLE IF NOT EXISTS messages (
     content TEXT NOT NULL,
     images TEXT[],
     videos TEXT[],
-    links TEXT[],
     FOREIGN KEY (_conversation_id) REFERENCES conversations(_id) ON DELETE CASCADE,
     FOREIGN KEY (_user_id) REFERENCES users(_id) ON DELETE CASCADE
 );

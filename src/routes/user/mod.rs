@@ -6,7 +6,6 @@ use rocket_dyn_templates::context;
 use rocket_dyn_templates::Template;
 
 use crate::auth_uri;
-use crate::controllers::htmx::redirect::HtmxRedirect;
 use crate::controllers::htmx::IsBoosted;
 use crate::models::seo::metadata::SeoMetadata;
 use crate::models::users::preferences::Theme;
@@ -55,9 +54,6 @@ pub fn malformed_uid(
 /// Just a no content for any request made where the first
 /// endpoint has forwarded.
 #[get("/<_..>", rank = 4)]
-pub fn logged_out(is_boosted: IsBoosted) -> ApiResponse {
-    match is_boosted {
-        IsBoosted(true) => ApiResponse::HtmxRedirect(HtmxRedirect::to(auth_uri!(login::page))),
-        IsBoosted(false) => ApiResponse::Redirect(Redirect::to(auth_uri!(login::page))),
-    }
+pub fn logged_out() -> ApiResponse {
+    ApiResponse::Redirect(Redirect::to(auth_uri!(login::page(Some(true)))))
 }

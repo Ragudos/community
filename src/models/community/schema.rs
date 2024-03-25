@@ -4,20 +4,6 @@ use time::OffsetDateTime;
 
 use crate::models::db::enums::{CommunityCategory, UserRole};
 
-#[derive(Clone, Debug)]
-pub struct CommunityTable {
-    _id: i64,
-    _created_at: String,
-    pub uid: String,
-    pub display_name: String,
-    pub categories: Option<Vec<CommunityCategory>>,
-    pub description: String,
-    pub owner_id: i64,
-    pub is_private: bool,
-    pub display_image: Option<String>,
-    pub cover_image: Option<String>,
-}
-
 #[derive(Serialize, Deserialize, FromRow, Clone, Debug)]
 pub struct Community {
     pub id: i64,

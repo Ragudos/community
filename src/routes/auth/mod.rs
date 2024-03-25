@@ -24,9 +24,6 @@ pub fn logged_in(_user: UserJWT, is_boosted: IsBoosted) -> ApiResponse {
 }
 
 #[get("/", rank = 2)]
-pub fn logged_out(is_boosted: IsBoosted) -> ApiResponse {
-    match is_boosted {
-        IsBoosted(true) => ApiResponse::HtmxRedirect(HtmxRedirect::to(auth_uri!(login::page))),
-        IsBoosted(false) => ApiResponse::Redirect(Redirect::to(auth_uri!(login::page))),
-    }
+pub fn logged_out() -> ApiResponse {
+    ApiResponse::Redirect(Redirect::to(auth_uri!(login::page(_))))
 }

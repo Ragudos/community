@@ -7,7 +7,6 @@ CREATE TABLE IF NOT EXISTS comments (
     content TEXT NOT NULL,
     images TEXT[],
     videos TEXT[],
-    links TEXT[],
     FOREIGN KEY (_post_id) REFERENCES posts(_id) ON DELETE CASCADE,
     FOREIGN KEY (_user_id) REFERENCES users(_id) ON DELETE CASCADE,
     FOREIGN KEY (_parent_comment_id) REFERENCES comments(_id) ON DELETE CASCADE
