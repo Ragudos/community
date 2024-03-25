@@ -1,9 +1,12 @@
+use rocket::response::Redirect;
 use rocket::{catch, Request};
 use rocket_dyn_templates::{context, Template};
 
+use crate::auth_uri;
 use crate::models::seo::metadata::SeoMetadata;
 use crate::models::users::preferences::Theme;
 use crate::models::{Toast, ToastTypes};
+use crate::routes::auth;
 
 #[catch(422)]
 pub fn unprocessable_entity(request: &Request) -> &'static str {
@@ -27,6 +30,11 @@ pub fn not_found(request: &Request) -> Template {
             metadata,
         },
     )
+}
+
+#[catch(401)]
+pub fn unauthorized_catcher(request: &Request) -> Redirect {
+    Redirect::to(auth_uri!(auth::login::page(_)))
 }
 
 #[catch(500)]

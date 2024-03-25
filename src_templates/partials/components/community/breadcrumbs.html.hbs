@@ -1,9 +1,0 @@
-{{#unless (lt page_count 1)}}
-    <button hx-target-400="#section-of-communities" {{#if (eq offset 0)}}disabled="true"{{/if}} hx-get="/preview/community?o={{(sub offset 1)}}" hx-target="#section-of-communities" hx-include="#search-input" hx-swap="outerHTML">Prev</button>
-    <div class="breadcrumbs">
-    {{#breadcrumbs offset page_count}}
-        <button {{#if (eq (sub this.value 1) ../offset)}}disabled="true"{{/if}} hx-get="/preview/community?o={{(sub this.value 1)}}" hx-target="#section-of-communities" hx-include="#search-input" hx-swap="outerHTML" class="square">{{this.value}}</button>
-    {{/breadcrumbs}}
-    </div>
-    <button {{#if (or (eq page_count 0) (eq offset (sub page_count 1)))}}disabled="true"{{/if}} hx-get="/preview/community?o={{(add offset 1)}}" hx-target="#section-of-communities" hx-include="#search-input" hx-swap="outerHTML">Next</button>
-{{/unless}}

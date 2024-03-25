@@ -54,10 +54,6 @@ main {
     border: 1px solid hsl(var(--border) / var(--_border-opacity, 0.87));
 }
 
-svg {
-    fill: currentColor;
-}
-
 .w-6 {
     width: 1.5rem;
 }
@@ -74,12 +70,29 @@ svg {
     @include cover_background;
 }
 
-dialog::backdrop {
-    background-color: hsl(var(--background) / 0.25);
+#page-load-bar {
+    position: fixed;
+    top: 0;
+    margin-inline: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 0.25rem;
+    background-color: hsl(var(--accent));
+    pointer-events: none;
+    touch-action: none;
 }
 
-.input-group {
-    display: flex;
-    flex-direction: column-reverse;
-    gap: calc($general-gap / 2);
+.fade-me-out.htmx-swapping,
+.fade-me-in {
+    transition: opacity var(--animation-duration, 250ms) ease-out;
+}
+
+.fade-me-in.htmx-added,
+.fade-me-out.htmx-swapping {
+    opacity: 0;
+}
+
+.fade-me-in {
+    opacity: 1;
 }

@@ -29,7 +29,7 @@ pub async fn get<'r>(
         return Ok(ApiResponse::Status(Status::Forbidden));
     };
 
-    if community_preview.is_viewer_outsider.unwrap_or(true) {
+    if !community_preview.is_viewer_a_member.unwrap_or(false) {
         return Ok(ApiResponse::Status(Status::Forbidden));
     }
 

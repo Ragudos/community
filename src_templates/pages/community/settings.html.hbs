@@ -2,10 +2,9 @@
     <head>
         {{> partials/head/main}}
         {{> partials/head/community}}
-        <link rel="stylesheet" href="/build/styles/settings_community.min.css">
     </head>
     {{#if includeheader}}
-        <aside id="community-header" hx-swap-oob="true">
+        <aside class="fade-me-in fade-me-out" id="community-header" hx-swap-oob="true">
             {{> partials/headers/community}}
         </aside>
     {{else}}
@@ -15,7 +14,6 @@
 {{else}}
     {{#> layouts/community}}
         {{#*inline "more_head_content"}}
-            <link rel="stylesheet" href="/build/styles/settings_community.min.css">
         {{/inline}}
         {{> partials/community/settings}}
     {{/layouts/community}}

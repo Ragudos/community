@@ -1,0 +1,15 @@
+{{#if is_boosted}}
+    <head>
+        {{> partials/head/main}}
+        {{> partials/head/community}}
+    </head>
+    <aside id="community-header" hx-swap-oob="true">
+    </aside>
+    <h1>{{metadata.title}}</h1>
+    <p>Community not found. Perhaps it has been deleted?</p>
+{{else}}
+    {{#> layouts/community}}
+        <h1>{{metadata.title}}</h1>
+        <p>Community not found. Perhaps it has been deleted?</p>
+    {{/layouts/community}}
+{{/if}}

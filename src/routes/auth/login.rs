@@ -8,7 +8,11 @@ use crate::models::seo::metadata::SeoMetadata;
 use crate::models::users::preferences::Theme;
 
 #[get("/login?<isredirected>", rank = 2)]
-pub fn page<'r>(cookie_jar: &CookieJar<'r>, is_boosted: IsBoosted, isredirected: Option<bool>) -> Template {
+pub fn page<'r>(
+    cookie_jar: &CookieJar<'r>,
+    is_boosted: IsBoosted,
+    isredirected: Option<bool>,
+) -> Template {
     let IsBoosted(is_boosted) = is_boosted;
     let theme = Theme::from_cookie_jar(cookie_jar);
     let metadata = SeoMetadata::build()
@@ -16,5 +20,8 @@ pub fn page<'r>(cookie_jar: &CookieJar<'r>, is_boosted: IsBoosted, isredirected:
         .title("Sign In to Community")
         .finalize();
 
-    Template::render("pages/auth/login", context! { metadata, is_boosted, isredirected })
+    Template::render(
+        "pages/auth/login",
+        context! { metadata, is_boosted, isredirected },
+    )
 }

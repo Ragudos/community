@@ -5,6 +5,7 @@
     margin-bottom: 0.5rem;
 
     background-color: hsl(var(--lighter-background) / var(--_background, 1));
+    border-bottom: 1px solid hsl(var(--border) / var(--_border-opacity, 1));
 }
 
 .header > * {

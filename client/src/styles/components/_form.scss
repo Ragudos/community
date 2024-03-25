@@ -1,6 +1,3 @@
-@use "./mixins" as *;
-@use "./variables" as *;
-
 .auth-form {
     @include flex-column;
     gap: $general-gap;
@@ -11,4 +8,10 @@
 .label-container {
     display: flex;
     gap: 0.25rem;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: calc($general-gap / 2);
 }

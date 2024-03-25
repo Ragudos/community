@@ -15,18 +15,18 @@ impl CommunityPreview {
                 SELECT
                 _id AS community_id,
                 owner_id,
-                is_viewer_outsider
+                is_viewer_a_member
                 FROM communities
                 LEFT JOIN (
-                    SELECT NOT EXISTS (
+                    SELECT EXISTS (
                         SELECT 1
                         FROM community_memberships
                         WHERE _community_id = $1
                         AND _user_id = $2
-                    ) AS is_viewer_outsider, _community_id
+                    ) AS is_viewer_a_member, _community_id
                     FROM community_memberships
 
-                    GROUP BY _community_id, is_viewer_outsider
+                    GROUP BY _community_id, is_viewer_a_member
                 ) cm ON _id = cm._community_id
                 WHERE _id = $1;
                 "#,

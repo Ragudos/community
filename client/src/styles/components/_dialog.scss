@@ -1,3 +1,7 @@
+dialog::backdrop {
+    background-color: hsl(var(--background) / 0.25);
+}
+
 dialog {
     background-color: transparent;
     border: none;

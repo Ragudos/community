@@ -9,19 +9,20 @@
         <noscript>
             <div class="no-js">Please enable JavaScript for this site to fully work.</div>
         </noscript>
+        <div id="page-load-bar"></div>
         {{#> header}}
-            <header id="header"></header>
-            <aside id="community-header"></aside>
+            <header class="fade-me-out fade-me-in" id="header"></header>
+            <aside class="fade-me-in fade-me-out" id="community-header"></aside>
         {{/header}}
-        <main>
+        <main class="fade-me-out fade-me-in">
             {{> @partial-block}}
         </main>
         <ol id="toast-container" aria-label="Notifcations"></ol>
         <!-- Used when doing OOB in error responses -->
         <div id="nothing" hidden></div>
         {{#if (eq metadata.env "development")}}
-        <div id="screen_size_indicator" style="position: fixed; bottom: 0; right: 0; z-index: 99999; color: white; background: black;"></div>
-        <script>!function(){let e;function n(){document.getElementById("screen_size_indicator").innerText=`${window.innerWidth}px`}window.addEventListener("resize",()=>{clearTimeout(e),e=setTimeout(n,1e3)})}();</script>
+            <div id="screen_size_indicator" style="position: fixed; bottom: 0; right: 0; z-index: 99999; color: white; background: black;"></div>
+            <script>!function(){let e;function n(){document.getElementById("screen_size_indicator").innerText=`${window.innerWidth}px`}window.addEventListener("resize",()=>{clearTimeout(e),e=setTimeout(n,1e3)})}();</script>
         {{/if}}
     </body>
 </html>

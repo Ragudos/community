@@ -1,7 +1,3 @@
-@use "./mixins/" as *;
-@use "./variables/" as *;
-@use "./functions/" as *;
-
 .discover-grid {
     --_content-width: min(100%, 20rem);
     --_content-height: 23rem;

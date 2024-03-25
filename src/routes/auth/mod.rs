@@ -16,10 +16,12 @@ pub mod register;
 #[get("/<_..>")]
 pub fn logged_in(_user: UserJWT, is_boosted: IsBoosted) -> ApiResponse {
     match is_boosted {
-        IsBoosted(true) => {
-            ApiResponse::HtmxRedirect(HtmxRedirect::to(discover_uri!(discover::page(Some(true), _))))
+        IsBoosted(true) => ApiResponse::HtmxRedirect(HtmxRedirect::to(discover_uri!(
+            discover::page(Some(true), _)
+        ))),
+        IsBoosted(false) => {
+            ApiResponse::Redirect(Redirect::to(discover_uri!(discover::page(Some(true), _))))
         }
-        IsBoosted(false) => ApiResponse::Redirect(Redirect::to(discover_uri!(discover::page(Some(true), _)))),
     }
 }
 

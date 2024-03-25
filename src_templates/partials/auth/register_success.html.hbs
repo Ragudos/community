@@ -1,5 +1,7 @@
 <div class="flex-col" style="margin-bottom: 1.5rem;">
-    <i class="fa fa-solid fa-check fa-2xl"></i>
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+        <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+    </svg>
     <p>Thank you, {{username}}. Your account has been created!</p>   
 </div>
-<a class="primary" href="/discover?isfromauth=true" hx-target="main" hx-target-error="#nothing">Let's go!</a>
+<a hx-swap="innerHTML swap:250ms" class="primary" href="/discover?isfromauth=true" hx-target="main" hx-target-error="#nothing">Let's go!</a>

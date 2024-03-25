@@ -93,7 +93,6 @@ pub fn rocket_from_config(figment: Figment) -> Rocket<Build> {
             rocket_routes![
                 routes::community::api::logged_out,
                 routes::community::api::malformed_uri,
-                routes::community::api::about::get,
             ],
         )
         .mount(
@@ -101,7 +100,7 @@ pub fn rocket_from_config(figment: Figment) -> Rocket<Build> {
             rocket_routes![
                 routes::community::api::join::public::post,
                 routes::community::api::join::logged_out
-            ]
+            ],
         )
         .mount(
             "/discover",

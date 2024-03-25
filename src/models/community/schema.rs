@@ -76,7 +76,7 @@ pub struct CommunityJoinRequest {
 pub struct CommunityPreview {
     pub owner_id: i64,
     pub community_id: i64,
-    pub is_viewer_outsider: Option<bool>,
+    pub is_viewer_a_member: Option<bool>,
 }
 
 #[derive(Serialize, Deserialize, FromRow, Debug, Clone)]

@@ -15,21 +15,6 @@ pub struct CountStruct {
 }
 
 impl CommunityAbout {
-    pub async fn foo(
-        db: &mut Connection<DbConn>,
-        community_id: &i64
-    ) -> Result<Option<i64>, sqlx::Error> {
-        Ok(
-            sqlx::query!(
-                r#"
-                SELECT COUNT(*) AS total_members
-                FROM community_memberships
-                WHERE _community_id = $1
-                "#,
-                community_id
-            ).fetch_one(&mut ***db).await?.total_members
-        )
-    }
     #[allow(non_snake_case)] // The macro builds what we return as, sqlx_query_as__id, _id being what is returned
     pub async fn get(
         db: &mut Connection<DbConn>,

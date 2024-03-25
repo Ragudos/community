@@ -1,14 +1,67 @@
-<ul class="list-of-links" id="list-of-community-links" {{#if oobswap}}hx-swap-oob="true"{{/if}}>
-    <li>
-        <a class="active-indicator {{#if (eq current_page "community")}}active{{/if}}" id="community-link" {{#if (eq current_page "community")}}aria-current="page"{{/if}} hx-target="main" hx-target-error="main" href="/community/{{community_id}}">Home</a>
-    </li>
-    <li>
-        <a class="active-indicator {{#if (eq current_page "members")}}active{{/if}}" id="members-link" {{#if (eq current_page "members")}}aria-current="page"{{/if}} hx-target="main" hx-target-error="main" href="/community/{{community_id}}/members">Members</a>
-    </li>
-    <li>
-        <a class="active-indicator {{#if (eq current_page "about")}}active{{/if}}" id="about-link" {{#if (eq current_page "about")}}aria-current="page"{{/if}} hx-target="main" hx-target-error="main" href="/community/{{community_id}}/about">About</a>
-    </li>
-    <li>
-        <a class="active-indicator {{#if (eq current_page "settings")}}active{{/if}}" id="settings-link" {{#if (eq current_page "settings")}}aria-current="page"{{/if}} hx-target="main" hx-target-error="main" href="/community/{{community_id}}/settings">Settings</a>
-    </li>
-</ul>
+{{#if oobswap}}
+    <ul class="list-of-links" id="list-of-community-links" hx-swap-oob="true">
+        {{#if (or community.is_viewer_a_member (eq community.owner_id user._id))}}
+            <li>
+                {{#if (eq current_page "community")}}
+                    <a class="active-indicator active" aria-current="page" hx-target-error="main" hx-target="main" href="/community/{{community_id}}">Home</a>
+                {{else}}
+                    <a hx-swap="innerHTML swap:250ms" class="active-indicator" hx-target-error="main" hx-target="main" href="/community/{{community_id}}">Home</a>
+                {{/if}}
+            </li>
+            <li>
+                {{#if (eq current_page "members")}}
+                    <a class="active-indicator active" aria-current="page" hx-target-error="main" hx-target="main" href="/community/{{community_id}}/members">Members</a>
+                {{else}}
+                    <a hx-swap="innerHTML swap:250ms" class="active-indicator" hx-target-error="main" hx-target="main" href="/community/{{community_id}}/members">Members</a>
+                {{/if}}
+            </li>
+            <li>
+                {{#if (eq current_page "about")}}
+                    <a class="active-indicator active" aria-current="page" hx-target-error="main" hx-target="main" href="/community/{{community_id}}/about">About</a>
+                {{else}}
+                    <a hx-swap="innerHTML swap:250ms" class="active-indicator" hx-target-error="main" hx-target="main" href="/community/{{community_id}}/about">About</a>
+                {{/if}}
+            </li>
+            <li>
+                {{#if (eq current_page "settings")}}
+                    <a class="active-indicator active" hx-target-error="main" hx-target="main" href="/community/{{community_id}}/settings">Settings</a>
+                {{else}}
+                    <a hx-swap="innerHTML swap:250ms" class="active-indicator" hx-target-error="main" hx-target="main" href="/community/{{community_id}}/settings">Settings</a>
+                {{/if}}
+            </li>
+        {{/if}}
+    </ul>
+{{else}}
+    <ul class="list-of-links" id="list-of-community-links">
+        {{#if (or community.is_viewer_a_member (eq community.owner_id user._id))}}
+            <li>
+                {{#if (eq current_page "community")}}
+                    <a class="active-indicator active" aria-current="page" hx-target-error="main" hx-target="main" href="/community/{{community_id}}">Home</a>
+                {{else}}
+                    <a hx-swap="innerHTML swap:250ms" class="active-indicator" hx-target-error="main" hx-target="main" href="/community/{{community_id}}">Home</a>
+                {{/if}}
+            </li>
+            <li>
+                {{#if (eq current_page "members")}}
+                    <a class="active-indicator active" aria-current="page" hx-target-error="main" hx-target="main" href="/community/{{community_id}}/members">Members</a>
+                {{else}}
+                    <a hx-swap="innerHTML swap:250ms" class="active-indicator" hx-target-error="main" hx-target="main" href="/community/{{community_id}}/members">Members</a>
+                {{/if}}
+            </li>
+            <li>
+                {{#if (eq current_page "about")}}
+                    <a class="active-indicator active" aria-current="page" hx-target-error="main" hx-target="main" href="/community/{{community_id}}/about">About</a>
+                {{else}}
+                    <a hx-swap="innerHTML swap:250ms" class="active-indicator" hx-target-error="main" hx-target="main" href="/community/{{community_id}}/about">About</a>
+                {{/if}}
+            </li>
+            <li>
+                {{#if (eq current_page "settings")}}
+                    <a class="active-indicator active" hx-target-error="main" hx-target="main" href="/community/{{community_id}}/settings">Settings</a>
+                {{else}}
+                    <a hx-swap="innerHTML swap:250ms" class="active-indicator" hx-target-error="main" hx-target="main" href="/community/{{community_id}}/settings">Settings</a>
+                {{/if}}
+            </li>
+        {{/if}}
+    </ul>
+{{/if}}

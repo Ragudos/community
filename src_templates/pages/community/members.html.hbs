@@ -1,0 +1,18 @@
+{{#if (or is_boosted shouldboost)}}
+    <head>
+        {{> partials/head/main}}
+        {{> partials/head/community}}
+    </head>
+    {{#if includeheader}}
+        <aside class="fade-me-in fade-me-out" id="community-header" hx-swap-oob="true">
+            {{> partials/headers/community}}
+        </aside>
+    {{else}}
+        {{> partials/headers/community_content oobswap=true}}
+    {{/if}}
+    {{> partials/community/index}}
+{{else}}
+    {{#> layouts/community}}
+        {{> partials/community/index}}
+    {{/layouts/community}}
+{{/if}}

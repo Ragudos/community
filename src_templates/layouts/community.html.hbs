@@ -5,11 +5,13 @@
         {{/more_head_content}}
     {{/inline}}
     {{#*inline "header"}}
-        <header id="header">
+        <header class="fade-me-in fade-me-out" id="header">
             {{> partials/headers/logged_in}}
         </header>
-        <aside id="community-header">
-            {{> partials/headers/community}}
+        <aside class="fade-me-in fade-me-out" id="community-header">
+            {{#if community}}
+                {{> partials/headers/community}}
+            {{/if}}
         </aside>
     {{/inline}}
     {{> @partial-block}}

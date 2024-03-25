@@ -1,8 +1,6 @@
 {{#if is_boosted}}
     <head>
         {{> partials/head/main}}
-        <link rel="preload" href="/build/styles/discover.min.css" as="style">
-        <link rel="stylesheet" href="/build/styles/discover.min.css">
     </head>
     {{#if isfromauth}}
         <header id="header" hx-swap-oob="true">
@@ -13,10 +11,6 @@
     {{> partials/discover/initial_state}}
 {{else}}
     {{#> layouts/main}}
-        {{#*inline "additional_head_content"}}
-            <link rel="preload" href="/build/styles/discover.min.css" as="style">
-            <link rel="stylesheet" href="/build/styles/discover.min.css">
-        {{/inline}}
         {{#*inline "header"}}
             <header id="header">
                 {{> partials/headers/logged_in}}

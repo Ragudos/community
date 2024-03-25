@@ -6,7 +6,6 @@ use crate::{
     responders::ApiResponse,
 };
 
-pub mod about;
 pub mod join;
 pub mod settings;
 

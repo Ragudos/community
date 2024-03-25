@@ -20,35 +20,31 @@ impl Config {
 pub fn run(config: &Config) -> Result<(), Box<dyn std::error::Error>> {
     let input_path = &config.input_path;
     let input_metadata = std::fs::metadata(input_path)?;
-    let mut cfg = minify_html::Cfg::new();
-
-    cfg.minify_css = true;
-    cfg.minify_js = true;
-    cfg.preserve_brace_template_syntax = true;
-    cfg.keep_closing_tags = true;
 
     if input_metadata.is_file() {
-        minify_file(input_path, &cfg)?;
+        minify_file(input_path)?;
     } else if input_metadata.is_dir() {
-        minify_dir(input_path, &cfg)?;
+        minify_dir(input_path)?;
     }
 
     Ok(())
 }
 
 /// Minify a file
-fn minify_file(file_path: &str, cfg: &minify_html::Cfg) -> Result<(), Box<dyn std::error::Error>> {
-    let file = std::fs::read(file_path)?;
-    let minified_html = minify_html::minify(&file, &cfg);
+fn minify_file(file_path: &str) -> Result<(), Box<dyn std::error::Error>> {
+    let contents = std::fs::read_to_string(file_path)?;
+    let mut helper = html_minifier::HTMLMinifier::new();
+
+    helper.set_minify_code(true);
+    helper.set_remove_comments(true);
+    helper.digest(contents)?;
+
+    let minified_html = helper.get_html();
     let path = std::path::Path::new(file_path);
-    let file_name_of_path = path
-        .to_str()
-        .expect("Expected file name to exist");
+    let file_name_of_path = path.to_str().expect("Expected file name to exist");
     let root_dir_name = std::path::Path::new(file_path)
         .parent()
-        .and_then(|parent| {
-            parent.components().nth(0)
-        })
+        .and_then(|parent| parent.components().nth(0))
         .map(|c| c.as_os_str().to_str().unwrap())
         .unwrap_or_default();
     let file_path_without_root = path.parent().unwrap().strip_prefix(root_dir_name)?;
@@ -59,28 +55,25 @@ fn minify_file(file_path: &str, cfg: &minify_html::Cfg) -> Result<(), Box<dyn st
     }
 
     let outpule_file_path = output_dir.join(path.file_name().unwrap().to_str().unwrap());
-    let output_file_pathname = outpule_file_path.to_str().unwrap();
     let mut file = std::fs::File::create(outpule_file_path.clone())?;
 
-    file.write_all(&minified_html)?;
+    file.write_all(minified_html)?;
 
-    println!(
-        "{}{}",
-        "Minified: ".bold(),
-        file_name_of_path,
-    );
+    println!("{}{}", "Minified: ".bold(), file_name_of_path,);
+
+    helper.reset();
 
     Ok(())
 }
 
 /// Minify a directory
-fn minify_dir(dir_path: &str, cfg: &minify_html::Cfg) -> Result<(), Box<dyn std::error::Error>> {
+fn minify_dir(dir_path: &str) -> Result<(), Box<dyn std::error::Error>> {
     let mut file_paths: Vec<std::path::PathBuf> = Vec::new();
 
     collect_filenames_recursively(dir_path, &mut file_paths)?;
 
     for path in &file_paths {
-        if let Err(err) = minify_file(path.to_str().unwrap(), cfg) {
+        if let Err(err) = minify_file(path.to_str().unwrap()) {
             eprintln!("{}: {}", "Error".red(), err);
         }
     }
@@ -88,7 +81,10 @@ fn minify_dir(dir_path: &str, cfg: &minify_html::Cfg) -> Result<(), Box<dyn std:
     Ok(())
 }
 
-fn collect_filenames_recursively(path: &str, files: &mut Vec<std::path::PathBuf>) -> Result<(), Box<dyn std::error::Error>> {
+fn collect_filenames_recursively(
+    path: &str,
+    files: &mut Vec<std::path::PathBuf>,
+) -> Result<(), Box<dyn std::error::Error>> {
     for entry in std::fs::read_dir(path)? {
         let entry = entry?;
         let path = entry.path();

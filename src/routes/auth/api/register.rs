@@ -23,10 +23,13 @@ use crate::routes::discover;
 #[post("/register")]
 pub fn logged_in(_user: UserJWT, is_htmx: IsHTMX) -> ApiResponse {
     match is_htmx {
-        IsHTMX(true) => {
-            ApiResponse::HtmxRedirect(HtmxRedirect::to(discover_uri!(discover::page(Some(true), _))))
+        IsHTMX(true) => ApiResponse::HtmxRedirect(HtmxRedirect::to(discover_uri!(discover::page(
+            Some(true),
+            _
+        )))),
+        IsHTMX(false) => {
+            ApiResponse::Redirect(Redirect::to(discover_uri!(discover::page(Some(true), _))))
         }
-        IsHTMX(false) => ApiResponse::Redirect(Redirect::to(discover_uri!(discover::page(Some(true), _)))),
     }
 }
 

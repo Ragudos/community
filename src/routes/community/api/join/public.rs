@@ -9,9 +9,9 @@ use sqlx::Acquire;
 use crate::community_uri;
 use crate::controllers::errors::extract_data_or_return_response;
 use crate::helpers::db::DbConn;
-use crate::models::query::ListQuery;
 use crate::models::community::forms::JoinPublicCommunity;
 use crate::models::community::schema::{Community, CommunityMembership};
+use crate::models::query::ListQuery;
 use crate::models::users::schema::UserJWT;
 use crate::models::{Toast, ToastTypes};
 use crate::responders::ApiResponse;
@@ -63,9 +63,7 @@ pub async fn post<'r>(
 
     tx.commit().await?;
 
-    Ok(
-        ApiResponse::Redirect(
-            Redirect::to(community_uri!(community::page(form.community_id, Some(true), _, _)))
-        )
-    )
+    Ok(ApiResponse::Redirect(Redirect::to(community_uri!(
+        community::page(form.community_id, Some(true), Some(false), _)
+    ))))
 }

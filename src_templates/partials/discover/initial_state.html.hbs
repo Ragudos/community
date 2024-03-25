@@ -5,9 +5,65 @@
 </aside>
 <section class="container">
     <h1 class="sr-only">Discover Communities</h1>
-    <div hx-target-error="#section-of-communities" data-loading-delay="100"  id="section-of-communities" class="discover-grid" hx-swap="outerHTML" hx-trigger="revealed" hx-get="/discover/api?{{#if list_query}}{{#if list_query.search}}search={{list_query.search}}&{{/if}}{{#if list_query.category}}category={{list_query.category}}&{{/if}}{{#if list_query.offset}}offset={{list_query.offset}}{{/if}}{{/if}}">
-        <div style="--_delay: 0ms" class="hidden" data-loading-class-remove="hidden" data-loading-class="skeleton fade"></div>
-        <div style="--_delay: 250ms" class="hidden" data-loading-class-remove="hidden" data-loading-class="skeleton fade"></div>
-        <div style="--_delay: 500ms" class="hidden" data-loading-class-remove="hidden" data-loading-class="skeleton fade"></div>
-    </div>
+    {{#if list_query}}
+        {{#if (and (and list_query.search list_query.category) list_query.offset)}}
+            <div hx-target-error="#section-of-communities" data-loading-delay="100"  id="section-of-communities" class="discover-grid" hx-swap="outerHTML" hx-trigger="revealed" hx-get="/discover/api?search={{list_query.search}}&category={{list_query.category}}&offset={{list_query.offset}}">
+                <div style="--_delay: 0ms" class="hidden" data-loading-class-remove="hidden" data-loading-class="skeleton fade"></div>
+                <div style="--_delay: 250ms" class="hidden" data-loading-class-remove="hidden" data-loading-class="skeleton fade"></div>
+                <div style="--_delay: 500ms" class="hidden" data-loading-class-remove="hidden" data-loading-class="skeleton fade"></div>
+            </div>
+        {{else}}
+            {{#if (and list_query.search list_query.category)}}
+                <div hx-target-error="#section-of-communities" data-loading-delay="100"  id="section-of-communities" class="discover-grid" hx-swap="outerHTML" hx-trigger="revealed" hx-get="/discover/api?search={{list_query.search}}&category={{list_query.category}}">
+                    <div style="--_delay: 0ms" class="hidden" data-loading-class-remove="hidden" data-loading-class="skeleton fade"></div>
+                    <div style="--_delay: 250ms" class="hidden" data-loading-class-remove="hidden" data-loading-class="skeleton fade"></div>
+                    <div style="--_delay: 500ms" class="hidden" data-loading-class-remove="hidden" data-loading-class="skeleton fade"></div>
+                </div>   
+            {{else}}
+                {{#if (and list_query.search list_query.offset)}}
+                    <div hx-target-error="#section-of-communities" data-loading-delay="100"  id="section-of-communities" class="discover-grid" hx-swap="outerHTML" hx-trigger="revealed" hx-get="/discover/api?search={{list_query.search}}&offset={{list_query.offset}}">
+                        <div style="--_delay: 0ms" class="hidden" data-loading-class-remove="hidden" data-loading-class="skeleton fade"></div>
+                        <div style="--_delay: 250ms" class="hidden" data-loading-class-remove="hidden" data-loading-class="skeleton fade"></div>
+                        <div style="--_delay: 500ms" class="hidden" data-loading-class-remove="hidden" data-loading-class="skeleton fade"></div>
+                    </div>
+                {{else}}
+                    {{#if list_query.search}}
+                        <div hx-target-error="#section-of-communities" data-loading-delay="100"  id="section-of-communities" class="discover-grid" hx-swap="outerHTML" hx-trigger="revealed" hx-get="/discover/api?search={{list_query.search}}">
+                            <div style="--_delay: 0ms" class="hidden" data-loading-class-remove="hidden" data-loading-class="skeleton fade"></div>
+                            <div style="--_delay: 250ms" class="hidden" data-loading-class-remove="hidden" data-loading-class="skeleton fade"></div>
+                            <div style="--_delay: 500ms" class="hidden" data-loading-class-remove="hidden" data-loading-class="skeleton fade"></div>
+                        </div>
+                    {{else}}
+                        {{#if (and list_query.category list_query.offset)}}
+                            <div hx-target-error="#section-of-communities" data-loading-delay="100"  id="section-of-communities" class="discover-grid" hx-swap="outerHTML" hx-trigger="revealed" hx-get="/discover/api?category={{list_query.category}}&{{list_query.offset}}">
+                                <div style="--_delay: 0ms" class="hidden" data-loading-class-remove="hidden" data-loading-class="skeleton fade"></div>
+                                <div style="--_delay: 250ms" class="hidden" data-loading-class-remove="hidden" data-loading-class="skeleton fade"></div>
+                                <div style="--_delay: 500ms" class="hidden" data-loading-class-remove="hidden" data-loading-class="skeleton fade"></div>
+                            </div>
+                        {{else}}
+                            {{#if list_query.category}}
+                                <div hx-target-error="#section-of-communities" data-loading-delay="100"  id="section-of-communities" class="discover-grid" hx-swap="outerHTML" hx-trigger="revealed" hx-get="/discover/api?category={{list_query.category}}">
+                                    <div style="--_delay: 0ms" class="hidden" data-loading-class-remove="hidden" data-loading-class="skeleton fade"></div>
+                                    <div style="--_delay: 250ms" class="hidden" data-loading-class-remove="hidden" data-loading-class="skeleton fade"></div>
+                                    <div style="--_delay: 500ms" class="hidden" data-loading-class-remove="hidden" data-loading-class="skeleton fade"></div>
+                                </div>
+                            {{else}}
+                                <div hx-target-error="#section-of-communities" data-loading-delay="100"  id="section-of-communities" class="discover-grid" hx-swap="outerHTML" hx-trigger="revealed" hx-get="/discover/api?offset={{list_query.offset}}">
+                                    <div style="--_delay: 0ms" class="hidden" data-loading-class-remove="hidden" data-loading-class="skeleton fade"></div>
+                                    <div style="--_delay: 250ms" class="hidden" data-loading-class-remove="hidden" data-loading-class="skeleton fade"></div>
+                                    <div style="--_delay: 500ms" class="hidden" data-loading-class-remove="hidden" data-loading-class="skeleton fade"></div>
+                                </div>
+                            {{/if}}
+                        {{/if}}
+                    {{/if}}
+                {{/if}}
+            {{/if}}
+        {{/if}}
+    {{else}}
+        <div hx-target-error="#section-of-communities" data-loading-delay="100"  id="section-of-communities" class="discover-grid" hx-swap="outerHTML" hx-trigger="revealed" hx-get="/discover/api">
+            <div style="--_delay: 0ms" class="hidden" data-loading-class-remove="hidden" data-loading-class="skeleton fade"></div>
+            <div style="--_delay: 250ms" class="hidden" data-loading-class-remove="hidden" data-loading-class="skeleton fade"></div>
+            <div style="--_delay: 500ms" class="hidden" data-loading-class-remove="hidden" data-loading-class="skeleton fade"></div>
+        </div>
+    {{/if}}
 </section>
