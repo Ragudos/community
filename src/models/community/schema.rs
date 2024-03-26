@@ -74,6 +74,9 @@ pub struct CommunityJoinRequest {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct CommunityPreview {
+    pub display_name: String,
+    pub display_image: Option<String>,
+    pub is_private: Option<bool>,
     pub owner_id: i64,
     pub community_id: i64,
     pub is_viewer_a_member: Option<bool>,

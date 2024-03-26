@@ -1,9 +1,11 @@
 use rocket::http::{Header, Status};
 use rocket::response::{Redirect, Responder, Response};
-use rocket_dyn_templates::Template;
+use rocket_csrf_token::VerificationFailure;
+use rocket_dyn_templates::{context, Template};
 
 use crate::controllers::htmx::redirect::HtmxRedirect;
 use crate::controllers::htmx::refresh::HtmxRefresh;
+use crate::models::{Toast, ToastTypes};
 
 #[derive(Debug)]
 pub enum HeaderCount {
@@ -22,6 +24,24 @@ pub enum ApiResponse {
         template: Option<Template>,
         headers: Option<HeaderCount>,
     },
+}
+
+impl From<VerificationFailure> for ApiResponse {
+    fn from(_: VerificationFailure) -> Self {
+        ApiResponse::Render {
+            status: Status::Forbidden,
+            template: Some(Template::render(
+                "partials/toast",
+                context! {
+                    toast: Toast {
+                        message: "You are no longer permitted to perform this action. Please try refreshing the page.".to_string(),
+                        r#type: Some(ToastTypes::Error),
+                    }
+                },
+            )),
+            headers: None,
+        }
+    }
 }
 
 impl<'a> Responder<'a, 'static> for ApiResponse {

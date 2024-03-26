@@ -48,15 +48,23 @@
                                     <div style="--_delay: 500ms" class="hidden" data-loading-class-remove="hidden" data-loading-class="skeleton fade"></div>
                                 </div>
                             {{else}}
-                                <div hx-target-error="#section-of-communities" data-loading-delay="100"  id="section-of-communities" class="discover-grid" hx-swap="outerHTML" hx-trigger="revealed" hx-get="/discover/api?offset={{list_query.offset}}">
-                                    <div style="--_delay: 0ms" class="hidden" data-loading-class-remove="hidden" data-loading-class="skeleton fade"></div>
-                                    <div style="--_delay: 250ms" class="hidden" data-loading-class-remove="hidden" data-loading-class="skeleton fade"></div>
-                                    <div style="--_delay: 500ms" class="hidden" data-loading-class-remove="hidden" data-loading-class="skeleton fade"></div>
-                                </div>
+                                {{#if list_query.offset}}
+                                    <div hx-target-error="#section-of-communities" data-loading-delay="100"  id="section-of-communities" class="discover-grid" hx-swap="outerHTML" hx-trigger="revealed" hx-get="/discover/api?offset={{list_query.offset}}">
+                                        <div style="--_delay: 0ms" class="hidden" data-loading-class-remove="hidden" data-loading-class="skeleton fade"></div>
+                                        <div style="--_delay: 250ms" class="hidden" data-loading-class-remove="hidden" data-loading-class="skeleton fade"></div>
+                                        <div style="--_delay: 500ms" class="hidden" data-loading-class-remove="hidden" data-loading-class="skeleton fade"></div>
+                                    </div>
+                                {{else}}
+                                    <div hx-target-error="#section-of-communities" data-loading-delay="100"  id="section-of-communities" class="discover-grid" hx-swap="outerHTML" hx-trigger="revealed" hx-get="/discover/api">
+                                        <div style="--_delay: 0ms" class="hidden" data-loading-class-remove="hidden" data-loading-class="skeleton fade"></div>
+                                        <div style="--_delay: 250ms" class="hidden" data-loading-class-remove="hidden" data-loading-class="skeleton fade"></div>
+                                        <div style="--_delay: 500ms" class="hidden" data-loading-class-remove="hidden" data-loading-class="skeleton fade"></div>
+                                    </div>
+                                    {{/if}}
+                                {{/if}}
                             {{/if}}
                         {{/if}}
                     {{/if}}
-                {{/if}}
             {{/if}}
         {{/if}}
     {{else}}

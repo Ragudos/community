@@ -1,5 +1,6 @@
 use rocket::get;
 use rocket::http::CookieJar;
+use rocket::http::Header;
 use rocket::http::Status;
 use rocket_db_pools::Connection;
 use rocket_dyn_templates::context;
@@ -12,9 +13,8 @@ use crate::models::seo::metadata::SeoMetadata;
 use crate::models::users::preferences::Theme;
 use crate::models::users::schema::UserJWT;
 use crate::responders::ApiResponse;
+use crate::responders::HeaderCount;
 
-/// TODO: Community Preview here with community's uid, owner's uid, and whether the user viewing this
-/// page is the owner or member of the community or not.
 #[get("/<community_id>/about?<includeheader>")]
 pub async fn page<'r>(
     mut db: Connection<DbConn>,
@@ -35,6 +35,8 @@ pub async fn page<'r>(
                 .theme(theme)
                 .title(&display_name)
                 .finalize();
+            let headers = Header::new("Cache-Control", "max-age=0, private, must-revalidate");
+            let headers2 = Header::new("X-Frame-Options", "deny");
 
             Ok(ApiResponse::Render {
                 status: Status::Ok,
@@ -42,7 +44,7 @@ pub async fn page<'r>(
                     "pages/community/about",
                     context! { metadata, user, is_boosted, includeheader, community_id, current_page: "about", community },
                 )),
-                headers: None,
+                headers: Some(HeaderCount::Many(vec![headers, headers2])),
             })
         }
         None => {

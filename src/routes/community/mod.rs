@@ -1,5 +1,6 @@
 use rocket::get;
 use rocket::http::CookieJar;
+use rocket::http::Header;
 use rocket::http::Status;
 use rocket::response::Redirect;
 use rocket_db_pools::Connection;
@@ -16,6 +17,7 @@ use crate::models::seo::metadata::SeoMetadata;
 use crate::models::users::preferences::Theme;
 use crate::models::users::schema::UserJWT;
 use crate::responders::ApiResponse;
+use crate::responders::HeaderCount;
 use crate::routes::auth::login;
 
 pub mod about;
@@ -37,9 +39,12 @@ pub async fn page<'r>(
 ) -> Result<ApiResponse, ApiResponse> {
     let IsBoosted(is_boosted) = is_boosted;
     let theme = Theme::from_cookie_jar(cookie_jar);
-    let metadata = SeoMetadata::build().theme(theme).finalize();
     let Some(community_preview) = CommunityPreview::get(&mut db, &community_id, &user._id).await?
     else {
+        let metadata = SeoMetadata::build()
+            .theme(theme)
+            .title("404 Not Found")
+            .finalize();
         return Ok(ApiResponse::Render {
             status: Status::NotFound,
             template: Some(Template::render(
@@ -58,13 +63,21 @@ pub async fn page<'r>(
         ))));
     }
 
+    let display_name = community_preview.display_name.clone();
+    let metadata = SeoMetadata::build()
+        .theme(theme)
+        .title(&display_name)
+        .finalize();
+    let headers = Header::new("Cache-Control", "max-age=0, private, must-revalidate");
+    let headers2 = Header::new("X-Frame-Options", "deny");
+
     Ok(ApiResponse::Render {
         status: Status::Ok,
         template: Some(Template::render(
             "pages/community",
             context! { includeheader, metadata, user, is_boosted, list_query, shouldboost, community_id, current_page: "community", community: community_preview },
         )),
-        headers: None,
+        headers: Some(HeaderCount::Many(vec![headers, headers2])),
     })
 }
 

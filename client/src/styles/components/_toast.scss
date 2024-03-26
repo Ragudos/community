@@ -31,13 +31,17 @@
     }
 
     .toaster[data-type="error"] {
-        background-color: hsl(var(--destructive) / var(--_background-opacity, 0.87));
+        background-color: hsl(
+            var(--destructive) / var(--_background-opacity, 0.87)
+        );
         color: hsl(var(--destructive-foreground));
         @include layered-shadow(hsl(var(--destructive), 0.075), 2);
     }
 
     .toaster[data-type="warning"] {
-        background-color: hsl(var(--warning) / var(--_background-opacity, 0.87));
+        background-color: hsl(
+            var(--warning) / var(--_background-opacity, 0.87)
+        );
         color: hsl(var(--warning-foreground));
         @include layered-shadow(hsl(var(--warning), 0.075), 2);
     }

@@ -18,7 +18,7 @@ export function initDialog() {
 
         target.showModal();
     };
-    window.closeDialog = function(el: HTMLButtonElement) {
+    window.closeDialog = function (el: HTMLButtonElement) {
         const targetId = el.getAttribute("aria-controls"),
             target = document.getElementById(targetId);
 
@@ -27,7 +27,7 @@ export function initDialog() {
         }
 
         target.close();
-    }
+    };
 }
 
 function onDialogClose(

@@ -14,6 +14,9 @@ impl CommunityPreview {
             r#"
                 SELECT
                 _id AS community_id,
+                display_name,
+                display_image,
+                is_private,
                 owner_id,
                 is_viewer_a_member
                 FROM communities

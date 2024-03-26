@@ -7,6 +7,7 @@ use crate::{
 };
 
 pub mod join;
+pub mod rename;
 pub mod settings;
 
 #[get("/<_..>", rank = 2)]

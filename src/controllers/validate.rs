@@ -17,6 +17,14 @@ pub fn validate_password_with_confirmation<'v>(
     Ok(())
 }
 
+pub fn validate_positive_integer<'v>(integer: &i64) -> Result<'v, ()> {
+    if integer.is_negative() {
+        return Err(Error::validation("Integer cannot be negative."))?;
+    }
+
+    Ok(())
+}
+
 pub fn validate_ascii_text<'v>(display_name: &str) -> Result<'v, ()> {
     if !display_name
         .chars()

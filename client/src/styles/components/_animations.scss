@@ -2,6 +2,10 @@
     animation: spin 1s linear forwards infinite;
 }
 
+.scale-up {
+    animation: scale-up var(--transition-duration, 250ms) ease-out forwards;
+}
+
 @keyframes spin {
     to {
         transform: rotate(360deg);
@@ -20,5 +24,15 @@
 @keyframes shimmer {
     to {
         transform: translateX(100%);
+    }
+}
+
+@keyframes scale-up {
+    from {
+        transform: scale(0);
+    }
+
+    to {
+        transform: scale(1);
     }
 }

@@ -56,6 +56,16 @@ export class InputWithCounter extends HTMLElement {
 
             this.input = nodes[0] as HTMLInputElement | HTMLTextAreaElement;
 
+            const counter = this.shadowRoot.querySelector(".counter");
+
+            if (!counter) {
+                throw new Error("InputWithCounter: Counter element not found.");
+            }
+
+            counter.textContent = this.input.defaultValue
+                ? this.input.defaultValue.length.toString()
+                : "0";
+
             const eventName = "input";
             const inputFn = (kbEvt: KeyboardEvent) => {
                 if (this.input.value.length > this.maxCount) {
@@ -99,13 +109,5 @@ export class InputWithCounter extends HTMLElement {
         }
 
         return parseInt(maxCount);
-    }
-
-    static get observedAttributes() {
-        return ["value"];
-    }
-
-    attrbuteChangedCallback(name: string, oldValue: any, newValue: any) {
-        console.log(name, oldValue, newValue);
     }
 }

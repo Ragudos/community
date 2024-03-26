@@ -113,6 +113,45 @@ impl CommunityAbout {
 }
 
 impl Community {
+    pub async fn update_name(
+        tx: &mut Transaction<'_, Postgres>,
+        community_id: &i64,
+        new_name: &str,
+    ) -> Result<(), sqlx::Error> {
+        sqlx::query!(
+            r#"
+                UPDATE communities
+                SET display_name = $1
+                WHERE _id = $2
+            "#,
+            new_name,
+            community_id
+        )
+        .execute(&mut **tx)
+        .await?;
+
+        Ok(())
+    }
+
+    pub async fn is_user_owner(
+        db: &mut Connection<DbConn>,
+        community_id: &i64,
+        user_id: &i64,
+    ) -> Result<Option<bool>, sqlx::Error> {
+        Ok(sqlx::query!(
+            r#"
+                    SELECT
+                    owner_id
+                    FROM communities
+                    WHERE _id = $1
+                "#,
+            community_id
+        )
+        .fetch_optional(&mut ***db)
+        .await?
+        .map(|t| &t.owner_id == user_id))
+    }
+
     pub async fn is_private(
         db: &mut Connection<DbConn>,
         community_id: &i64,

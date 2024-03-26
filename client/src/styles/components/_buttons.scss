@@ -2,7 +2,8 @@ button,
 input,
 textarea,
 select,
-a {
+a,
+.dropdown summary {
     border-radius: calc(var(--radius) / 4);
     color: hsl(var(--text) / var(--_text-opacity, 1));
 
@@ -18,10 +19,17 @@ a {
 }
 
 button,
-input,
-textarea,
 a {
     background-color: transparent;
+}
+
+input,
+textarea {
+    background-color: hsl(var(--text) / 0.075);
+
+    &:focus-visible {
+        background-color: transparent;
+    }
 }
 
 select {
@@ -30,9 +38,10 @@ select {
 
 input,
 textarea,
-select {
+select,
+.dropdown summary {
     border: 1px solid;
-    border-color: hsl(var(--border) / var(--_border-opacity, 0.75));
+    border-color: hsl(var(--border) / var(--_border-opacity, 0.87));
 
     padding: 0.5rem 0.75rem;
 
@@ -46,19 +55,19 @@ a {
 }
 
 button,
-input[type=submit] {
-    padding: 0.25rem 1rem;
+input[type="submit"],
+.dropdown summary {
+    padding: 0.5rem 1rem;
 }
 
 button,
 input[type="submit"],
-a {
+a,
+.dropdown summary {
     @include flex-center(inline-flex);
 
-    min-width: 7.5ch;
-    min-height: 5ch;
-
-    font-size: 0.875rem;
+    min-width: 7ch;
+    min-height: 3.5ch;
 
     will-change: background-color, transform;
     transition-property: background-color, transform;
@@ -79,7 +88,31 @@ a {
     }
 }
 
-.icon {
+button,
+input,
+a,
+textarea {
+    &:disabled {
+        --_background-opacity: 1 !important;
+        cursor: not-allowed !important;
+        opacity: 0.5 !important;
+    }
+}
+
+.btn {
+    background-color: hsl(var(--text) / var(--_background-opacity, 0.075));
+
+    &:hover {
+        --_background-opacity: 0.175;
+    }
+
+    &:disabled {
+        --_background-opacity: 0.075 !important;
+    }
+}
+
+.icon,
+.dropdown summary.icon {
     min-width: auto;
     min-height: auto;
     width: $icon;
@@ -92,7 +125,8 @@ a {
     overflow: hidden;
 }
 
-.circle {
+.circle,
+.dropdown summary.circle {
     min-width: auto;
     min-height: auto;
     padding: 0;

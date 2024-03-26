@@ -1,7 +1,9 @@
 use rocket::get;
 use rocket::http::CookieJar;
+use rocket::http::Header;
 use rocket::http::Status;
 use rocket::response::Redirect;
+use rocket_csrf_token::CsrfToken;
 use rocket_db_pools::Connection;
 use rocket_dyn_templates::context;
 use rocket_dyn_templates::Template;
@@ -14,6 +16,7 @@ use crate::models::seo::metadata::SeoMetadata;
 use crate::models::users::preferences::Theme;
 use crate::models::users::schema::UserJWT;
 use crate::responders::ApiResponse;
+use crate::responders::HeaderCount;
 use crate::routes::community::about;
 
 /// TODO: Community Preview here with community's uid, owner's uid, and whether the user viewing this
@@ -26,6 +29,7 @@ pub async fn page<'r>(
     is_boosted: IsBoosted,
     includeheader: Option<bool>,
     community_id: i64,
+    csrf_token: CsrfToken,
 ) -> Result<ApiResponse, ApiResponse> {
     let IsBoosted(is_boosted) = is_boosted;
     let theme = Theme::from_cookie_jar(cookie_jar);
@@ -53,12 +57,25 @@ pub async fn page<'r>(
         ))));
     }
 
+    let authenticity_token = csrf_token.authenticity_token()?;
+    let headers = Header::new("Cache-Control", "max-age=0, private, must-revalidate");
+    let headers2 = Header::new("X-Frame-Options", "deny");
+
     Ok(ApiResponse::Render {
         status: Status::Ok,
         template: Some(Template::render(
             "pages/community/settings",
-            context! { metadata, user, is_boosted, includeheader, community_id, current_page: "settings", community: community_preview },
+            context! {
+                metadata,
+                user,
+                is_boosted,
+                includeheader,
+                community_id,
+                current_page: "settings",
+                community: community_preview,
+                authenticity_token
+            },
         )),
-        headers: None,
+        headers: Some(HeaderCount::Many(vec![headers, headers2])),
     })
 }

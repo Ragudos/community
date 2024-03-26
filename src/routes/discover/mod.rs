@@ -1,5 +1,7 @@
 use rocket::get;
 use rocket::http::CookieJar;
+use rocket::http::Header;
+use rocket::http::Status;
 use rocket::response::Redirect;
 use rocket_dyn_templates::context;
 use rocket_dyn_templates::Template;
@@ -11,6 +13,7 @@ use crate::models::seo::metadata::SeoMetadata;
 use crate::models::users::preferences::Theme;
 use crate::models::users::schema::UserJWT;
 use crate::responders::ApiResponse;
+use crate::responders::HeaderCount;
 use crate::routes::auth::login;
 
 pub mod api;
@@ -25,18 +28,26 @@ pub fn page<'r>(
     is_boosted: IsBoosted,
     isfromauth: Option<bool>,
     list_query: Option<ListQuery<'r>>,
-) -> Template {
+) -> ApiResponse {
     let IsBoosted(is_boosted) = is_boosted;
     let theme = Theme::from_cookie_jar(cookie_jar);
     let metadata = SeoMetadata::build()
         .theme(theme)
         .title("Discover Communities")
         .finalize();
+    let headers = Header::new("Cache-Control", "max-age=0, private, must-revalidate");
+    let headers2 = Header::new("X-Frame-Options", "deny");
 
-    Template::render(
-        "pages/discover",
-        context! { metadata, user, is_boosted, isfromauth, list_query },
-    )
+    ApiResponse::Render {
+        status: Status::Ok,
+        template: Some(
+            Template::render(
+                "pages/discover",
+                context! { metadata, user, is_boosted, isfromauth, list_query },
+            )
+        ),
+        headers: Some(HeaderCount::Many(vec![headers, headers2]))
+    }
 }
 
 #[get("/<_..>", rank = 3)]
