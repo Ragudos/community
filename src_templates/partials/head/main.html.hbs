@@ -5,18 +5,18 @@
 <meta name="title" content="{{ metadata.title }}" />
 <meta name="description" content="{{ metadata.description }}" />
 {{#unless metadata.open_graph}}
-    <meta name="og:title" content="{{metadata.title}}" />
-    <meta name="og:description" content="{{metdata.description}}" />
+<meta name="og:title" content="{{metadata.title}}" />
+<meta name="og:description" content="{{metdata.description}}" />
 {{else}}
-    <meta name="og:title" content="{{metadata.open_graph.title}}" />
-    <meta name="og:title" content="{{metadata.open_graph.description}}" />
-    {{#if metadata.open_graph.image}}
-        <meta name="og:image" content="{{metadata.open_graph.image.url}}" />
-        <meta name="og:image:secure_url" content="{{metadata.open_graph.image.url}}" />
-        <meta name="og:image:width" content="{{metadata.open_graph.image.width}}" />
-        <meta name="og:image:height" content="{{metadata.open_graph.image.height}}" />
-        <meta name="og:image:alt" content="{{metadata.open_graph.image.alt}}" />
-    {{/if}}
+<meta name="og:title" content="{{metadata.open_graph.title}}" />
+<meta name="og:title" content="{{metadata.open_graph.description}}" />
+{{#if metadata.open_graph.image}}
+<meta name="og:image" content="{{metadata.open_graph.image.url}}" />
+<meta name="og:image:secure_url" content="{{metadata.open_graph.image.url}}" />
+<meta name="og:image:width" content="{{metadata.open_graph.image.width}}" />
+<meta name="og:image:height" content="{{metadata.open_graph.image.height}}" />
+<meta name="og:image:alt" content="{{metadata.open_graph.image.alt}}" />
+{{/if}}
 {{/unless}}
 <meta property="og:site_name" content="{{ metadata.site_name }}" />
 <meta name="environment" content="{{ metadata.env }}" />
@@ -32,7 +32,15 @@
 <script src="/assets/scripts/htmx-response-target.min.js"></script>
 <script src="/assets/scripts/htmx-remove-me.min.js"></script>
 <script src="/build/index.min.js" type="module"></script>
-<style>[data-loading]{display:none}.hidden{display:none !important}</style>
+<style>
+    [data-loading] {
+        display: none
+    }
+
+    .hidden {
+        display: none !important
+    }
+</style>
 {{#unless (eq (len stylesheets) 0)}}
 {{#each stylesheets as |stylesheet|}}
 <link rel="stylesheet" href="{{stylesheet}}">

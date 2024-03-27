@@ -15,45 +15,73 @@
 
     .toaster {
         padding: 1rem;
+
         border: 1px solid;
+
         display: flex;
         gap: 1rem;
         align-items: center;
+
         width: min(100%, 25rem);
-        backdrop-filter: blur(1rem);
+
         border-radius: $radius;
-        border-color: hsl(var(--border) / var(--_border-opacity, 0.87));
-        background-color: hsl(
+        border-color: hsl(var(--border) / var(--_border-opacity, 0.5));
+        
+        position: relative;
+
+        --_background: hsl(
             var(--background) / var(--_background-opacity, 0.87)
         );
         color: hsl(var(--text) / var(--_text-opacity, 1));
+
         @include layered-shadow(hsl(var(--text) / 0.075), 2);
+
+        &::before {
+            content: "";
+
+            position: absolute;
+
+            inset: 0;
+            
+            border-radius: inherit;
+
+            background-color: var(--_background);
+
+            backdrop-filter: blur(1rem);
+
+            z-index: 1;
+        }
+
+        * {
+            position: relative;
+            z-index: 2;
+        }
     }
 
     .toaster[data-type="error"] {
-        background-color: hsl(
-            var(--destructive) / var(--_background-opacity, 0.87)
+        --_background: hsl(
+            var(--destructive) / var(--_background-opacity, 0.5)
         );
         color: hsl(var(--destructive-foreground));
         @include layered-shadow(hsl(var(--destructive), 0.075), 2);
     }
 
     .toaster[data-type="warning"] {
-        background-color: hsl(
-            var(--warning) / var(--_background-opacity, 0.87)
+        --_background: hsl(
+            var(--warning) / var(--_background-opacity, 0.5)
         );
         color: hsl(var(--warning-foreground));
         @include layered-shadow(hsl(var(--warning), 0.075), 2);
     }
 
     .toaster[data-type="info"] {
-        background-color: hsl(var(--info), var(--_background-opacity, 0.87));
+        --_background: hsl(var(--info) / var(--_background-opacity, 0.5));
         color: hsl(var(--info-foreground));
         @include layered-shadow(hsl(var(--warning), 0.075), 2);
     }
 
     .toaster[data-type="success"] {
-        background-color: hsl(var(--success), var(--_background-opacity, 0.87));
+        --_background: hsl(var(--success) / var(--_background-opacity, 0.5));
         color: hsl(var(--success-foreground));
         @include layered-shadow(hsl(var(--success), 0.075), 2);
     }

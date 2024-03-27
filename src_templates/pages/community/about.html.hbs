@@ -1,17 +1,22 @@
 {{#if is_boosted}}
-    <head>
-        {{> partials/head/main}}
-    </head>
-    {{#if includeheader}}
-        <aside class="fade-me-in fade-me-out" id="community-header" hx-swap-oob="true">
-            {{> partials/headers/community}}
-        </aside>
-    {{else}}
-        {{> partials/headers/community_content oobswap=true}}
-    {{/if}}
-    {{> partials/community/about}}
+
+<head>
+    {{> partials/head/main}}
+    <meta name="robots" content="follow, index" />
+</head>
+{{#if includeheader}}
+<aside class="fade-me-in fade-me-out" id="community-header" hx-swap-oob="true">
+    {{> partials/headers/community}}
+</aside>
 {{else}}
-    {{#> layouts/community}}
-        {{> partials/community/about}}
-    {{/layouts/community}}
+{{> partials/headers/community_content oobswap=true}}
+{{/if}}
+{{> partials/community/about}}
+{{else}}
+{{#> layouts/community}}
+{{#*inline "more_head_content"}}
+<meta name="robots" content="follow, index" />
+{{/inline}}
+{{> partials/community/about}}
+{{/layouts/community}}
 {{/if}}

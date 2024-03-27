@@ -48,7 +48,7 @@ pub fn rocket_from_config(figment: Figment) -> Rocket<Build> {
         .attach(Fairing::new(
             CsrfConfig::default()
                 .with_cookie_len(32)
-                .with_cookie_name("CSRF-TOKEN")
+                .with_cookie_name("CSRF-TOKEN"),
         ))
         .attach(db::stage())
         .attach(handlebars::register())
@@ -91,16 +91,18 @@ pub fn rocket_from_config(figment: Figment) -> Rocket<Build> {
                 routes::community::page,
                 routes::community::about::page,
                 routes::community::members::page,
-                routes::community::settings::page
+                routes::community::settings::page,
+                routes::community::delete_community::page,
+                routes::community::delete_community::unauthorized
             ],
         )
         .mount(
             "/community/api",
             rocket_routes![
                 routes::community::api::logged_out,
-                routes::community::api::malformed_uri,
                 routes::community::api::rename::post,
-                routes::community::api::rename::post_unauthorized
+                routes::community::api::rename::post_unauthorized,
+                routes::community::api::request_deletion::post,
             ],
         )
         .mount(

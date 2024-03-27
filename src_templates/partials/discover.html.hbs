@@ -1,11 +1,11 @@
 {{#if (eq (len communities) 0)}}
-    <div class="discover-grid" style="display: initial;" data-loading-states id="section-of-communities">
-        0 community found.
-    </div>
+<div class="discover-grid" style="display: initial;" data-loading-states id="section-of-communities">
+    0 community found.
+</div>
 {{else}}
-    <div class="discover-grid" data-loading-states id="section-of-communities">
-        {{#each communities}}
-            {{> partials/discover/preview_card community=this}}
-        {{/each}}
-    </div>
+<div class="discover-grid" data-loading-states id="section-of-communities">
+    {{#each communities}}
+    {{> partials/discover/preview_card community=this}}
+    {{/each}}
+</div>
 {{/if}}

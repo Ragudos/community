@@ -1,20 +1,52 @@
 {{#if is_boosted}}
-    <head>
-        {{> partials/head/main}}
-        {{> partials/head/community}}
-    </head>
-    {{#if includeheader}}
-        <aside class="fade-me-in fade-me-out" id="community-header" hx-swap-oob="true">
-            {{> partials/headers/community}}
-        </aside>
-    {{else}}
-        {{> partials/headers/community_content oobswap=true}}
-    {{/if}}
-    {{> partials/community/settings}}
+
+<head>
+    {{> partials/head/main}}
+    {{> partials/head/community}}
+    <script>
+        function renameScript(el) {
+            if (document.getElementById("rename-form").classList.contains("htmx-request")) {
+                return;
+            }
+
+            if (el.value != document.getElementById("default-rename-value").value) {
+                document.getElementById("rename-submit").removeAttribute("disabled");
+            } else {
+                document.getElementById("rename-submit").setAttribute("disabled", "true");
+            }
+        }
+    </script>
+</head>
+{{#if includemainheader}}
+    <header class="fade-me-in fade-me-out" id="header" hx-swap-oob="true">
+        {{> partials/headers/logged_in}}
+    </header>
+{{/if}}
+{{#if includeheader}}
+<aside class="fade-me-in fade-me-out" id="community-header" hx-swap-oob="true">
+    {{> partials/headers/community}}
+</aside>
 {{else}}
-    {{#> layouts/community}}
-        {{#*inline "more_head_content"}}
-        {{/inline}}
-        {{> partials/community/settings}}
-    {{/layouts/community}}
+{{> partials/headers/community_content oobswap=true}}
+{{/if}}
+{{> partials/community/settings}}
+{{else}}
+{{#> layouts/community}}
+{{#*inline "more_head_content"}}
+<script>
+    function renameScript(el) {
+        if (document.getElementById("rename-form").classList.contains("htmx-request")) {
+            return;
+        }
+
+        if (el.value != document.getElementById("default-rename-value").value) {
+            document.getElementById("rename-submit").removeAttribute("disabled");
+        } else {
+            document.getElementById("rename-submit").setAttribute("disabled", "true");
+        }
+    }
+</script>
+{{/inline}}
+{{> partials/community/settings}}
+{{/layouts/community}}
 {{/if}}

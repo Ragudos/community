@@ -245,19 +245,15 @@ select {
 
 a,
 button,
-input[type="submit"] {
+input[type="submit"],
+.dropdown summary {
     -webkit-tap-highlight-color: transparent;
     line-height: normal;
     overflow: visible;
 
     -webkit-appearance: button;
     appearance: button;
-    font-weight: 600;
-
-    &::-moz-focus-inner {
-        border: 0;
-        padding: 0;
-    }
+    font-weight: 500;
 }
 
 input {

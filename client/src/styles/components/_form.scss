@@ -12,6 +12,10 @@
 
 .input-group {
     display: flex;
-    flex-direction: column-reverse;
-    gap: calc($general-gap / 2);
+    flex-direction: column;
+
+    input,
+    textarea {
+        margin-top: 0.5rem;
+    }
 }

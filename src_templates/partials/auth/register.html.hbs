@@ -1,19 +1,27 @@
 <span class="title-sm">Create your account.</span>
-<form data-loading-delay="50" data-loading-aria-busy hx-target="#form-container" class="auth-form" hx-target-error="#nothing" hx-sync="this, a" hx-post="/auth/api/register" hx-trigger="submit" method="post" action="/auth/api/register">
+<form data-loading-delay="50" data-loading-aria-busy hx-target="#form-container" class="auth-form"
+    hx-target-error="#nothing" hx-sync="this, a" hx-post="/auth/api/register" hx-trigger="submit" method="post"
+    action="/auth/api/register">
     <div class="input-group">
-        <span class="error" id="username-error"></span>
-        <input placeholder="johndoe" type="text" name="username" id="username" pattern="[a-zA-z0-9À-ž\s]+" autocomplete="name" spellcheck="false" autocapitalize="none" maxlength="60" required aria-errormessage="username-error" />
         <label class="label" for="username">Username</label>
+        <input placeholder="johndoe" type="text" name="username" id="username" pattern="[a-zA-z0-9À-ž\s]+"
+            autocomplete="name" spellcheck="false" autocapitalize="none" maxlength="60" required
+            aria-errormessage="username-error" />
+        <span id="username-error"></span>
     </div>
     <div class="input-group">
-        <span class="error" id="password-error"></span>
-        <input placeholder="********" type="password" name="password" id="password" spellcheck="false" autocapitalize="none" autocomplete="list" minlength="8" maxlength="64" required aria-errormessage="password-error" />
         <label class="label" for="password">Password</label>
+        <input placeholder="********" type="password" name="password" id="password" spellcheck="false"
+            autocapitalize="none" autocomplete="list" minlength="8" maxlength="64" required
+            aria-errormessage="password-error" />
+        <span id="password-error"></span>
     </div>
     <div class="input-group">
-        <span class="error" id="confirm-password-error"></span>
-        <input placeholder="********" type="password" name="confirm_password" id="confirm-password" spellcheck="false" autocapitalize="none" autocomplete="current-password" minlength="8" maxlength="64" required aria-errormessage="confirm-password-error" />
         <label class="label" for="confirm-password">Confirm Password</label>
+        <input placeholder="********" type="password" name="confirm_password" id="confirm-password" spellcheck="false"
+            autocapitalize="none" autocomplete="current-password" minlength="8" maxlength="64" required
+            aria-errormessage="confirm-password-error" />
+        <span id="confirm-password-error"></span>
     </div>
     <input aria-hidden="true" name="honeypot" value="" hidden />
     <button data-loading-disable type="submit" class="primary">
@@ -24,6 +32,7 @@
 <div style="text-align: center;">
     <small>
         Already have an account?
-        <a hx-swap="innerHTML swap:250ms" class="link" hx-target-error="body" hx-target="#form-container" href="/auth/login">Sign in</a>
+        <a hx-swap="innerHTML swap:250ms" class="link" hx-target-error="body" hx-target="#form-container"
+            href="/auth/login">Sign in</a>
     </small>
 </div>

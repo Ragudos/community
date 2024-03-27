@@ -1,17 +1,23 @@
 <span class="title-sm">Sign in to your account.</span>
-<form hx-swap="innerHTML swap:250ms" hx-replace-url="/discover" data-loading-delay="50" data-loading-aria-busy hx-target="body" class="auth-form" data-loading-path="/auth/api/login" hx-target-error="#nothing" hx-sync="this, a" hx-post="/auth/api/login" hx-trigger="submit" method="post" action="/auth/api/login">
+<form hx-swap="innerHTML" hx-replace-url="/discover" data-loading-delay="50" data-loading-aria-busy
+    hx-target="body" class="auth-form" data-loading-path="/auth/api/login" hx-target-error="#nothing" hx-sync="this, a"
+    hx-post="/auth/api/login" hx-trigger="submit" method="post" action="/auth/api/login">
     <div class="input-group">
-        <span class="error" id="username-error"></span>
-        <input placeholder="johndoe" type="text" name="username" id="username" pattern="[a-zA-z0-9À-ž\s]+" autocomplete="username" spellcheck="false" autocapitalize="none" maxlength="60"  required aria-errormessage="username-error" />
         <label class="label" for="username">Username</label>
+        <input placeholder="johndoe" type="text" name="username" id="username" pattern="[a-zA-z0-9À-ž\s]+"
+            autocomplete="username" spellcheck="false" autocapitalize="none" maxlength="60" required
+            aria-errormessage="username-error" />
+        <span id="username-error"></span>
     </div>
     <div class="input-group">
-        <span class="error" id="password-error"></span>
-        <input placeholder="********" type="password" name="password" id="password" spellcheck="false" autocapitalize="none" autocomplete="list" minlength="8" maxlength="64" required aria-errormessage="password-error" />
         <div style="justify-content: space-between; flex-wrap: wrap;" class="label-container">
             <label class="label" for="password">Password</label>
             <small><a class="link" hx-target-error="body" href="/auth/forgot-password">Forgot password?</a></small>
         </div>
+        <input placeholder="********" type="password" name="password" id="password" spellcheck="false"
+            autocapitalize="none" autocomplete="list" minlength="8" maxlength="64" required
+            aria-errormessage="password-error" />
+        <span id="password-error"></span>
     </div>
     <input aria-hidden="true" name="honeypot" value="" hidden />
     <button data-loading-disable type="submit" class="primary">
@@ -22,6 +28,7 @@
 <div style="text-align: center;">
     <small>
         Don't have an account?
-        <a hx-swap="innerHTML swap:250ms" class="link" hx-target-error="body" hx-target="#form-container" href="/auth/register">Sign up</a>
+        <a hx-swap="innerHTML swap:250ms" class="link" hx-target-error="body" hx-target="#form-container"
+            href="/auth/register">Sign up</a>
     </small>
 </div>

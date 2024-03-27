@@ -4,31 +4,25 @@
         <details class="dropdown">
             <summary class="circle" aria-label="A menu dropdown relevant to the user.">
                 {{#if user.display_image}}
-                    <img
-                        src="{{user.display_image}}"
-                        alt="{{user.display_name}}'s avatar"
-                        width="36"
-                        height="36"
-                        style="border-radius: 50%;"
-                    />
+                <img src="{{user.display_image}}" alt="{{user.display_name}}'s avatar" width="36" height="36"
+                    style="border-radius: 50%;" />
                 {{else}}
-                    <img
-                        src="https://placehold.co/36x36"
-                        alt="{{user.display_name}}'s avatar"
-                        width="36"
-                        height="36"
-                        style="border-radius: 50%;"
-                    />
+                <img src="https://placehold.co/36x36" alt="{{user.display_name}}'s avatar" width="36" height="36"
+                    style="border-radius: 50%;" />
                 {{/if}}
             </summary>
             <div class="dropdown-wrapper" id="user-dropdown">
                 <div>
                     <ul class="user-dropdown">
                         <li>
-                            <form hx-swap="innerHTML swap:250ms" hx-replace-url="/auth/login" hx-target="body" hx-target-error="#nothing" data-loading-path="/auth/api/login" data-loading-delay="100" hx-delete="/auth/api/logout" hx-trigger="submit" hx-sync="this, a">
+                            <form hx-swap="innerHTML swap:250ms" hx-replace-url="/auth/login" hx-target="body"
+                                hx-target-error="#nothing" data-loading-path="/auth/api/login" data-loading-delay="100"
+                                hx-delete="/auth/api/logout" hx-trigger="submit" hx-sync="this, a">
                                 <button data-loading-disable type="submit">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
                                     </svg>
                                     <span data-loading-class="hidden">Logout</span>
                                     <span data-loading-class-remove="hidden" class="hidden">
@@ -40,6 +34,6 @@
                     </ul>
                 </div>
             </div>
-        </div>
     </div>
+</div>
 </div>

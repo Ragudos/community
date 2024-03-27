@@ -7,12 +7,11 @@ use rocket_dyn_templates::{context, Template};
 use sqlx::Acquire;
 
 use crate::controllers::errors::extract_data_or_return_response;
-use crate::controllers::htmx::refresh::HtmxRefresh;
 use crate::helpers::db::DbConn;
 use crate::models::community::forms::EditDisplayName;
 use crate::models::community::schema::Community;
 use crate::models::users::schema::UserJWT;
-use crate::models::{Toast, ToastTypes};
+use crate::models::Toast;
 use crate::responders::ApiResponse;
 
 #[post("/rename", data = "<form>")]
@@ -35,10 +34,7 @@ pub async fn post<'r>(
             template: Some(Template::render(
                 "partials/toast",
                 context! {
-                    toast: Toast {
-                        message: "You are not allowed to perform this action.".to_string(),
-                        r#type: Some(ToastTypes::Error)
-                    }
+                    toast: Toast::error(Some("You are not allowed to perform this action.".to_string()))
                 },
             )),
             headers: None,
@@ -51,7 +47,17 @@ pub async fn post<'r>(
 
     tx.commit().await?;
 
-    Ok(ApiResponse::HtmxRefresh(HtmxRefresh))
+    Ok(ApiResponse::Render {
+        status: Status::Ok,
+        template: Some(Template::render(
+            "partials/community/settings/rename_success",
+            context! {
+                toast: Toast::success(Some(format!("Community name has been renamed to {}", form.display_name))),
+                new_name: form.display_name
+            },
+        )),
+        headers: None,
+    })
 }
 
 #[post("/rename", rank = 2)]

@@ -22,6 +22,7 @@ use crate::routes::auth::login;
 
 pub mod about;
 pub mod api;
+pub mod delete_community;
 pub mod members;
 pub mod settings;
 

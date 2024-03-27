@@ -27,6 +27,44 @@ pub struct Toast {
     pub r#type: Option<ToastTypes>,
 }
 
+impl Toast {
+    pub fn success(message: Option<String>) -> Self {
+        Self {
+            message: message.unwrap_or("Success".to_string()),
+            r#type: Some(ToastTypes::Success),
+        }
+    }
+
+    pub fn error(message: Option<String>) -> Self {
+        Self {
+            message: message.unwrap_or("Something went wrong".to_string()),
+            r#type: Some(ToastTypes::Error),
+        }
+    }
+
+    pub fn warning(message: String) -> Self {
+        Self {
+            message,
+            r#type: Some(ToastTypes::Warning),
+        }
+    }
+
+    pub fn info(message: String) -> Self {
+        Self {
+            message,
+            r#type: Some(ToastTypes::Info),
+        }
+    }
+
+    pub fn message(message: String) -> Self {
+        Self {
+            message,
+            r#type: None,
+        }
+    }
+}
+
+pub const REQUEST_DELETION_JWT_NAME: &str = "SensitiveAction_jwt";
 pub const JWT_NAME: &str = "Community__jwt";
 pub const HOMEPAGE_COMMUNITY_LIMIT: i64 = 12;
 pub const COMMUNITY_POST_LIMIT: i64 = 20;

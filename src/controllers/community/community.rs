@@ -113,6 +113,23 @@ impl CommunityAbout {
 }
 
 impl Community {
+    pub async fn get_name(
+        db: &mut Connection<DbConn>,
+        community_id: &i64,
+    ) -> Result<Option<String>, sqlx::Error> {
+        Ok(sqlx::query!(
+            r#"
+                SELECT display_name
+                FROM communities
+                WHERE _id = $1
+                "#,
+            community_id
+        )
+        .fetch_optional(&mut ***db)
+        .await?
+        .map(|t| t.display_name))
+    }
+
     pub async fn update_name(
         tx: &mut Transaction<'_, Postgres>,
         community_id: &i64,

@@ -1,76 +1,80 @@
 <!DOCTYPE html>
 <html lang="{{ metadata.language }}" data-theme="{{ metadata.theme }}">
-    <head>
-        {{> partials/head/main}}
-        {{#> additional_head_content}}
-        {{/additional_head_content}}
-    </head>
-    <body hx-boost="true" hx-ext="loading-states, response-targets, remove-me, head-support">
-        <noscript>
-            <div class="no-js">Please enable JavaScript for this site to fully work.</div>
-        </noscript>
-        <div id="page-load-bar"></div>
-        {{#> header}}
-            <header class="fade-me-out fade-me-in" id="header"></header>
-            <aside class="fade-me-in fade-me-out" id="community-header"></aside>
-        {{/header}}
-        <main class="fade-me-out fade-me-in">
-            {{> @partial-block}}
-        </main>
-        <ol id="toast-container" aria-label="Notifcations"></ol>
-        <!-- Used when doing OOB in error responses -->
-        <div id="nothing" hidden></div>
-        {{#if (eq metadata.env "development")}}
-            <div id="screen_size_indicator" style="position: fixed; bottom: 0; right: 0; z-index: 99999; color: white; background: black;"></div>
-            <script>!function(){let e;function n(){document.getElementById("screen_size_indicator").innerText=`${window.innerWidth}px`}window.addEventListener("resize",()=>{clearTimeout(e),e=setTimeout(n,1e3)})}();</script>
-        {{/if}}
-        <script>
-            document.addEventListener("htmx:xhr:loadstart", (evt) => {
-                const target = evt.target;
 
-                if (!(target instanceof HTMLAnchorElement)) {
-                    return;
-                }
+<head>
+    {{> partials/head/main}}
+    {{#> additional_head_content}}
+    {{/additional_head_content}}
+</head>
 
-                if (target.classList.contains("active")) {
-                    return;
-                }
+<body hx-boost="true" hx-ext="loading-states, response-targets, remove-me, head-support">
+    <noscript>
+        <div class="no-js">Please enable JavaScript for this site to fully work.</div>
+    </noscript>
+    <div id="page-load-bar"></div>
+    {{#> header}}
+    <header class="fade-me-out fade-me-in" id="header"></header>
+    <aside class="fade-me-in fade-me-out" id="community-header"></aside>
+    {{/header}}
+    <main class="fade-me-out fade-me-in">
+        {{> @partial-block}}
+    </main>
+    <ol id="toast-container" aria-label="Notifcations"></ol>
+    <!-- Used when doing OOB in error responses -->
+    <div id="nothing" hidden></div>
+    {{#if (eq metadata.env "development")}}
+    <div id="screen_size_indicator"
+        style="position: fixed; bottom: 0; right: 0; z-index: 99999; color: white; background: black;"></div>
+    <script>!function () { let e; function n() { document.getElementById("screen_size_indicator").innerText = `${window.innerWidth}px` } window.addEventListener("resize", () => { clearTimeout(e), e = setTimeout(n, 1e3) }) }();</script>
+    {{/if}}
+    <script>
+        document.addEventListener("htmx:xhr:loadstart", (evt) => {
+            const target = evt.target;
 
-                document.getElementById("page-load-bar").style.opacity = "1";
-            });
-            document.addEventListener("htmx:xhr:progress", (evt) => {
-                const target = evt.target;
+            if (!(target instanceof HTMLAnchorElement)) {
+                return;
+            }
 
-                if (!(target instanceof HTMLAnchorElement)) {
-                    return;
-                }
+            if (target.classList.contains("active")) {
+                return;
+            }
 
-                if (target.classList.contains("active")) {
-                    return;
-                }
+            document.getElementById("page-load-bar").style.opacity = "1";
+        });
+        document.addEventListener("htmx:xhr:progress", (evt) => {
+            const target = evt.target;
 
-                const progressIndicator = document.getElementById("page-load-bar");
+            if (!(target instanceof HTMLAnchorElement)) {
+                return;
+            }
 
-                if (!progressIndicator) {
-                    return;
-                }
+            if (target.classList.contains("active")) {
+                return;
+            }
 
-                const progress = evt.detail.total === 0 ? 1 : evt.detail.loaded / evt.detail.total;
+            const progressIndicator = document.getElementById("page-load-bar");
 
-                progressIndicator.style.width = `${progress * 100}%`;
-            });
-            document.addEventListener("htmx:xhr:loadend", (evt) => {
-                const target = evt.target;
+            if (!progressIndicator) {
+                return;
+            }
 
-                if (!(target instanceof HTMLAnchorElement)) {
-                    return;
-                }
+            const progress = evt.detail.total === 0 ? 1 : evt.detail.loaded / evt.detail.total;
 
-                setTimeout(() => {
-                    document.getElementById("page-load-bar").style.opacity = "0";
-                    document.getElementById("page-load-bar").style.width = "0";
-                }, 250);
-            });
-        </script>
-    </body>
+            progressIndicator.style.width = `${progress * 100}%`;
+        });
+        document.addEventListener("htmx:xhr:loadend", (evt) => {
+            const target = evt.target;
+
+            if (!(target instanceof HTMLAnchorElement)) {
+                return;
+            }
+
+            setTimeout(() => {
+                document.getElementById("page-load-bar").style.opacity = "0";
+                document.getElementById("page-load-bar").style.width = "0";
+            }, 250);
+        });
+    </script>
+</body>
+
 </html>

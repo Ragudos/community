@@ -7,4 +7,4 @@ edition = "2021"
 
 [dependencies]
 colored = "2.1.0"
-html-minifier = "5.0.0"
+minify-html = "0.15.0"

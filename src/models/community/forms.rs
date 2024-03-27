@@ -44,3 +44,10 @@ pub struct EditDisplayName {
     #[field(validate = validate_positive_integer())]
     pub community_id: i64,
 }
+
+#[derive(FromForm, Debug)]
+pub struct RequestDeletion {
+    #[field(validate = validate_positive_integer())]
+    pub community_id: i64,
+    pub authenticity_token: String,
+}

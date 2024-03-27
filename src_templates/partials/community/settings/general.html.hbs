@@ -3,14 +3,16 @@
 {{#if (eq community.owner_id user._id)}}
 <div>
     {{> partials/templates/input_with_counter}}
-    <form data-loading-aria-busy id="rename-form" class="form-rename" data-loading-path="/community/api/rename" data-loading-delay="50"
-        hx-post="/community/api/rename" hx-target-error="#nothing">
+    <input type="hidden" id="default-rename-value" value="{{community.display_name}}" />
+    <form hx-target="#nothing" data-loading-aria-busy id="rename-form" class="form-rename"
+        data-loading-path="/community/api/rename" data-loading-delay="250" hx-post="/community/api/rename"
+        hx-target-error="#nothing">
         <div class="input-group">
-            <input-with-counter data-max-count="60">
+            <input-with-counter hx-preserve="true" id="rename-input-container" data-max-count="60">
                 <label slot="label" for="community_name">Community name</label>
-                <input data-loading-disable slot="input" placeholder="The name of your community" name="community_name" id="community_name"
-                    aria-errormessage="community_name_error" value="{{community.display_name}}" maxlength="60"
-                    minlength="3" required pattern="[a-zA-z0-9À-ž\s]+" />
+                <input oninput="renameScript(this)" data-loading-disable slot="input" placeholder="The name of your community" name="community_name"
+                    id="community_name" aria-errormessage="community_name_error" value="{{community.display_name}}"
+                    maxlength="60" minlength="3" required pattern="[a-zA-z0-9À-ž\s]+" />
             </input-with-counter>
             <span id="community_name_error"></span>
         </div>
@@ -22,20 +24,6 @@
             <span data-loading>Renaming...</span>
         </button>
     </form>
-    <script>
-        const input = document.getElementById("community_name");
-        input.addEventListener("input", (evt) => {
-            if (document.getElementById("rename-form").classList.contains("htmx-request")) {
-                return;
-            }
-
-            if (input.value != input.defaultValue) {
-                document.getElementById("rename-submit").removeAttribute("disabled");
-            } else {
-                document.getElementById("rename-submit").setAttribute("disabled", "true");
-            }
-        });
-    </script>
 </div>
 {{/if}}
 <div class="subhead">
@@ -54,7 +42,8 @@
                 {{/if}}
             </div>
             <details class="dropdown">
-                <summary class="destructive" aria-label="A menu dropdown for changing the process how users join to this community.">
+                <summary class="destructive"
+                    aria-label="A menu dropdown for changing the process how users join to this community.">
                     <div>Change who can join</div>
                 </summary>
                 <div class="dropdown-wrapper" id="change-join-process-dropdown">
@@ -125,39 +114,83 @@
             </form>
         </div>
     </dialog>
-    <dialog aria-modal="true" id="delete-confirmation" class="scale-up">
-        <div>
-            <div class="overlay-header">
-                <h1 class="title-xs">Delete {{community.display_name}}</h1>
-            </div>
-            <div class="overlay-content">
+    <dialog aria-labelledby="delete-confirmation-title" aria-modal="true" id="delete-confirmation" class="scale-up">
+        <div class="overlay-header">
+            <div>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                     stroke="currentColor" class="w-6 h-6">
                     <path stroke-linecap="round" stroke-linejoin="round"
                         d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
                 </svg>
-                <p class="title-md">{{community.display_name}}</p>
+                <h1 class="title-sm" id="delete-confirmation-title">Delete {{community.display_name}}</h1>
+
+                <div style="flex: 1; display: flex; justify-content: flex-end;">
+                    <button aria-label="Close delete confirmation modal" aria-controls="delete-confirmation"
+                        onclick="closeDialog(this)" class="btn square">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
             </div>
-            <form>
-                <button type="submit" class="destructive">
-                    I want to delete this community
-                </button>
-            </form>
+        </div>
+        <div class="overlay-content">
+            <div>
+                <div id="community-delete-warning-container">
+                    <div class="warning warning__with-icon">
+                        <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                            stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+                        </svg>
+                        Unexpected bad things wil happen if you don't read this!
+                    </div>
+                    <div style="margin-top: 0.5rem;">
+                        <div class="timeline-item timeline-item__condensed">
+                            <div class="timeline-item-badge">
+                                <svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" class="fill">
+                                    <path d="M8 4a4 4 0 1 1 0 8 4 4 0 0 1 0-8Z"></path>
+                                </svg>
+                            </div>
+                            <div class="timeline-content">
+                                This will permanently delete the
+                                <strong> {{community.display_name}} </strong>
+                                community, courses, user data, posts, comments, reactions, images,
+                                and all other relevant data.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="overlay-ctrls">
+            <div>
+                <form style="width: 100%;" data-loading-aria-busy data-loading-delay="250" hx-target-error="#nothing" hx-target="body"
+                    hx-confirm="Are you sure?" hx-post="/community/api/request-deletion">
+                    <input type="hidden" name="community_id" value="{{community.community_id}}" required />
+                    <input type="hidden" name="authenticity_token" value="{{authenticity_token}}" required />
+                    <button style="width: 100%;" type="submit" class="destructive">
+                        I have read and understand these effects
+                    </button>
+                </form>
+            </div>
         </div>
     </dialog>
     {{/if}}
     {{#if (not (eq community.owner_id user._id))}}
     <dialog aria-modal="true" id="leave-confirmation" class="scale-up">
         <div>
-            <div class="overlay-header">
-                <h1 class="title-xs">Leave {{community.display_name}}</h1>
-            </div>
-            <div class="overlay-content">
+            <div class="overlay-title">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                     stroke="currentColor" class="w-6 h-6">
                     <path stroke-linecap="round" stroke-linejoin="round"
                         d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
                 </svg>
+                <h1 class="title-md">Leave {{community.display_name}}</h1>
+            </div>
+            <div class="overlay-content">
+
                 <p class="title-md">{{community.display_name}}</p>
             </div>
             <form>

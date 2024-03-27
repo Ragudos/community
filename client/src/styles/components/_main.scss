@@ -31,6 +31,7 @@
     --info-foreground: #{color_in_theme("info-foreground")};
     --success: #{color_in_theme("success")};
     --success-foreground: #{color_in_theme("success-foreground")};
+    --muted: #{color_in_theme("muted")};
 }
 
 body {
@@ -64,6 +65,7 @@ main {
 
 .error {
     color: red;
+    margin-top: 0.5rem;
 }
 
 .background {
@@ -101,4 +103,36 @@ main {
 
 .fade-me-in {
     opacity: 1;
+}
+
+.warning {
+    padding: 1rem;
+
+    background-color: hsl(var(--warning) / var(--_background-opacity, 0.5));
+    color: hsl(var(--warning-foreground) /var(--_text-opacity, 1));
+
+    border: 1px solid hsl(var(--warning));
+    border-radius: calc(var(--radius) / 2);
+}
+
+.warning__with-icon {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    svg.outline {
+        stroke: hsl(var(--warning) / var(--_stroke-opacity, 1));
+    }
+
+    svg.fill {
+        fill: hsl(var(--warning) / var(--_fill-opacity, 1));
+    }
+}
+
+.p-0 {
+    padding: 0 !important; 
+}
+
+svg.fill {
+    fill: currentColor;
 }

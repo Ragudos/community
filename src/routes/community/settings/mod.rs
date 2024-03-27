@@ -19,31 +19,31 @@ use crate::responders::ApiResponse;
 use crate::responders::HeaderCount;
 use crate::routes::community::about;
 
-/// TODO: Community Preview here with community's uid, owner's uid, and whether the user viewing this
-/// page is the owner or member of the community or not.
-#[get("/<community_id>/settings?<includeheader>")]
+#[get("/<community_id>/settings?<includeheader>&<includemainheader>")]
 pub async fn page<'r>(
     mut db: Connection<DbConn>,
     cookie_jar: &CookieJar<'r>,
     user: UserJWT,
     is_boosted: IsBoosted,
     includeheader: Option<bool>,
+    includemainheader: Option<bool>,
     community_id: i64,
     csrf_token: CsrfToken,
 ) -> Result<ApiResponse, ApiResponse> {
     let IsBoosted(is_boosted) = is_boosted;
     let theme = Theme::from_cookie_jar(cookie_jar);
-    let metadata = SeoMetadata::build()
-        .theme(theme)
-        .title("General")
-        .finalize();
+    
     let Some(community_preview) = CommunityPreview::get(&mut db, &community_id, &user._id).await?
     else {
+        let metadata = SeoMetadata::build()
+            .theme(theme.clone())
+            .title("404 Not Found")
+            .finalize();
         return Ok(ApiResponse::Render {
             status: Status::NotFound,
             template: Some(Template::render(
                 "pages/community/not_found",
-                context! { metadata, user, is_boosted, includeheader, community_id },
+                context! { metadata, user, is_boosted, includeheader, includemainheader, community_id },
             )),
             headers: None,
         });
@@ -57,6 +57,10 @@ pub async fn page<'r>(
         ))));
     }
 
+    let metadata = SeoMetadata::build()
+        .theme(theme)
+        .title("General")
+        .finalize();
     let authenticity_token = csrf_token.authenticity_token()?;
     let headers = Header::new("Cache-Control", "max-age=0, private, must-revalidate");
     let headers2 = Header::new("X-Frame-Options", "deny");
@@ -73,7 +77,8 @@ pub async fn page<'r>(
                 community_id,
                 current_page: "settings",
                 community: community_preview,
-                authenticity_token
+                authenticity_token,
+                includemainheader
             },
         )),
         headers: Some(HeaderCount::Many(vec![headers, headers2])),

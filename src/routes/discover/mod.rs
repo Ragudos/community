@@ -40,13 +40,11 @@ pub fn page<'r>(
 
     ApiResponse::Render {
         status: Status::Ok,
-        template: Some(
-            Template::render(
-                "pages/discover",
-                context! { metadata, user, is_boosted, isfromauth, list_query },
-            )
-        ),
-        headers: Some(HeaderCount::Many(vec![headers, headers2]))
+        template: Some(Template::render(
+            "pages/discover",
+            context! { metadata, user, is_boosted, isfromauth, list_query },
+        )),
+        headers: Some(HeaderCount::Many(vec![headers, headers2])),
     }
 }
 

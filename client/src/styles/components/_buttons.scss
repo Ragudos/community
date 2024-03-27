@@ -38,8 +38,7 @@ select {
 
 input,
 textarea,
-select,
-.dropdown summary {
+select {
     border: 1px solid;
     border-color: hsl(var(--border) / var(--_border-opacity, 0.87));
 
@@ -111,6 +110,14 @@ textarea {
     }
 }
 
+.square {
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0.5rem;
+    min-height: auto;
+    min-width: auto;
+}
+
 .icon,
 .dropdown summary.icon {
     min-width: auto;
@@ -134,12 +141,17 @@ textarea {
     overflow: hidden;
 }
 
-.error.errored + input,
-.error.errored + textarea {
-    border-color: hsl(var(--destructive) / var(--_destructive-opacity, 1));
+.input-group:has(.error.errored) {
+    .error {
+        color: red;
+    }
 
-    &:focus-visible {
-        --_border-opacity: 1;
+    input, textarea {
+        border-color: hsl(var(--destructive) / var(--_destructive-opacity, 1));
+
+        &:focus-visible {
+            --_border-opacity: 1;
+        }
     }
 }
 
