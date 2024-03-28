@@ -5,7 +5,7 @@ use crate::models::users::preferences::Theme;
 impl Theme {
     pub fn from_cookie_jar(cookie_jar: &CookieJar<'_>) -> Self {
         cookie_jar
-            .get("theme")
+            .get("preferred_color_scheme")
             .map_or("system", |cookie| cookie.value_trimmed())
             .into()
     }

@@ -2,7 +2,8 @@ CREATE TABLE IF NOT EXISTS users (
     _id BIGSERIAL PRIMARY KEY,
     _created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     display_name VARCHAR(60) UNIQUE NOT NULL,
-    display_image TEXT
+    display_image TEXT,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE IF NOT EXISTS user_metadata (

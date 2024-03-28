@@ -70,8 +70,8 @@ pub fn rocket_from_config(figment: Figment) -> Rocket<Build> {
             rocket_routes![
                 routes::auth::logged_in,
                 routes::auth::logged_out,
-                routes::auth::login::page,
-                routes::auth::register::page
+                routes::auth::login::login_page,
+                routes::auth::register::register_page
             ],
         )
         .mount(
@@ -87,49 +87,63 @@ pub fn rocket_from_config(figment: Figment) -> Rocket<Build> {
         .mount(
             "/community",
             rocket_routes![
-                routes::community::logged_out,
-                routes::community::page,
-                routes::community::about::page,
-                routes::community::members::page,
-                routes::community::settings::page,
-                routes::community::delete_community::page,
-                routes::community::delete_community::unauthorized
+                routes::community::unauthorized_community_page,
+                routes::community::community_page,
+                routes::community::about::about_community_page,
+                routes::community::about::unauthorized_page,
+                routes::community::members::community_members_page,
+                routes::community::members::unauthorized_page,
+                routes::community::settings::community_settings_page,
+                routes::community::settings::unauthorized_page,
+                routes::community::delete_community::delete_community_page,
+                routes::community::delete_community::unauthorized_page,
+                routes::community::change_join_process::change_join_process_page,
+                routes::community::change_join_process::unauthorized_page,
             ],
         )
         .mount(
             "/community/api",
             rocket_routes![
                 routes::community::api::logged_out,
-                routes::community::api::rename::post,
-                routes::community::api::rename::post_unauthorized,
-                routes::community::api::request_deletion::post,
+                routes::community::api::rename::rename_endpoint,
+                routes::community::api::rename::rename_unauthorized,
+                routes::community::api::rename::non_htmx_rename_endpoint,
+                routes::community::api::rename::non_htmx_rename_unauthorized,
+                routes::community::api::request_deletion::request_deletion_endpoint,
+                routes::community::api::request_deletion::unauthorized_request_deletion,
+                routes::community::api::request_change_join_process::request_change_join_process_endpoint,
+                routes::community::api::request_change_join_process::unauthorized_request_change_join_process,
+                routes::community::api::change_join_process::change_join_process_endpoint,
+                routes::community::api::change_join_process::change_join_process_unauthorized_endpoint,
+                routes::community::api::delete_community::delete_community_endpoint,
+                routes::community::api::delete_community::unauthorized_delete_community
             ],
         )
         .mount(
             "/community/api/join",
             rocket_routes![
-                routes::community::api::join::public::post,
-                routes::community::api::join::logged_out
+                routes::community::api::join::public::public_join_post,
+                routes::community::api::join::public::unauthorized_join_public
             ],
         )
         .mount(
             "/discover",
-            rocket_routes![routes::discover::page, routes::discover::logged_out],
+            rocket_routes![routes::discover::discover_page, routes::discover::unauthorized_discover],
         )
         .mount(
             "/discover/api",
             rocket_routes![
-                routes::discover::api::get,
-                routes::discover::api::logged_out
+                routes::discover::api::discover_endpoint,
+                routes::discover::api::discover_endpoint_unauthorized
             ],
         )
         .mount(
             "/create",
-            rocket_routes![routes::create::logged_out, routes::create::community::page],
+            rocket_routes![routes::create::community::unauthorized_page, routes::create::community::community_page],
         )
         .mount(
             "/create/api",
-            rocket_routes![routes::create::api::logged_out],
+            rocket_routes![routes::create::api::community::create_community_endpoint, routes::create::api::community::create_community_unauthorized],
         )
         .mount(
             "/user",

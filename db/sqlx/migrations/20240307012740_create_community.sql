@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS communities (
     cover_image TEXT,
     owner_id BIGINT NOT NULL,
     is_private BOOLEAN NOT NULL DEFAULT true,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
     FOREIGN KEY (owner_id) REFERENCES users(_id) ON DELETE CASCADE
 );
 

@@ -9,5 +9,8 @@
             "database": "community",
             "username": "postgres"
         }
+    ],
+    "rust-analyzer.linkedProjects": [
+        ".\\Cargo.toml"
     ]
 }

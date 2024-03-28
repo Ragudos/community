@@ -16,10 +16,10 @@ use crate::models::{Toast, ToastTypes};
 use crate::responders::{ApiResponse, HeaderCount};
 
 #[post("/community", data = "<community_info>")]
-pub async fn post<'r>(
+pub async fn create_community_endpoint<'r>(
     mut db: Connection<DbConn>,
     user: UserJWT,
-    community_info: Result<Form<CreateCommunity>, Errors<'r>>,
+    community_info: Result<Form<CreateCommunity<'r>>, Errors<'r>>,
     rate_limiter: &State<RateLimiter>,
 ) -> Result<ApiResponse, ApiResponse> {
     let community_info =
@@ -85,4 +85,9 @@ pub async fn post<'r>(
         )),
         headers: Some(HeaderCount::One(header)),
     })
+}
+
+#[post("/community", rank = 2)]
+pub fn create_community_unauthorized() -> ApiResponse {
+    ApiResponse::Status(Status::Unauthorized)
 }

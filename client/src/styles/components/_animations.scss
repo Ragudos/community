@@ -6,6 +6,19 @@
     animation: scale-up var(--transition-duration, 250ms) ease-out forwards;
 }
 
+.fade-in {
+    animation: fade-in var(--transition-duration, 250ms) ease-out forwards;
+}
+
+@keyframes fade-in {
+    from {
+        opacity: var(--_max-opacity, 0);
+    }
+    to {
+        opacity: 1;
+    }
+}
+
 @keyframes spin {
     to {
         transform: rotate(360deg);

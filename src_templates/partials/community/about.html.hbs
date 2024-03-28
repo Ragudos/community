@@ -67,38 +67,67 @@
             <p class="about-description">{{community.description}}</p>
         </div>
         {{#unless (or community.is_viewer_a_member (eq community.owner_id user._id))}}
-        {{#if is_private}}
+        {{#if community.is_private}}
         {{> partials/templates/input_with_counter}}
         <button type="button" class="primary" onclick="openDialog(this)" aria-controls="join-community-dialog">
             Join Now
         </button>
-        <dialog id="join-community-dialog">
-            <form hx-target="main" hx-target-error="#nothing" data-loading-delay="100"
-                data-loading-path="/community/api/join/private" hx-post="/community/api/join/private"
-                hx-trigger="submit" hx-synx="this, a" action="/community/api/join/private" method="post">
-                <input type="text" hidden name="honeypot" value="" />
-                <input type="number" hidden name="community_id" value="{{community._id}}" readonly />
-                <span class="title-md">Send Join Request</span>
-                <div class="input-group">
-                    <input-with-counter data-max-count="255">
-                        <label slot="label" for="reason">
-                            Message
-                        </label>
-                        <textarea slot="input" autofocus name="reason"
-                            placeholder="How will you contribute to this community?" minlength="20" maxlength="255"
-                            required></textarea>
-                    </input-with-counter>
-                    <span class="error" id="message-error"></span>
+        <dialog id="join-community-dialog" aria-labelledby="join-community-title">
+            <div class="overlay-header">
+                <div>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
+                    </svg>
+                    <h1 class="title-sm" id="join-community-title">Request to join {{community.display_name}}</h1>
+
+                    <div style="flex: 1; display: flex; justify-content: flex-end;">
+                        <button aria-label="Close change join process modal" aria-controls="join-community"
+                            onclick="closeDialog(this)" class="btn square">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="w-6 h-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
-                <div class="actions">
-                    <button data-loading-disable type="button" class="secondary" onclick="closeDialog(this)"
-                        aria-controls="join-community-dialog">Cancel</button>
-                    <button type="submit" class="primary">
-                        Send
+            </div>
+            <div class="overlay-content">
+                <div>
+                    <form hx-target="main" hx-target-error="#nothing" data-loading-delay="100" id="join-request-form"
+                        data-loading-path="/community/api/join/private" hx-post="/community/api/join/private"
+                        hx-trigger="submit" hx-synx="this, a" action="/community/api/join/private" method="post">
+                        <input type="text" hidden name="honeypot" value="" />
+                        <input type="number" hidden name="community_id" value="{{community._id}}" readonly />
+                        <div class="input-group">
+                            <input-with-counter data-max-count="255">
+                                <label slot="label" for="reason">
+                                    Message
+                                </label>
+                                <textarea slot="input" autofocus name="reason"
+                                    placeholder="How will you contribute to this community?" minlength="20"
+                                    maxlength="255" required></textarea>
+                            </input-with-counter>
+                            <span class="error" id="message-error"></span>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="overlay-ctrls">
+                <div>
+                    <button style="width: 100%;" type="submit" class="primary" onclick="requestSubmit(this)" data-target="join-request-form">
+                        <span data-loading-class="hidden">Send</span>
+                        <span class="hidden" data-loading-class-remove="hidden">Sending...</span>
                     </button>
                 </div>
-            </form>
+            </div>
         </dialog>
+        <script>
+            function requestSubmit(btn) {
+                document.getElementById(btn.getAttribute('data-target')).requestSubmit();
+            }
+        </script>
         {{else}}
         <form hx-target="main" hx-confirm="Are you sure?" hx-target-error="#nothing" data-loading-aria-busy
             data-loading-delay="100" data-loading-path="/community/api/join/public" hx-post="/community/api/join/public"

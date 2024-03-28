@@ -113,6 +113,62 @@ impl CommunityAbout {
 }
 
 impl Community {
+
+    pub async fn change_join_process(
+        tx: &mut Transaction<'_, Postgres>,
+        community_id: &i64,
+    ) -> Result<bool, sqlx::Error> {
+        let t = sqlx::query!(
+            r#"
+                UPDATE communities
+                SET is_private = NOT is_private
+                WHERE _id = $1
+                RETURNING is_private
+                "#,
+            community_id
+        )
+        .fetch_one(&mut **tx)
+        .await?;
+
+        Ok(t.is_private)
+    }
+
+    pub async fn soft_delete(
+        tx: &mut Transaction<'_, Postgres>,
+        community_id: &i64,
+    ) -> Result<(), sqlx::Error> {
+        sqlx::query!(
+            r#"
+                UPDATE communities
+                SET is_deleted = true
+                WHERE _id = $1
+                "#,
+            community_id
+        )
+        .execute(&mut **tx)
+        .await?;
+
+        Ok(())
+    }
+
+    /// Hard deletes a community from the database.
+    pub async fn delete(
+        tx: &mut Transaction<'_, Postgres>,
+        community_id: &i64,
+    ) -> Result<(), sqlx::Error> {
+        sqlx::query!(
+            r#"
+                DELETE FROM communities
+                WHERE _id = $1
+                "#,
+            community_id
+        )
+        .execute(&mut **tx)
+        .await?;
+
+        Ok(())
+    }
+
     pub async fn get_name(
         db: &mut Connection<DbConn>,
         community_id: &i64,

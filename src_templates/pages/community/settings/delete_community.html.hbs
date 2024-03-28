@@ -1,8 +1,8 @@
 {{#> layouts/main}}
 <div class="min-h-screen ce-wrapper">
-    <div class="container general-card" style="--_max-content-width: 30rem;">
+    <div id="form-container" class="container general-card" style="--_max-content-width: 30rem;">
         <div style="display: flex; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap;">
-            <div class="title-md">Delete {{community_name}}</div>
+            <div class="title-sm">Delete {{community_name}}</div>
         </div>
         <div class="warning warning__with-icon" style="margin-top: 0.5rem;">
             <div>
@@ -16,20 +16,21 @@
                 You cannot recover this community once you delete it. Please be certain.
             </div>
         </div>
-        <form style="gap: 1rem;" data-loading-aria-busy data-loading-delay="250" hx-confirm="Are you absolutely sure?"
-            hx-target-error="#nothing" hx-delete="/community/api/delete-community" class="auth-form">
+        <form hx-target="#form-container" hx-target-error="#nothing" hx-sync="this, a" style="gap: 1rem;"
+            data-loading-aria-busy data-loading-delay="250" hx-confirm="Are you absolutely sure?"
+            hx-target-error="#nothing" hx-delete="/community/api/delete-community" class="auth-form" method="POST"
+            action="/community/api/delete-community">
             <label for="password">Confirm with your password</label>
-            <input type="hidden" name="user_id" value="{{user_id}}" />
-            <input type="hidden" name="community_id" value="{{community_id}}" />
             <input type="hidden" name="authenticity_token" value="{{authenticity_token}}" />
             <input type="text" name="honeypot" hidden value="" />
-            <input type="password" id="password" name="password" placeholder="********" required maxlength="60"
+            <input data-loading-disable autocomplete="current-password" autocapitalize="off" spellcheck="false"
+                type="password" id="password" name="user_password" placeholder="********" required maxlength="60"
                 minlength="8" />
             <div style="display: flex; flex-direction: column; gap: 0.5rem">
                 <button type="button" class="btn" style="width: 100%" onclick="window.location.reload()">
                     Go back
                 </button>
-                <button type="submit" class="destructive" style="width: 100%;">
+                <button data-loading-disable type="submit" class="destructive" style="width: 100%;">
                     <span data-loading-class="hidden">Delete {{community_name}}</span>
                     <span data-loading-class-remove="hidden" class="hidden">
                         Deleting... Please do not leave the page.

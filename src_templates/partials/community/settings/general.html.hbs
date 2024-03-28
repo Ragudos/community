@@ -5,10 +5,10 @@
     {{> partials/templates/input_with_counter}}
     <input type="hidden" id="default-rename-value" value="{{community.display_name}}" />
     <form hx-target="#nothing" data-loading-aria-busy id="rename-form" class="form-rename"
-        data-loading-path="/community/api/rename" data-loading-delay="250" hx-post="/community/api/rename"
-        hx-target-error="#nothing">
+        data-loading-path="/community/api/rename" data-loading-delay="250" hx-put="/community/api/rename"
+        hx-target-error="#nothing" action="/community/api/rename" method="POST">
         <div class="input-group">
-            <input-with-counter hx-preserve="true" id="rename-input-container" data-max-count="60">
+            <input-with-counter style="display: flex; flex-direction: column;" hx-preserve="true" id="rename-input-container" data-max-count="60">
                 <label slot="label" for="community_name">Community name</label>
                 <input oninput="renameScript(this)" data-loading-disable slot="input" placeholder="The name of your community" name="community_name"
                     id="community_name" aria-errormessage="community_name_error" value="{{community.display_name}}"
@@ -16,13 +16,14 @@
             </input-with-counter>
             <span id="community_name_error"></span>
         </div>
-        <input type="hidden" name="community_id" value="{{community.community_id}}" hidden />
-        <input type="hidden" name="authenticity_token" value="{{authenticity_token}}" hidden />
+        <input type="hidden" name="community_id" value="{{community.community_id}}" />
+        <input type="hidden" name="authenticity_token" value="{{authenticity_token}}" />
         <input type="text" name="honeypot" value="" hidden />
-        <button disabled id="rename-submit" type="submit" class="btn" data-loading-disable>
+        <button id="rename-submit" type="submit" class="btn" data-loading-disable>
             <span data-loading-class="hidden">Rename</span>
             <span data-loading>Renaming...</span>
         </button>
+        <script>document.getElementById("rename-submit").setAttribute("disabled", "true")</script>
     </form>
 </div>
 {{/if}}
@@ -82,10 +83,15 @@
         {{/if}}
     </ul>
     {{#if (eq community.owner_id user._id)}}
-    <dialog aria-modal="true" id="change-join-process-confirmation" class="scale-up">
-        <div>
-            <div class="overlay-header">
-                <h1 class="title-xs">
+    <dialog aria-modal="true" aria-labelledby="change-join-process-title" id="change-join-process-confirmation" class="fade-in">
+        <div class="overlay-header">
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+                </svg>
+                <h1 class="title-sm" id="change-join-process-title">
                     Make {{community.display_name}}
                     {{#if community.is_private}}
                     public
@@ -93,25 +99,86 @@
                     private
                     {{/if}}
                 </h1>
+
+                <div style="flex: 1; display: flex; justify-content: flex-end;">
+                    <button aria-label="Close change join process modal" aria-controls="change-join-process-confirmation"
+                        onclick="closeDialog(this)" class="btn square">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
             </div>
-            <div class="overlay-content">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                    stroke="currentColor" class="w-6 h-6">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
-                </svg>
-                <p class="title-md">{{community.display_name}}</p>
+        </div>
+        <div class="overlay-content">
+            <div>
+                <div id="community-change-join-process-warning-container">
+                    <div class="warning warning__with-icon">
+                        <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                            stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+                        </svg>
+                        Unexpected bad things wil happen if you don't read this!
+                    </div>
+                    <div style="margin-top: 0.5rem;">
+                        <div class="timeline-item timeline-item__condensed">
+                            <div class="timeline-item-badge">
+                                <svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" class="fill">
+                                    <path d="M8 4a4 4 0 1 1 0 8 4 4 0 0 1 0-8Z"></path>
+                                </svg>
+                            </div>
+                            <div class="timeline-content">
+                                {{#if community.is_private}}
+                                    This will permanently reject all pending join requests
+                                    for community
+                                {{else}}
+                                    This will close the community to potential new members
+                                    for community
+                                {{/if}}
+                                <strong> {{community.display_name}} </strong>
+                                and change the community's way of accepting new members
+                                {{#if community.is_private}}, allowing anyone to join
+                                {{else}}, requiring approval to join
+                                {{/if}}. This will still be visible to the public.
+                            </div>
+                        </div>
+                        <div class="timeline-item timeline-item__condensed">
+                            <div class="timeline-item-badge">
+                                <svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" class="fill">
+                                    <path d="M8 4a4 4 0 1 1 0 8 4 4 0 0 1 0-8Z"></path>
+                                </svg>
+                            </div>
+                            <div class="timeline-content">
+                                Private - Requires approval to join
+                            </div>
+                        </div>
+                        <div class="timeline-item timeline-item__condensed">
+                            <div class="timeline-item-badge">
+                                <svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" class="fill">
+                                    <path d="M8 4a4 4 0 1 1 0 8 4 4 0 0 1 0-8Z"></path>
+                                </svg>
+                            </div>
+                            <div class="timeline-content">
+                                Public - Anyone can join
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <form>
-                <button type="submit" class="destructive">
-                    I want to make this community
-                    {{#if community.is_private}}
-                    public
-                    {{else}}
-                    private
-                    {{/if}}
-                </button>
-            </form>
+        </div>
+        <div class="overlay-ctrls">
+            <div>
+                <form style="width: 100%;" data-loading-aria-busy data-loading-delay="250" hx-target-error="#nothing" hx-target="body"
+                    hx-confirm="Are you sure?" hx-post="/community/api/request-change-join-process">
+                    <input type="hidden" name="community_id" value="{{community.community_id}}" required />
+                    <input type="hidden" name="authenticity_token" value="{{authenticity_token}}" required />
+                    <button style="width: 100%;" type="submit" class="destructive">
+                        I have read and understand these effects
+                    </button>
+                </form>
+            </div>
         </div>
     </dialog>
     <dialog aria-labelledby="delete-confirmation-title" aria-modal="true" id="delete-confirmation" class="scale-up">

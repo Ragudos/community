@@ -2,6 +2,7 @@ use std::num::ParseIntError;
 
 use rocket::form::{Errors, Form, FromForm};
 use rocket::http::Status;
+use rocket_csrf_token::VerificationFailure;
 use rocket_dyn_templates::context;
 use rocket_dyn_templates::Template;
 use serde::{Deserialize, Serialize};

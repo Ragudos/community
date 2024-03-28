@@ -8,7 +8,7 @@ use crate::models::seo::metadata::SeoMetadata;
 use crate::models::users::preferences::Theme;
 
 #[get("/login?<isredirected>", rank = 2)]
-pub fn page<'r>(
+pub fn login_page<'r>(
     cookie_jar: &CookieJar<'r>,
     is_boosted: IsBoosted,
     isredirected: Option<bool>,

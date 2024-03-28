@@ -7,7 +7,6 @@ use rocket_db_pools::Connection;
 use rocket_dyn_templates::context;
 use rocket_dyn_templates::Template;
 
-use crate::auth_uri;
 use crate::community_uri;
 use crate::controllers::htmx::IsBoosted;
 use crate::helpers::db::DbConn;
@@ -18,17 +17,17 @@ use crate::models::users::preferences::Theme;
 use crate::models::users::schema::UserJWT;
 use crate::responders::ApiResponse;
 use crate::responders::HeaderCount;
-use crate::routes::auth::login;
 
 pub mod about;
 pub mod api;
 pub mod delete_community;
 pub mod members;
 pub mod settings;
+pub mod change_join_process;
 
 // TODO: Implement to get the uid from the URL
 #[get("/<community_id>?<shouldboost>&<includeheader>&<list_query..>")]
-pub async fn page<'r>(
+pub async fn community_page<'r>(
     mut db: Connection<DbConn>,
     cookie_jar: &CookieJar<'r>,
     user: UserJWT,
@@ -60,7 +59,7 @@ pub async fn page<'r>(
         && community_preview.owner_id != user._id
     {
         return Ok(ApiResponse::Redirect(Redirect::to(community_uri!(
-            about::page(community_id, includeheader)
+            about::about_community_page(community_id, includeheader)
         ))));
     }
 
@@ -82,7 +81,7 @@ pub async fn page<'r>(
     })
 }
 
-#[get("/<_..>", rank = 4)]
-pub fn logged_out() -> ApiResponse {
-    ApiResponse::Redirect(Redirect::to(auth_uri!(login::page(Some(true)))))
+#[get("/<community_id>", rank = 2)]
+pub fn unauthorized_community_page(community_id: i64) -> Redirect {
+    Redirect::to(community_uri!(about::about_community_page(community_id, Some(true))))
 }

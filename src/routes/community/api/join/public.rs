@@ -18,10 +18,10 @@ use crate::responders::ApiResponse;
 use crate::routes::community;
 
 #[post("/public", data = "<form>")]
-pub async fn post<'r>(
+pub async fn public_join_post<'r>(
     mut db: Connection<DbConn>,
     user: UserJWT,
-    form: Result<Form<JoinPublicCommunity>, Errors<'r>>,
+    form: Result<Form<JoinPublicCommunity<'r>>, Errors<'r>>,
 ) -> Result<ApiResponse, ApiResponse> {
     let form = extract_data_or_return_response(form, "partials/community/join/public_error")?;
 
@@ -64,6 +64,11 @@ pub async fn post<'r>(
     tx.commit().await?;
 
     Ok(ApiResponse::Redirect(Redirect::to(community_uri!(
-        community::page(form.community_id, Some(true), Some(false), _)
+        community::community_page(form.community_id, Some(true), Some(false), _)
     ))))
+}
+
+#[post("/public", rank = 2)]
+pub fn unauthorized_join_public() -> ApiResponse {
+    ApiResponse::Status(Status::Unauthorized)
 }

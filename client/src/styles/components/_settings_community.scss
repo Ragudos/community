@@ -78,3 +78,40 @@
     margin-top: 2.5rem;
     margin-bottom: 0.5rem;
 }
+
+.danger-zone {
+    ul {
+        border: 1px solid hsl(var(--border) / var(--_border-opacity, 0.675));
+        border-radius: var(--radius);
+
+        li:not(:last-child) {
+            border-bottom: 1px solid hsl(var(--border) / var(--_border-opacity, 0.675));
+        }
+
+        li {
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.5rem;
+
+            button,
+            summary {
+                flex-shrink: 0.5;
+
+                @include s-mobilesmall {
+                    flex-shrink: 0;
+                    white-space: nowrap;
+                }
+            }
+        }
+
+        li > div {
+            flex: auto;
+
+            div {
+                font-weight: 300;
+            }
+        }
+    }
+}

@@ -2,10 +2,12 @@ use rocket::get;
 use rocket::http::CookieJar;
 use rocket::http::Header;
 use rocket::http::Status;
+use rocket::response::Redirect;
 use rocket_db_pools::Connection;
 use rocket_dyn_templates::context;
 use rocket_dyn_templates::Template;
 
+use crate::auth_uri;
 use crate::controllers::htmx::IsBoosted;
 use crate::helpers::db::DbConn;
 use crate::models::community::schema::CommunityAbout;
@@ -14,9 +16,10 @@ use crate::models::users::preferences::Theme;
 use crate::models::users::schema::UserJWT;
 use crate::responders::ApiResponse;
 use crate::responders::HeaderCount;
+use crate::routes::auth::login;
 
 #[get("/<community_id>/about?<includeheader>")]
-pub async fn page<'r>(
+pub async fn about_community_page<'r>(
     mut db: Connection<DbConn>,
     cookie_jar: &CookieJar<'r>,
     user: UserJWT,
@@ -63,4 +66,9 @@ pub async fn page<'r>(
             })
         }
     }
+}
+
+#[get("/<community_id>/about", rank = 2)]
+pub fn unauthorized_page(community_id: i64) -> ApiResponse {
+    ApiResponse::Redirect(Redirect::to(auth_uri!(login::login_page(_))))
 }

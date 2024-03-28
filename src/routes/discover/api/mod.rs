@@ -12,7 +12,7 @@ use crate::responders::ApiResponse;
 
 /// For displaying possible communities to join
 #[get("/?<list_query..>")]
-pub async fn get<'r>(
+pub async fn discover_endpoint<'r>(
     mut db: Connection<DbConn>,
     user: UserJWT,
     list_query: Option<ListQuery<'r>>,
@@ -55,9 +55,7 @@ pub async fn get<'r>(
     })
 }
 
-/// Just a no content for any request made where the first
-/// endpoint has forwarded.
-#[get("/<_..>", rank = 2)]
-pub fn logged_out() -> ApiResponse {
-    ApiResponse::Status(Status::NoContent)
+#[get("/", rank = 2)]
+pub fn discover_endpoint_unauthorized() -> Status {
+    Status::Unauthorized
 }

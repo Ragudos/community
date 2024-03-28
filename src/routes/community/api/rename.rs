@@ -1,11 +1,13 @@
 use rocket::form::{Errors, Form};
 use rocket::http::Status;
-use rocket::post;
+use rocket::response::Redirect;
 use rocket_csrf_token::CsrfToken;
 use rocket_db_pools::Connection;
 use rocket_dyn_templates::{context, Template};
 use sqlx::Acquire;
+use rocket::{post, put};
 
+use crate::community_uri;
 use crate::controllers::errors::extract_data_or_return_response;
 use crate::helpers::db::DbConn;
 use crate::models::community::forms::EditDisplayName;
@@ -13,17 +15,54 @@ use crate::models::community::schema::Community;
 use crate::models::users::schema::UserJWT;
 use crate::models::Toast;
 use crate::responders::ApiResponse;
+use crate::routes::community::settings;
+
+fn handle_sqlx_error(error: sqlx::Error) -> Status {
+    eprintln!("{:?}", error);
+    Status::InternalServerError
+}
 
 #[post("/rename", data = "<form>")]
-pub async fn post<'r>(
+pub async fn non_htmx_rename_endpoint<'r>(
     mut db: Connection<DbConn>,
     user: UserJWT,
-    form: Result<Form<EditDisplayName>, Errors<'r>>,
+    form: Form<EditDisplayName<'r>>,
+    csrf: CsrfToken,
+) -> Result<Redirect, Status> {
+    if !Community::is_user_owner(&mut db, &form.community_id, &user._id)
+        .await
+        .map_err(handle_sqlx_error)?
+        .unwrap_or(false)
+    {
+        return Err(Status::Forbidden);
+    }
+
+    csrf.verify(&form.authenticity_token.to_string()).map_err(|_| Status::Forbidden)?;
+
+    let mut tx = db.begin().await.map_err(handle_sqlx_error)?;
+
+    Community::update_name(&mut tx, &form.community_id, &form.display_name).await.map_err(handle_sqlx_error)?;
+
+    tx.commit().await.map_err(handle_sqlx_error)?;
+
+    Ok(Redirect::to(community_uri!(settings::community_settings_page(form.community_id, _, _))))
+}
+
+#[post("/rename", rank = 2)]
+pub fn non_htmx_rename_unauthorized() -> Status {
+    Status::Unauthorized
+}
+
+#[put("/rename", data = "<form>")]
+pub async fn rename_endpoint<'r>(
+    mut db: Connection<DbConn>,
+    user: UserJWT,
+    form: Result<Form<EditDisplayName<'r>>, Errors<'r>>,
     csrf_token: CsrfToken,
 ) -> Result<ApiResponse, ApiResponse> {
     let form = extract_data_or_return_response(form, "partials/community/settings/rename_error")?;
 
-    csrf_token.verify(&form.authenticity_token)?;
+    csrf_token.verify(&form.authenticity_token.to_string())?;
 
     if !Community::is_user_owner(&mut db, &form.community_id, &user._id)
         .await?
@@ -60,7 +99,7 @@ pub async fn post<'r>(
     })
 }
 
-#[post("/rename", rank = 2)]
-pub fn post_unauthorized() -> Status {
+#[put("/rename", rank = 2)]
+pub fn rename_unauthorized() -> Status {
     Status::Unauthorized
 }

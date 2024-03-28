@@ -64,7 +64,6 @@ impl Toast {
     }
 }
 
-pub const REQUEST_DELETION_JWT_NAME: &str = "SensitiveAction_jwt";
-pub const JWT_NAME: &str = "Community__jwt";
+pub const JWT_NAME: &str = "CommunityAuthSession__jwt";
 pub const HOMEPAGE_COMMUNITY_LIMIT: i64 = 12;
 pub const COMMUNITY_POST_LIMIT: i64 = 20;

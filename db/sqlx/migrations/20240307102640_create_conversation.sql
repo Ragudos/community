@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS conversations (
     _id BIGSERIAL PRIMARY KEY,
     _created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
     type ConversationType NOT NULL DEFAULT 'direct'
 );
 
@@ -12,6 +13,7 @@ CREATE TABLE IF NOT EXISTS messages (
     content TEXT NOT NULL,
     images TEXT[],
     videos TEXT[],
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
     FOREIGN KEY (_conversation_id) REFERENCES conversations(_id) ON DELETE CASCADE,
     FOREIGN KEY (_user_id) REFERENCES users(_id) ON DELETE CASCADE
 );

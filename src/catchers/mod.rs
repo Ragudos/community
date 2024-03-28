@@ -34,7 +34,7 @@ pub fn not_found(request: &Request) -> Template {
 
 #[catch(401)]
 pub fn unauthorized_catcher(request: &Request) -> Redirect {
-    Redirect::to(auth_uri!(auth::login::page(_)))
+    Redirect::to(auth_uri!(auth::login::login_page(_)))
 }
 
 #[catch(500)]

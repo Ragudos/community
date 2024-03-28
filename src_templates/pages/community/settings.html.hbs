@@ -3,19 +3,6 @@
 <head>
     {{> partials/head/main}}
     {{> partials/head/community}}
-    <script>
-        function renameScript(el) {
-            if (document.getElementById("rename-form").classList.contains("htmx-request")) {
-                return;
-            }
-
-            if (el.value != document.getElementById("default-rename-value").value) {
-                document.getElementById("rename-submit").removeAttribute("disabled");
-            } else {
-                document.getElementById("rename-submit").setAttribute("disabled", "true");
-            }
-        }
-    </script>
 </head>
 {{#if includemainheader}}
     <header class="fade-me-in fade-me-out" id="header" hx-swap-oob="true">
@@ -30,10 +17,7 @@
 {{> partials/headers/community_content oobswap=true}}
 {{/if}}
 {{> partials/community/settings}}
-{{else}}
-{{#> layouts/community}}
-{{#*inline "more_head_content"}}
-<script>
+<script id="rename-script">
     function renameScript(el) {
         if (document.getElementById("rename-form").classList.contains("htmx-request")) {
             return;
@@ -46,7 +30,21 @@
         }
     }
 </script>
-{{/inline}}
+{{else}}
+{{#> layouts/community}}
 {{> partials/community/settings}}
+<script id="rename-script">
+    function renameScript(el) {
+        if (document.getElementById("rename-form").classList.contains("htmx-request")) {
+            return;
+        }
+
+        if (el.value != document.getElementById("default-rename-value").value) {
+            document.getElementById("rename-submit").removeAttribute("disabled");
+        } else {
+            document.getElementById("rename-submit").setAttribute("disabled", "true");
+        }
+    }
+</script>
 {{/layouts/community}}
 {{/if}}

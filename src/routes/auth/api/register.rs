@@ -23,12 +23,12 @@ use crate::routes::discover;
 #[post("/register")]
 pub fn logged_in(_user: UserJWT, is_htmx: IsHTMX) -> ApiResponse {
     match is_htmx {
-        IsHTMX(true) => ApiResponse::HtmxRedirect(HtmxRedirect::to(discover_uri!(discover::page(
+        IsHTMX(true) => ApiResponse::HtmxRedirect(HtmxRedirect::to(discover_uri!(discover::discover_page(
             Some(true),
             _
         )))),
         IsHTMX(false) => {
-            ApiResponse::Redirect(Redirect::to(discover_uri!(discover::page(Some(true), _))))
+            ApiResponse::Redirect(Redirect::to(discover_uri!(discover::discover_page(Some(true), _))))
         }
     }
 }
@@ -86,7 +86,7 @@ pub async fn post<'r>(
             headers: Some(HeaderCount::One(header)),
         }),
         IsHTMX(false) => Ok(ApiResponse::Redirect(Redirect::to(discover_uri!(
-            discover::page(Some(true), _)
+            discover::discover_page(Some(true), _)
         )))),
     }
 }

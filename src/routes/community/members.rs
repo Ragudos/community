@@ -29,7 +29,7 @@ pub struct MemberFilter {
 /// page is the owner or member of the community or not.
 /// Also do the t filter which stands for type, and it can be either `members`, `admins`, `online`.
 #[get("/<community_id>/members?<includeheader>&<t..>")]
-pub async fn page<'r>(
+pub async fn community_members_page<'r>(
     mut db: Connection<DbConn>,
     cookie_jar: &CookieJar<'r>,
     user: UserJWT,
@@ -60,7 +60,7 @@ pub async fn page<'r>(
         && community_preview.owner_id != user._id
     {
         return Ok(ApiResponse::Redirect(Redirect::to(community_uri!(
-            about::page(community_id, includeheader)
+            about::about_community_page(community_id, includeheader)
         ))));
     }
 
@@ -80,4 +80,9 @@ pub async fn page<'r>(
         )),
         headers: Some(HeaderCount::Many(vec![headers, headers2])),
     })
+}
+
+#[get("/<community_id>/members", rank = 2)]
+pub fn unauthorized_page(community_id: i64) -> Redirect {
+    Redirect::to(community_uri!(about::about_community_page(community_id, Some(true))))
 }

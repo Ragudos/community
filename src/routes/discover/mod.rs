@@ -22,7 +22,7 @@ pub mod api;
 // this will just transfer over the initial query of the URI
 // to the HTML markup for HTMX to handle the AJAX side of things.
 #[get("/?<isfromauth>&<list_query..>")]
-pub fn page<'r>(
+pub fn discover_page<'r>(
     cookie_jar: &CookieJar<'r>,
     user: UserJWT,
     is_boosted: IsBoosted,
@@ -48,7 +48,7 @@ pub fn page<'r>(
     }
 }
 
-#[get("/<_..>", rank = 3)]
-pub fn logged_out() -> ApiResponse {
-    ApiResponse::Redirect(Redirect::to(auth_uri!(login::page(Some(true)))))
+#[get("/", rank = 2)]
+pub fn unauthorized_discover() -> ApiResponse {
+    ApiResponse::Redirect(Redirect::to(auth_uri!(login::login_page(Some(true)))))
 }

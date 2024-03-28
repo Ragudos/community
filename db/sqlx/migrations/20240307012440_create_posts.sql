@@ -7,5 +7,6 @@ CREATE TABLE IF NOT EXISTS posts (
     images TEXT[],
     videos TEXT[],
     is_pinned BOOLEAN NOT NULL DEFAULT false,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
     FOREIGN KEY (owner_id) REFERENCES users(_id) ON DELETE CASCADE
 );
