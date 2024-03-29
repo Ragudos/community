@@ -1,7 +1,7 @@
 <span class="title-sm">Create your account.</span>
 <form data-loading-delay="50" data-loading-aria-busy hx-target="#form-container" class="auth-form"
-    hx-target-error="#nothing" hx-sync="this, a" hx-post="/auth/api/register" hx-trigger="submit" method="post"
-    action="/auth/api/register">
+    hx-target-error="#nothing" hx-sync="#submit-form, a" hx-post="/auth/api/register" hx-trigger="submit" method="post"
+    action="/auth/api/register" id="submit-form" hx-headers='{"Toaster": "true"}'>
     <div class="input-group">
         <label class="label" for="username">Username</label>
         <input placeholder="johndoe" type="text" name="username" id="username" pattern="[a-zA-z0-9À-ž\s]+"
@@ -23,6 +23,7 @@
             aria-errormessage="confirm-password-error" />
         <span id="confirm-password-error"></span>
     </div>
+    <input type="hidden" name="authenticity_token" value="{{authenticity_token}}" />
     <input aria-hidden="true" name="honeypot" value="" hidden />
     <button data-loading-disable type="submit" class="primary">
         <span data-loading-class="hidden">Sign up</span>

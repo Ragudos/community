@@ -42,18 +42,7 @@ pub async fn community_members_page<'r>(
     let theme = Theme::from_cookie_jar(cookie_jar);
     let Some(community_preview) = CommunityPreview::get(&mut db, &community_id, &user._id).await?
     else {
-        let metadata = SeoMetadata::build()
-            .theme(theme)
-            .title("404 Not Found")
-            .finalize();
-        return Ok(ApiResponse::Render {
-            status: Status::NotFound,
-            template: Some(Template::render(
-                "pages/community/not_found",
-                context! { metadata, user, is_boosted, includeheader, community_id },
-            )),
-            headers: None,
-        });
+        return Err(ApiResponse::Status(Status::NotFound));
     };
 
     if !community_preview.is_viewer_a_member.unwrap_or(false)
@@ -80,9 +69,4 @@ pub async fn community_members_page<'r>(
         )),
         headers: Some(HeaderCount::Many(vec![headers, headers2])),
     })
-}
-
-#[get("/<community_id>/members", rank = 2)]
-pub fn unauthorized_page(community_id: i64) -> Redirect {
-    Redirect::to(community_uri!(about::about_community_page(community_id, Some(true))))
 }

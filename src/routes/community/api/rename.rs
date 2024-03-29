@@ -1,11 +1,11 @@
 use rocket::form::{Errors, Form};
 use rocket::http::Status;
 use rocket::response::Redirect;
+use rocket::{post, put};
 use rocket_csrf_token::CsrfToken;
 use rocket_db_pools::Connection;
 use rocket_dyn_templates::{context, Template};
 use sqlx::Acquire;
-use rocket::{post, put};
 
 use crate::community_uri;
 use crate::controllers::errors::extract_data_or_return_response;
@@ -37,15 +37,20 @@ pub async fn non_htmx_rename_endpoint<'r>(
         return Err(Status::Forbidden);
     }
 
-    csrf.verify(&form.authenticity_token.to_string()).map_err(|_| Status::Forbidden)?;
+    csrf.verify(&form.authenticity_token.to_string())
+        .map_err(|_| Status::Forbidden)?;
 
     let mut tx = db.begin().await.map_err(handle_sqlx_error)?;
 
-    Community::update_name(&mut tx, &form.community_id, &form.display_name).await.map_err(handle_sqlx_error)?;
+    Community::update_name(&mut tx, &form.community_id, &form.display_name)
+        .await
+        .map_err(handle_sqlx_error)?;
 
     tx.commit().await.map_err(handle_sqlx_error)?;
 
-    Ok(Redirect::to(community_uri!(settings::community_settings_page(form.community_id, _, _))))
+    Ok(Redirect::to(community_uri!(
+        settings::community_settings_page(form.community_id, _, _)
+    )))
 }
 
 #[post("/rename", rank = 2)]

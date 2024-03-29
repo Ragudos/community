@@ -5,6 +5,22 @@ use sqlx::postgres::PgHasArrayType;
 use sqlx::prelude::Type;
 
 #[derive(Serialize, Deserialize, PartialEq, Eq, Type, FromFormField, Clone, Debug)]
+#[sqlx(type_name = "notificationtype", rename_all = "lowercase")]
+pub enum NotificationType {
+    Follows,
+    CommunityEntrance,
+    CommunityPosts,
+}
+
+#[derive(Serialize, Deserialize, PartialEq, Eq, Type, FromFormField, Clone, Debug)]
+#[sqlx(type_name = "requeststatus", rename_all = "lowercase")]
+pub enum RequestStatus {
+    Pending,
+    Rejected,
+    Accepted,
+}
+
+#[derive(Serialize, Deserialize, PartialEq, Eq, Type, FromFormField, Clone, Debug)]
 #[sqlx(type_name = "gender", rename_all = "lowercase")]
 pub enum Gender {
     Male,
@@ -57,24 +73,6 @@ pub enum CommunityCategory {
     SelfImprovement,
     Academics,
     Other,
-}
-
-impl From<&str> for CommunityCategory {
-    fn from(s: &str) -> Self {
-        match s {
-            "art" => CommunityCategory::Art,
-            "music" => CommunityCategory::Music,
-            "gaming" => CommunityCategory::Gaming,
-            "sports" => CommunityCategory::Sports,
-            "science" => CommunityCategory::Science,
-            "technology" => CommunityCategory::Technology,
-            "literature" => CommunityCategory::Literature,
-            "healthandfitness" => CommunityCategory::HealthAndFitness,
-            "selfimprovement" => CommunityCategory::SelfImprovement,
-            "academics" => CommunityCategory::Academics,
-            _ => CommunityCategory::Other,
-        }
-    }
 }
 
 impl PgHasArrayType for CommunityCategory {

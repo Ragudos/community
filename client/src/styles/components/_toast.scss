@@ -18,6 +18,9 @@
 
         border: 1px solid;
 
+        pointer-events: all;
+        touch-action: auto;
+
         display: flex;
         gap: 1rem;
         align-items: center;

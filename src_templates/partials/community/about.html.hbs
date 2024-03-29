@@ -68,11 +68,14 @@
         </div>
         {{#unless (or community.is_viewer_a_member (eq community.owner_id user._id))}}
         {{#if community.is_private}}
+        {{#if did_user_request_to_join}}
+            <a href="/user/community-join-requests/{{community._id}}" hx-target="main" hx-target-error="main">Check the status of your join request</a>
+        {{else}}
         {{> partials/templates/input_with_counter}}
         <button type="button" class="primary" onclick="openDialog(this)" aria-controls="join-community-dialog">
             Join Now
         </button>
-        <dialog id="join-community-dialog" aria-labelledby="join-community-title">
+        <dialog class="scale-up" id="join-community-dialog" aria-labelledby="join-community-title">
             <div class="overlay-header">
                 <div>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -83,7 +86,7 @@
                     <h1 class="title-sm" id="join-community-title">Request to join {{community.display_name}}</h1>
 
                     <div style="flex: 1; display: flex; justify-content: flex-end;">
-                        <button aria-label="Close change join process modal" aria-controls="join-community"
+                        <button aria-label="Close change join process modal" aria-controls="join-community-dialog"
                             onclick="closeDialog(this)" class="btn square">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                 stroke="currentColor" class="w-6 h-6">
@@ -95,17 +98,19 @@
             </div>
             <div class="overlay-content">
                 <div>
-                    <form hx-target="main" hx-target-error="#nothing" data-loading-delay="100" id="join-request-form"
-                        data-loading-path="/community/api/join/private" hx-post="/community/api/join/private"
-                        hx-trigger="submit" hx-synx="this, a" action="/community/api/join/private" method="post">
+                    <form data-loading-aria-busy hx-target="main" itemid="send-join-request-form" hx-target-error="#nothing"
+                        data-loading-delay="250" id="join-request-form" data-loading-path="/community/api/join/private"
+                        hx-post="/community/api/join/private" hx-trigger="submit" hx-synx="#send-join-request-form, a"
+                        action="/community/api/join/private" method="post" hx-headers='{"Toaster": "true"}'>
                         <input type="text" hidden name="honeypot" value="" />
                         <input type="number" hidden name="community_id" value="{{community._id}}" readonly />
+                        <input type="hidden" readonly name="authenticity_token" value="{{authenticity_token}}" />
                         <div class="input-group">
                             <input-with-counter data-max-count="255">
                                 <label slot="label" for="reason">
                                     Message
                                 </label>
-                                <textarea slot="input" autofocus name="reason"
+                                <textarea data-loading-disable slot="input" autofocus name="reason"
                                     placeholder="How will you contribute to this community?" minlength="20"
                                     maxlength="255" required></textarea>
                             </input-with-counter>
@@ -116,7 +121,8 @@
             </div>
             <div class="overlay-ctrls">
                 <div>
-                    <button style="width: 100%;" type="submit" class="primary" onclick="requestSubmit(this)" data-target="join-request-form">
+                    <button data-loading-disable style="width: 100%;" type="submit" class="primary" onclick="requestSubmit(this)"
+                        data-target="join-request-form">
                         <span data-loading-class="hidden">Send</span>
                         <span class="hidden" data-loading-class-remove="hidden">Sending...</span>
                     </button>
@@ -128,12 +134,14 @@
                 document.getElementById(btn.getAttribute('data-target')).requestSubmit();
             }
         </script>
+        {{/if}}
         {{else}}
-        <form hx-target="main" hx-confirm="Are you sure?" hx-target-error="#nothing" data-loading-aria-busy
-            data-loading-delay="100" data-loading-path="/community/api/join/public" hx-post="/community/api/join/public"
-            hx-sync="this, a">
+        <form hx-target="main" id="join-form" hx-confirm="Are you sure?" hx-target-error="#nothing"
+            data-loading-aria-busy data-loading-delay="100" data-loading-path="/community/api/join/public"
+            hx-post="/community/api/join/public" hx-sync="#join-form, a" hx-headers='{"Toaster": "true" }'>
             <input type="text" hidden name="honeypot" value="" />
-            <input type="number" hidden readonly name="community_id" value="{{community._id}}">
+            <input type="hidden" readonly name="community_id" value="{{community._id}}" />
+            <input type="hidden" readonly name="authenticity_token" value="{{authenticity_token}}" />
             <button data-loading-disable class="primary" type="submit">
                 <span data-loading-class="hidden">Join Now</span>
                 <span data-loading>

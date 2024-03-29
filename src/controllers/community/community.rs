@@ -113,6 +113,22 @@ impl CommunityAbout {
 }
 
 impl Community {
+    pub async fn get_owner_id(
+        db: &mut Connection<DbConn>,
+        community_id: &i64,
+    ) -> Result<i64, sqlx::Error> {
+        Ok(sqlx::query!(
+            r#"
+                SELECT owner_id
+                FROM communities
+                WHERE _id = $1
+                "#,
+            community_id
+        )
+        .fetch_one(&mut ***db)
+        .await?
+        .owner_id)
+    }
 
     pub async fn change_join_process(
         tx: &mut Transaction<'_, Postgres>,
@@ -228,7 +244,7 @@ impl Community {
     pub async fn is_private(
         db: &mut Connection<DbConn>,
         community_id: &i64,
-    ) -> Result<bool, sqlx::Error> {
+    ) -> Result<Option<bool>, sqlx::Error> {
         Ok(sqlx::query!(
             r#"
                 SELECT is_private
@@ -237,9 +253,9 @@ impl Community {
                 "#,
             community_id
         )
-        .fetch_one(&mut ***db)
+        .fetch_optional(&mut ***db)
         .await?
-        .is_private)
+        .map(|row| row.is_private))
     }
 
     pub async fn is_name_taken(

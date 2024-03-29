@@ -16,16 +16,19 @@
                 You cannot recover this community once you delete it. Please be certain.
             </div>
         </div>
-        <form hx-target="#form-container" hx-target-error="#nothing" hx-sync="this, a" style="gap: 1rem;"
+        <form hx-trigger="submit" hx-target="#form-container" hx-target-error="#nothing" hx-sync="#submit-form, a" style="gap: 1rem;"
             data-loading-aria-busy data-loading-delay="250" hx-confirm="Are you absolutely sure?"
             hx-target-error="#nothing" hx-delete="/community/api/delete-community" class="auth-form" method="POST"
-            action="/community/api/delete-community">
-            <label for="password">Confirm with your password</label>
-            <input type="hidden" name="authenticity_token" value="{{authenticity_token}}" />
+            action="/community/api/delete-community" id="submit-form" hx-headers="{"Toaster": "true"}">
+            <input type="hidden" readonly name="authenticity_token" value="{{authenticity_token}}" />
             <input type="text" name="honeypot" hidden value="" />
-            <input data-loading-disable autocomplete="current-password" autocapitalize="off" spellcheck="false"
-                type="password" id="password" name="user_password" placeholder="********" required maxlength="60"
-                minlength="8" />
+            <div class="input-group">
+                <label for="password">Confirm with your password</label>
+                <input data-loading-disable autocomplete="current-password" autocapitalize="off" spellcheck="false"
+                    type="password" id="password" name="user_password" placeholder="********" required maxlength="60"
+                    minlength="8" />
+                <span id="user-password-error"></span>
+            </div>
             <div style="display: flex; flex-direction: column; gap: 0.5rem">
                 <button type="button" class="btn" style="width: 100%" onclick="window.location.reload()">
                     Go back

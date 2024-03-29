@@ -11,6 +11,7 @@ pub mod comments;
 pub mod community;
 pub mod create;
 pub mod discover;
+pub mod notifications;
 pub mod posts;
 pub mod user;
 

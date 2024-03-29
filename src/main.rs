@@ -6,8 +6,6 @@ extern crate rocket;
 
 #[launch]
 fn rocket() -> _ {
-    dotenv::dotenv().ok();
-
     let config = create_config(get_environment().into());
     rocket_from_config(config)
 }

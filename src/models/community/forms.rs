@@ -1,7 +1,7 @@
 use rocket::FromForm;
 
 use crate::controllers::validate::{
-    validate_ascii_text, validate_honeypot, validate_positive_integer, validate_password
+    validate_ascii_text, validate_honeypot, validate_password, validate_positive_integer,
 };
 
 #[derive(FromForm, Debug)]
@@ -14,6 +14,7 @@ pub struct CreateCommunity<'r> {
     pub description: &'r str,
     #[field(validate = validate_honeypot())]
     pub honeypot: &'r str,
+    pub authenticity_token: &'r str,
 }
 
 #[derive(FromForm, Debug)]
@@ -21,6 +22,7 @@ pub struct JoinPublicCommunity<'r> {
     pub community_id: i64,
     #[field(validate = validate_honeypot())]
     pub honeypot: &'r str,
+    pub authenticity_token: &'r str,
 }
 
 #[derive(FromForm, Debug)]
@@ -30,6 +32,7 @@ pub struct JoinPrivateCommunity<'r> {
     pub community_id: i64,
     #[field(validate = validate_honeypot())]
     pub honeypot: &'r str,
+    pub authenticity_token: &'r str,
 }
 
 #[derive(FromForm, Debug)]
@@ -47,6 +50,13 @@ pub struct EditDisplayName<'r> {
 
 #[derive(FromForm, Debug)]
 pub struct RequestDeletion<'r> {
+    #[field(validate = validate_positive_integer())]
+    pub community_id: i64,
+    pub authenticity_token: &'r str,
+}
+
+#[derive(FromForm, Debug)]
+pub struct LeaveCommunity<'r> {
     #[field(validate = validate_positive_integer())]
     pub community_id: i64,
     pub authenticity_token: &'r str,

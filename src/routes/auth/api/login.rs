@@ -3,6 +3,7 @@ use rocket::form::{Errors, Form};
 use rocket::http::{CookieJar, Status};
 use rocket::response::Redirect;
 use rocket::{post, State};
+use rocket_csrf_token::CsrfToken;
 use rocket_db_pools::Connection;
 use rocket_dyn_templates::{context, Template};
 
@@ -21,13 +22,12 @@ use crate::routes::discover;
 #[post("/login")]
 pub fn logged_in(_user: UserJWT, is_htmx: IsHTMX) -> ApiResponse {
     match is_htmx {
-        IsHTMX(true) => ApiResponse::HtmxRedirect(HtmxRedirect::to(discover_uri!(discover::discover_page(
-            Some(true),
-            _
-        )))),
-        IsHTMX(false) => {
-            ApiResponse::Redirect(Redirect::to(discover_uri!(discover::discover_page(Some(true), _))))
-        }
+        IsHTMX(true) => ApiResponse::HtmxRedirect(HtmxRedirect::to(discover_uri!(
+            discover::discover_page(Some(true), _)
+        ))),
+        IsHTMX(false) => ApiResponse::Redirect(Redirect::to(discover_uri!(
+            discover::discover_page(Some(true), _)
+        ))),
     }
 }
 
@@ -36,11 +36,14 @@ pub async fn post<'r>(
     mut db: Connection<DbConn>,
     cookie_jar: &CookieJar<'r>,
     rate_limiter: &State<RateLimiter>,
-    login_data: Result<Form<LoginFormData>, Errors<'r>>,
+    login_data: Result<Form<LoginFormData<'r>>, Errors<'r>>,
+    csrf_token: CsrfToken
 ) -> Result<ApiResponse, ApiResponse> {
     rate_limiter.add_to_limit_or_return()?;
 
     let login_data = extract_data_or_return_response(login_data, "partials/auth/login_error")?;
+
+    csrf_token.verify(&login_data.authenticity_token.to_string())?;
 
     if let Some(password_struct) =
         UserCredentials::get_password_hash_by_name(&mut db, &login_data.display_name).await?

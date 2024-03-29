@@ -7,10 +7,10 @@
 <aside id="community-header" hx-swap-oob="true">
 </aside>
 <h1>{{metadata.title}}</h1>
-<p>Community not found. Perhaps it has been deleted?</p>
+<p>{{message}}</p>
 {{else}}
 {{#> layouts/community}}
 <h1>{{metadata.title}}</h1>
-<p>Community not found. Perhaps it has been deleted?</p>
+<p>{{message}}</p>
 {{/layouts/community}}
 {{/if}}

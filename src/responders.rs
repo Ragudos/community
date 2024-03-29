@@ -5,7 +5,7 @@ use rocket_dyn_templates::{context, Template};
 
 use crate::controllers::htmx::redirect::HtmxRedirect;
 use crate::controllers::htmx::refresh::HtmxRefresh;
-use crate::models::{Toast, ToastTypes};
+use crate::models::Toast;
 
 #[derive(Debug)]
 pub enum HeaderCount {
@@ -33,10 +33,7 @@ impl From<VerificationFailure> for ApiResponse {
             template: Some(Template::render(
                 "partials/toast",
                 context! {
-                    toast: Toast {
-                        message: "You are no longer permitted to perform this action. Please try refreshing the page.".to_string(),
-                        r#type: Some(ToastTypes::Error),
-                    }
+                    toast: Toast::error(Some("You are no longer permitted to perform this action. Please try refreshing the page.".to_string()))
                 },
             )),
             headers: None,

@@ -20,6 +20,11 @@
 {{/unless}}
 <meta property="og:site_name" content="{{ metadata.site_name }}" />
 <meta name="environment" content="{{ metadata.env }}" />
+{{#if user}}
+<meta name="is_logged_in" content="true" />
+{{else}}
+<meta name="is_logged_in" content="fase" />
+{{/if}}
 <link rel="preload" href="/build/styles/fonts.min.css" as="style" />
 <link rel="stylesheet" href="/build/styles/fonts.min.css" />
 <link rel="preload" href="/build/styles/resets.min.css" as="style" />
@@ -30,7 +35,6 @@
 <script src="/assets/scripts/htmx-head.min.js"></script>
 <script src="/assets/scripts/htmx-loading.min.js"></script>
 <script src="/assets/scripts/htmx-response-target.min.js"></script>
-<script src="/assets/scripts/htmx-remove-me.min.js"></script>
 <script src="/build/index.min.js" type="module"></script>
 <style>
     [data-loading] {
@@ -41,6 +45,95 @@
         display: none !important
     }
 </style>
+<script>
+    function removeElement(element) {
+        element.remove();
+    }
+
+    const toast_timers = [];
+
+    function removeToaster(el) {
+        const toaster = el.closest(".toaster");
+        const toastContainer = document.getElementById("toast-container");
+        const index = Array.prototype.indexOf.call(toastContainer.children, toaster);
+
+        if (index > -1) {
+            const timeout = toast_timers[index];
+            clearTimeout(timeout);
+            toast_timers.splice(index, 1);
+        }
+        toaster.remove();
+    }
+    function maybeRemoveMe(elt) {
+        const timing = elt.getAttribute("remove-me") || elt.getAttribute("data-remove-me");
+        if (timing) {
+            const timeout =  setTimeout(() => {
+                elt.parentElement.removeChild(elt);
+            }, htmx.parseInterval(timing));
+
+            if (elt.classList.contains("toaster")) {
+                toast_timers.push(
+                    timeout
+                )
+            }
+        }
+    }
+    window.htmx.defineExtension("remove-me", {
+        onEvent: function (name, evt) {
+            if (name != "htmx:afterProcessNode") {
+                return;
+            }
+
+            const elt = evt.detail.elt;
+
+            if (elt.getAttribute) {
+                maybeRemoveMe(elt);
+
+                if (elt.querySelectorAll) {
+                    const children = elt.querySelectorAll("[remove-me], [data-remove-me]");
+                    for (let idx = 0; idx < children.length; ++idx) {
+                        maybeRemoveMe(children[idx]);
+                    }
+                }
+            }
+        }
+    })
+</script>
+<script>
+    const isLoggedIn = document.querySelector('meta[name="is_logged_in"]').getAttribute("content") === "true";
+    let retryCount = 0;
+    const maxRetryCount = 3;
+    if (isLoggedIn) {
+        startNotifSSE();
+    }
+
+    function startNotifSSE() {
+        let evs = new EventSource("/notifications");
+
+        evs.addEventListener("open", () => {
+            console.log("%cInitialized connection to notifications. Waiting for data...", "color: lightblue; font-size: 14px;");
+        });
+
+        evs.addEventListener("message", (evt) => {
+            console.log(evt);
+        });
+
+        evs.addEventListener("close", () => {
+            console.log("%cConnection to notifications closed.", "color: red; font-size: 14px;");
+            evs.close();
+            
+            if (retryCount >= maxRetryCount) {
+                console.log("%cMax retry count reached. Stopping connection to notifications.", "color: red; font-size: 14px;");
+            } else {
+                console.log("%cRetrying connection to notifications...", "color: lightblue; font-size: 14px;");
+                setTimeout(() => {
+                    startNotifSSE();
+                    retryCount++;
+                }, 1000);
+            }
+        });
+    }
+</script>
 {{#unless (eq (len stylesheets) 0)}}
 {{#each stylesheets as |stylesheet|}}
 <link rel="stylesheet" href="{{stylesheet}}">

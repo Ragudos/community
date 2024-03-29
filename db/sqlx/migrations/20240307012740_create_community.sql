@@ -23,12 +23,18 @@ CREATE TABLE IF NOT EXISTS community_memberships (
 );
 
 -- For private communities
+-- This should be a separate table because it's a many-to-many relationship
+-- between users and communities.
+-- This table is used to store join requests
+-- This should be deleted if a community becomes public
 CREATE TABLE IF NOT EXISTS community_join_requests (
+    _id BIGSERIAL,
     _community_id BIGINT NOT NULL,
     _user_id BIGINT NOT NULL,
     _created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     reason VARCHAR(255) NOT NULL,
-    PRIMARY KEY (_community_id, _user_id),
+    status RequestStatus NOT NULL DEFAULT 'pending',
+    PRIMARY KEY (_community_id, _user_id, _id),
     FOREIGN KEY (_community_id) REFERENCES communities(_id) ON DELETE CASCADE,
     FOREIGN KEY (_user_id) REFERENCES users(_id) ON DELETE CASCADE
 );
@@ -44,6 +50,8 @@ CREATE TABLE IF NOT EXISTS community_posts (
 CREATE INDEX IF NOT EXISTS idx_community_posts ON community_posts(_community_id, _post_id);
 CREATE INDEX IF NOT EXISTS idx_community_join_requests ON community_join_requests(_community_id, _user_id);
 CREATE INDEX IF NOT EXISTS idx_community_join_requests_created_at ON community_join_requests(_created_at);
+CREATE INDEX IF NOT EXISTS idx_community_join_requests_id ON community_join_requests(_id);
+CREATE INDEX IF NOT EXISTS idx_community_join_requests_status ON community_join_requests(status);
 
 CREATE INDEX IF NOT EXISTS idx_community_memberships ON community_memberships(_community_id, _user_id);
 CREATE INDEX IF NOT EXISTS idx_community_memberships_role ON community_memberships(role);

@@ -2,6 +2,7 @@ use rocket::form::{Errors, Form};
 use rocket::http::Status;
 use rocket::post;
 use rocket::response::Redirect;
+use rocket_csrf_token::CsrfToken;
 use rocket_db_pools::Connection;
 use rocket_dyn_templates::{context, Template};
 use sqlx::Acquire;
@@ -22,17 +23,36 @@ pub async fn public_join_post<'r>(
     mut db: Connection<DbConn>,
     user: UserJWT,
     form: Result<Form<JoinPublicCommunity<'r>>, Errors<'r>>,
+    csrf_token: CsrfToken,
 ) -> Result<ApiResponse, ApiResponse> {
     let form = extract_data_or_return_response(form, "partials/community/join/public_error")?;
 
-    if Community::is_private(&mut db, &form.community_id).await? {
+    csrf_token.verify(&form.authenticity_token.to_string())?;
+
+    if let Some(is_private) = Community::is_private(&mut db, &form.community_id).await? {
+        if is_private {
+            return Err(ApiResponse::Render {
+                status: Status::Forbidden,
+                template: Some(Template::render(
+                    "partials/toast",
+                    context! {
+                        toast: Toast {
+                            message: "This community has been made private. Please try refreshing the page and try again.".to_string(),
+                            r#type: Some(ToastTypes::Error)
+                        }
+                    },
+                )),
+                headers: None,
+            });
+        }
+    } else {
         return Err(ApiResponse::Render {
-            status: Status::Forbidden,
+            status: Status::NotFound,
             template: Some(Template::render(
                 "partials/toast",
                 context! {
                     toast: Toast {
-                        message: "This community has been made private. Please try refreshing the page and try again.".to_string(),
+                        message: "This community does not exist.".to_string(),
                         r#type: Some(ToastTypes::Error)
                     }
                 },
@@ -47,10 +67,7 @@ pub async fn public_join_post<'r>(
             template: Some(Template::render(
                 "partials/toast",
                 context! {
-                    toast: Toast {
-                        message: "You are already a member of this community.".to_string(),
-                        r#type: Some(ToastTypes::Error)
-                    }
+                    toast: Toast::error(Some( "You are already a member of this community.".to_string(),))
                 },
             )),
             headers: None,

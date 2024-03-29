@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS follow_requests (
     _follower_id BIGINT NOT NULL,
     _followee_id BIGINT NOT NULL,
     _created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    status RequestStatus NOT NULL DEFAULT 'pending',
     PRIMARY KEY (_follower_id, _followee_id),
     FOREIGN KEY (_follower_id) REFERENCES users(_id) ON DELETE CASCADE,
     FOREIGN KEY (_followee_id) REFERENCES users(_id) ON DELETE CASCADE

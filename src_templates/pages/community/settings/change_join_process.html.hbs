@@ -29,15 +29,18 @@
                 {{/if}}
             </div>
         </div>
-        <form hx-target="#form-container" style="gap: 1rem;" data-loading-aria-busy data-loading-delay="250"
+        <form hx-target="#form-container" style="gap: 1rem;" hx-sync="#submit-form, a" data-loading-aria-busy data-loading-delay="250"
             hx-confirm="Are you absolutely sure?" hx-target-error="#nothing" hx-put="/community/api/change-join-process"
-            class="auth-form" method="POST" action="/community/api/change-join-process">
-            <label for="password">Confirm with your password</label>
-            <input type="hidden" name="authenticity_token" value="{{authenticity_token}}" />
+            class="auth-form" method="POST" action="/community/api/change-join-process" id="submit-form" hx-headers="{"Toaster": "true"}">
+            <input type="hidden" readonly name="authenticity_token" value="{{authenticity_token}}" />
             <input type="text" name="honeypot" hidden value="" />
-            <input data-loading-disable spellcheck="false" autocomplete="current-password" autocapitalize="off"
-                type="password" id="password" name="user_password" placeholder="********" required maxlength="60"
-                minlength="8" />
+            <div class="input-group">
+                <label for="password">Confirm with your password</label>
+                <input data-loading-disable spellcheck="false" autocomplete="current-password" autocapitalize="off"
+                    type="password" id="password" name="user_password" placeholder="********" required maxlength="60"
+                    minlength="8" />
+                <span id="user-password-error"></span>
+            </div>
             <div style="display: flex; flex-direction: column; gap: 0.5rem">
                 <button data-loading-disable type="button" class="btn" style="width: 100%"
                     onclick="window.location.reload()">

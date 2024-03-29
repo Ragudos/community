@@ -12,6 +12,18 @@
 
     background-color: hsl(var(--lighter-background) / var(--_background, 1));
     border-bottom: 1px solid hsl(var(--border) / var(--_border-opacity, 1));
+
+    .dropdown summary { 
+        width: 2rem;
+        height: 2rem;
+
+        border: 1px solid hsl(var(--border) / var(--_border-opacity, 0.675));
+        @include layered-shadow(hsl(var(--border) / 0.075), 2);
+
+        &:hover {
+            background-color: hsl(var(--muted) / 0.075);
+        }
+    }
 }
 
 .header > * {

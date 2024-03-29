@@ -98,4 +98,18 @@ BEGIN
             'group'
         );
     END IF;
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_type
+        WHERE typname = 'requeststatus'
+        AND typnamespace = (
+            SELECT oid FROM pg_namespace
+            WHERE nspname = 'public'
+        )
+    ) THEN
+        CREATE TYPE RequestStatus AS ENUM (
+            'pending',
+            'accepted',
+            'rejected'
+        );
+    END IF;
 END $$;

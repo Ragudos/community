@@ -4,7 +4,6 @@
 /// its relevant data one-by-one using a CRON job
 /// to avoid overloading the server since we need to
 /// images, videos, etc.
-
 use rocket::delete;
 use rocket::form::{Errors, Form};
 use rocket::http::{CookieJar, Status};
@@ -14,12 +13,12 @@ use rocket_dyn_templates::{context, Template};
 use sqlx::Acquire;
 
 use crate::controllers::errors::{extract_data_or_return_response, ValidationError};
+use crate::helpers::db::DbConn;
 use crate::models::community::forms::DeleteCommunity;
 use crate::models::community::schema::Community;
 use crate::models::users::schema::{UserCredentials, UserJWT};
 use crate::models::Toast;
 use crate::responders::ApiResponse;
-use crate::helpers::db::DbConn;
 use crate::routes::community::delete_community::RequestDeletionJWT;
 
 #[delete("/delete-community", data = "<form>")]
@@ -34,7 +33,10 @@ pub async fn delete_community_endpoint<'r>(
     let delete_jwt = delete_jwt.map_err(|_| {
         return ApiResponse::Status(Status::Forbidden);
     })?;
-    let form = extract_data_or_return_response(form, "partials/community/settings/delete_community_error")?;
+    let form = extract_data_or_return_response(
+        form,
+        "partials/community/settings/delete_community_error",
+    )?;
 
     csrf_token.verify(&form.authenticity_token.to_string())?;
 
@@ -51,7 +53,8 @@ pub async fn delete_community_endpoint<'r>(
         return Ok(ApiResponse::Status(Status::Forbidden));
     }
 
-    let Some(password_struct) = UserCredentials::get_password_hash(&mut db, &user._id).await? else {
+    let Some(password_struct) = UserCredentials::get_password_hash(&mut db, &user._id).await?
+    else {
         return Ok(ApiResponse::Status(Status::InternalServerError));
     };
 
@@ -59,34 +62,32 @@ pub async fn delete_community_endpoint<'r>(
         // We remove the jwt cookie to not let anyone brute force the password.
         // This will make it more cumbersome to troll the community owner if a person
         // gets access to their logged in device.
-        
+
         cookie_jar.remove_private(delete_jwt.to_cookie()?);
 
         return Ok(ApiResponse::Render {
             status: Status::UnprocessableEntity,
-            template: Some(
-                Template::render(
-                    "partials/community/settings/delete_community_error",
-                    context! {
-                        errors: vec![
-                            ValidationError {
-                                field: Some("user_password".to_string()),
-                                message: "The password you entered is incorrect.".to_string(),
-                            },
-                        ],
-                        toast: Toast::warning("We revoked your access to this page to prevent brute-force attacks. Please try again by going back to settings.".to_string()),
-                        should_refresh: true
-                    }
-                )
-            ),
-            headers: None
+            template: Some(Template::render(
+                "partials/community/settings/delete_community_error",
+                context! {
+                    errors: vec![
+                        ValidationError {
+                            field: Some("user_password".to_string()),
+                            message: "The password you entered is incorrect.".to_string(),
+                        },
+                    ],
+                    toast: Toast::warning("We revoked your access to this page to prevent brute-force attacks. Please try again by going back to settings.".to_string()),
+                    should_refresh: true
+                },
+            )),
+            headers: None,
         });
     }
 
     let Some(community_name) = Community::get_name(&mut db, &delete_jwt.community_id).await? else {
         return Ok(ApiResponse::Status(Status::InternalServerError));
     };
-    
+
     let mut tx = db.begin().await?;
 
     // For now, we just remove it for good from the database since
@@ -97,15 +98,13 @@ pub async fn delete_community_endpoint<'r>(
 
     Ok(ApiResponse::Render {
         status: Status::Ok,
-        template: Some(
-            Template::render(
-                "partials/community/settings/delete_community_success",
-                context! {
-                    community_name
-                }
-            )
-        ),
-        headers: None
+        template: Some(Template::render(
+            "partials/community/settings/delete_community_success",
+            context! {
+                community_name
+            },
+        )),
+        headers: None,
     })
 }
 

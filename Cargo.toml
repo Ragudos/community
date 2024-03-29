@@ -8,14 +8,13 @@ edition = "2021"
 
 [dependencies]
 bcrypt = "0.15.0"
-rocket = { version = "0.5.0", features = ["secrets"] }
+rocket = { version = "0.5.0", features = ["secrets", "json"] }
 rocket_dyn_templates = { version = "0.1.0", features = ["handlebars"] }
 rocket_db_pools = { version = "0.1.0", features = ["sqlx_postgres"] }
 sqlx = { version = "0.7.3", features = ["macros", "migrate", "time", "bigdecimal"] }
 serde = "1.0.197"
 time = { version = "0.3.34", features = ["serde"] }
 serde_json = "1.0.114"
-random-string = "1.1.0"
-dotenv = "0.15.0"
 rocket_async_compression = "0.5.1"
 rocket_csrf_token = "0.3.5"
+dotenv = "0.15.0"

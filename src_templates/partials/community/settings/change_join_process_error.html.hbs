@@ -1,5 +1,22 @@
 {{#each errors}}
-{{#if user_password}}
-    {{user_password.message}}
+{{#if (eq field "user_password")}}
+    <span data-loading-class-remove="errored" class="error errored" id="user-password-error" hx-swap-oob="true">
+        <small data-loading-class="hidden">{{message}}</small>
+    </span>
+{{/if}}
+{{#if (eq field "honeypot")}}
+    {{> partials/toast type="error" message=message}}
 {{/if}}
 {{/each}}
+{{#if toast}}
+    {{> partials/toast}}
+{{/if}}
+{{#if should_refresh}}
+    <div id="refresh-time-to-reload">
+        {{time_to_reload}}
+    </div>
+    <script>
+        let time_to_reload = parseInt(document.getElementById("refresh-time-to-reload").textContent) * 1000;
+        setTimeout(() => window.location.reload(), time_to_reload);
+    </script>
+{{/if}}

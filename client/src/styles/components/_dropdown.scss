@@ -34,6 +34,10 @@
 
     @include layered-shadow(hsl(0 0% 2% / 0.075), 1);
 
+    @include s-mobile {
+        white-space: nowrap;
+    }
+
     &::before {
         content: "";
         position: absolute;
@@ -59,13 +63,13 @@
     }
 }
 
-.user-dropdown {
+.dropdown {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
 
     li {
-        button {
+        button, a {
             min-width: auto;
             min-height: auto;
 

@@ -3,8 +3,52 @@ use sqlx::{Postgres, Transaction};
 
 use crate::helpers::db::DbConn;
 use crate::models::community::schema::CommunityMembership;
+use crate::models::db::enums::UserRole;
 
 impl CommunityMembership {
+    /// BEWARE: This function does not check if the user is a member of the community nor if they are the owner or not.
+    pub async fn change_role_of_user(
+        tx: &mut Transaction<'_, Postgres>,
+        community_id: &i64,
+        user_id: &i64,
+        role: UserRole,
+    ) -> Result<(), sqlx::Error> {
+        sqlx::query!(
+            r#"
+            UPDATE community_memberships
+            SET role = $1
+            WHERE _community_id = $2
+            AND _user_id = $3;
+            "#,
+            role as UserRole,
+            community_id,
+            user_id
+        )
+        .execute(&mut **tx)
+        .await?;
+
+        Ok(())
+    }
+
+    pub async fn remove_user_from_community(
+        tx: &mut Transaction<'_, Postgres>,
+        community_id: &i64,
+        user_id: &i64,
+    ) -> Result<(), sqlx::Error> {
+        sqlx::query!(
+            r#"
+            DELETE FROM community_memberships
+            WHERE _community_id = $1
+            AND _user_id = $2;
+            "#,
+            community_id,
+            user_id
+        )
+        .execute(&mut **tx)
+        .await?;
+
+        Ok(())
+    }
     pub async fn get_total(
         db: &mut Connection<DbConn>,
         id: &i64,
