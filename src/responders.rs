@@ -2,6 +2,7 @@ use rocket::http::{Header, Status};
 use rocket::response::{Redirect, Responder, Response};
 use rocket_csrf_token::VerificationFailure;
 use rocket_dyn_templates::{context, Template};
+use serde::{Deserialize, Serialize};
 
 use crate::controllers::htmx::redirect::HtmxRedirect;
 use crate::controllers::htmx::refresh::HtmxRefresh;
@@ -24,6 +25,7 @@ pub enum ApiResponse {
         template: Option<Template>,
         headers: Option<HeaderCount>,
     },
+    Toast(Status, Toast),
 }
 
 impl From<VerificationFailure> for ApiResponse {
@@ -41,9 +43,27 @@ impl From<VerificationFailure> for ApiResponse {
     }
 }
 
+#[derive(Deserialize, Serialize)]
+struct ToastTrigger {
+    #[serde(rename = "HxEvent:Toast")]
+    toast: Toast,
+}
+
 impl<'a> Responder<'a, 'static> for ApiResponse {
     fn respond_to(self, request: &'a rocket::Request<'_>) -> rocket::response::Result<'static> {
         match self {
+            ApiResponse::Toast(status, toast) => {
+                let trigger_header = ToastTrigger { toast };
+                let response = Response::build()
+                    .status(status)
+                    .header(Header::new(
+                        "HX-Trigger",
+                        serde_json::to_string(&trigger_header).unwrap(),
+                    ))
+                    .ok();
+
+                response
+            }
             ApiResponse::Status(status) => status.respond_to(request),
             ApiResponse::HtmxRedirect(htmx_redirect) => htmx_redirect.respond_to(request),
             ApiResponse::HtmxRefresh(htmx_refresh) => htmx_refresh.respond_to(request),

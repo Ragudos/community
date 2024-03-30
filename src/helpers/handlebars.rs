@@ -7,6 +7,9 @@ use rocket_dyn_templates::{
     Template,
 };
 use serde_json::Value;
+use time::OffsetDateTime;
+
+use crate::controllers::format_time_difference;
 
 handlebars_helper!(num_abbr: |x: isize| {
     if x < 1_000 {
@@ -18,6 +21,9 @@ handlebars_helper!(num_abbr: |x: isize| {
     } else {
         format!("{:.1}b", x as f64 / 1_000_000_000.0)
     }
+});
+handlebars_helper!(format_datetime_difference: |date: OffsetDateTime| {
+    format_time_difference(date)
 });
 handlebars_helper!(is_none: |x: Option<Value>| x.is_none());
 handlebars_helper!(add: |x: i64, y: i64| x + y);
@@ -186,5 +192,9 @@ pub fn register() -> impl Fairing {
         engines
             .handlebars
             .register_helper("is_none", Box::new(is_none));
+        engines.handlebars.register_helper(
+            "format_datetime_difference",
+            Box::new(format_datetime_difference),
+        );
     })
 }

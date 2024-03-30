@@ -9,6 +9,7 @@ use crate::helpers::db::DbConn;
 use crate::models::community::schema::Community;
 use crate::models::seo::metadata::SeoMetadata;
 use crate::models::users::preferences::Theme;
+use crate::models::users::schema::UserJWT;
 use crate::responders::ApiResponse;
 
 create_request_sensitive_action_jwt!(RequestChangeJoinProcessJWT, "/community/");
@@ -16,6 +17,7 @@ create_request_sensitive_action_jwt!(RequestChangeJoinProcessJWT, "/community/")
 #[get("/<community_id>/change-join-process")]
 pub async fn change_join_process_page<'r>(
     mut db: Connection<DbConn>,
+    user: UserJWT,
     cookie_jar: &CookieJar<'r>,
     change_join_process_jwt: Result<RequestChangeJoinProcessJWT, &str>,
     csrf_token: CsrfToken,
@@ -26,7 +28,9 @@ pub async fn change_join_process_page<'r>(
         return ApiResponse::Status(Status::Forbidden);
     })?;
 
-    if change_join_process_jwt.community_id != community_id {
+    if change_join_process_jwt.community_id != community_id
+        || change_join_process_jwt.user_id != user._id
+    {
         return Err(ApiResponse::Status(Status::Forbidden));
     }
 

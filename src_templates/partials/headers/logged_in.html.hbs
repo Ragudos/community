@@ -2,9 +2,10 @@
     <div class="container">
         <a hx-swap="innerHTML swap:50ms" href="/discover" hx-target-error="main" hx-target="main">COMMUNITY</a>
         <div style="display: flex; align-items: center; gap: 0.5rem;">
-            <details style="display: flex; align-items: center;" class="dropdown">
-                <summary class="circle" aria-label="A menu dropdown for creating stuff">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+            <details class="dropdown" id="create-dropdown-details">
+                <summary aria-label="A menu dropdown for creating stuff">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor" class="w-6 h-6">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                     </svg>
                 </summary>
@@ -12,18 +13,24 @@
                     <div>
                         <ul class="create-stuff-dropdown">
                             <li>
-                                <a href="/create/community" hx-target="main" hx-target-error="main">
+                                <a aria-controls="create-dropdown-details" onclick="closeDropdown(this)"
+                                    href="/create/community" hx-target="main" hx-target-error="main">
                                     <span>Create a community</span>
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
                                     </svg>
                                 </a>
                             </li>
                             <li>
-                                <a href="/create/post" hx-target="main" hx-target-error="main">
+                                <a aria-controls="create-dropdown-details" onclick="closeDropdown(this)"
+                                    href="/create/post" hx-target="main" hx-target-error="main">
                                     <span>Create a post</span>
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
                                     </svg>
                                 </a>
                             </li>
@@ -31,8 +38,42 @@
                     </div>
                 </div>
             </details>
-            <details style="display: flex; align-items: center;" class="dropdown">
-                <summary class="circle" aria-label="A menu dropdown relevant to the user.">
+            <details class="dropdown">
+                <summary aria-label="A menu dropdown for notifications" hx-get="/notifications?isfirst=true"
+                    hx-target="#notifications" hx-trigger="load once">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
+                    </svg>
+                    <div class="notifications-count" id="unread-notifications-count">
+                    </div>
+                </summary>
+                <div class="dropdown-wrapper" id="create-stuff-dropdown">
+                    <div>
+                        <div class="notifications-container">
+                            <div class="notifications-header">
+                                <div class="title-xs">Notifications</div>
+                                <div class="notifications-actions">
+                                    <select name="filter" hx-trigger="change" hx-target="#notifications"
+                                        hx-get="/notifications">
+                                        <option value="all">All</option>
+                                        <option value="unread">Unread</option>
+                                        <option value="read">Read</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <ul class="notifications-content" id="notifications">
+                                <li style="display: flex; justify-content: center;">
+                                    <span class="spinner" data-loading-class="spin"></span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </details>
+            <details class="dropdown" id="user-dropdown-details">
+                <summary aria-label="A menu dropdown relevant to the user.">
                     {{#if user.display_image}}
                     <img src="{{user.display_image}}" alt="{{user.display_name}}'s avatar" width="28" height="28"
                         style="border-radius: 50%;" />
@@ -46,9 +87,11 @@
                         <ul class="user-dropdown">
                             <li>
                                 <form hx-swap="innerHTML swap:250ms" hx-replace-url="/auth/login" hx-target="body"
-                                    hx-target-error="#nothing" data-loading-path="/auth/api/login" data-loading-delay="100"
-                                    hx-delete="/auth/api/logout" hx-trigger="submit" hx-sync="this, a">
-                                    <button data-loading-disable type="submit">
+                                    hx-target-error="#nothing" data-loading-path="/auth/api/login"
+                                    data-loading-delay="100" hx-delete="/auth/api/logout" hx-trigger="submit"
+                                    hx-sync="this, a">
+                                    <button aria-controls="user-dropdown-details" onclick="closeDropdown(this)"
+                                        data-loading-disable type="submit">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                             stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                                             <path stroke-linecap="round" stroke-linejoin="round"

@@ -30,5 +30,5 @@ pub struct LoginFormData<'r> {
     pub password: &'r str,
     #[field(validate = validate_honeypot())]
     pub honeypot: &'r str,
-    pub authenticity_token: &'r str
+    pub authenticity_token: &'r str,
 }

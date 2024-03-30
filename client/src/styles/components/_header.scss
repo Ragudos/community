@@ -13,16 +13,96 @@
     background-color: hsl(var(--lighter-background) / var(--_background, 1));
     border-bottom: 1px solid hsl(var(--border) / var(--_border-opacity, 1));
 
-    .dropdown summary { 
-        width: 2rem;
-        height: 2rem;
+    .dropdown {
+        display: flex;
+        align-items: center;
+    }
+    
+    .dropdown summary {
+        width: 3rem;
+        height: 3rem;
 
-        border: 1px solid hsl(var(--border) / var(--_border-opacity, 0.675));
-        @include layered-shadow(hsl(var(--border) / 0.075), 2);
+        padding: 0.5rem;
+
+        position: relative;
+        min-width: auto;
+        min-height: auto;
+
+        &::before {
+            content: '';
+            position: absolute;
+
+            @include pseudo;
+            inset: 0;
+
+            border-radius: 50%;
+            z-index: 1;
+            pointer-events: none;
+            touch-action: none;
+
+            background-color: hsl(var(--text) / var(--_background-opacity, 0));
+        }
+
+        &:hover::before {
+            --_background-opacity: 0.075;
+        }
+
+        svg {
+            color: hsl(var(--text) / var(--_text-opacity, 0.75));
+        }
 
         &:hover {
-            background-color: hsl(var(--muted) / 0.075);
+            svg {
+                --_text-opacity: 0.875;
+            }
         }
+
+        .notifications-count {
+            position: absolute;
+
+            min-width: 1.25rem;
+            min-height: 1.25rem;
+            
+            aspect-ratio: 1/1;
+
+            display: flex;
+            justify-content: center;
+            -webkit-box-pack: center;
+            align-items: center;
+
+            pointer-events: none;
+            touch-action: none;
+
+            top: 0px;
+            right: -4px;
+
+            z-index: 2;
+            user-select: none;
+        }
+    }
+
+    .dropdown[open] summary {
+        svg {
+            --_text-opacity: 1;
+        }
+
+        &::before {
+            --_background-opacity: 0.075;
+        }
+    }
+
+    .dropdown > *:not(summary) {
+        will-change: opacity, transform;
+        transition-property: opacity, transform;
+        transition-duration: var(--animation-duration, 250ms);
+        transition-timing-function: ease-out;
+        opacity: 0;
+        transform: translateY(-25%);
+    }
+
+    .dropdown[open] > *:not(summary) {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 

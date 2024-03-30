@@ -9,7 +9,7 @@ pub mod query;
 pub mod seo;
 pub mod users;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub enum ToastTypes {
     #[serde(rename = "success")]
     Success,
@@ -21,7 +21,7 @@ pub enum ToastTypes {
     Info,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Toast {
     pub message: String,
     pub r#type: Option<ToastTypes>,

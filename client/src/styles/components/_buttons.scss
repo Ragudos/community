@@ -77,7 +77,7 @@ a,
     }
 
     &:active {
-        transform: scale(0.95);
+        transform: scale(0.9);
     }
 
     &:disabled {
@@ -146,7 +146,8 @@ textarea {
         color: red;
     }
 
-    input, textarea {
+    input,
+    textarea {
         border-color: hsl(var(--destructive) / var(--_destructive-opacity, 1));
 
         &:focus-visible {

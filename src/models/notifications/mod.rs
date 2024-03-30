@@ -12,18 +12,22 @@ use super::db::enums::NotificationType;
 #[serde(crate = "rocket::serde")]
 pub struct RealtimeNotification {
     pub _recipient_id: i64,
+    pub _sender_id: i64,
     pub message: String,
     pub sent_at: String,
+    pub link: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, FromRow, Clone, Debug)]
 pub struct Notification {
     pub _id: i64,
     pub _recipient_id: i64,
+    pub _sender_id: i64,
     pub _created_at: OffsetDateTime,
     pub notification_type: NotificationType,
     pub is_read: Option<bool>,
     pub message: String,
+    pub link: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]

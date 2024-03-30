@@ -22,10 +22,8 @@ pub async fn leave_community_endpoint<'r>(
     form: Result<Form<LeaveCommunity<'r>>, Errors<'r>>,
     csrf_token: CsrfToken,
 ) -> Result<ApiResponse, ApiResponse> {
-    let form = extract_data_or_return_response(
-        form,
-        "partials/community/settings/request_leave_error",
-    )?;
+    let form =
+        extract_data_or_return_response(form, "partials/community/settings/request_leave_error")?;
 
     csrf_token.verify(&form.authenticity_token.to_string())?;
 

@@ -96,8 +96,8 @@ pub async fn private_join_post<'r, 'v>(
         .await?
         .unwrap();
     let message = format!(
-        "{} has requested to join your community <strong>{}</strong>.",
-        user.display_name, community_name
+        "{} has requested to join your community {}: \n{}",
+        user.display_name, community_name, form.reason
     );
     let owner_id = Community::get_owner_id(&mut db, &form.community_id).await?;
     let does_owner_want_notifications =
@@ -111,13 +111,18 @@ pub async fn private_join_post<'r, 'v>(
 
     let join_request_id =
         CommunityJoinRequest::create(&mut tx, &form.community_id, &user._id, &message).await?;
+    let link = format!("/community/{}/community_join_requests/{}", form.community_id, join_request_id);
 
+    // True for now, we havent implemented the user preferences
+    // yet.
     if true {
         let notification = Notification::create(
             &mut tx,
             &owner_id,
+            &user._id,
             NotificationType::CommunityEntrance,
             &message,
+            Some(&link)
         )
         .await?;
 
@@ -127,11 +132,12 @@ pub async fn private_join_post<'r, 'v>(
         // We dont need to handle the error if no one is online to receive it.
         // If the owner is offline, they can simple receive this notif once it loads
         // when they turn online.
-        println!("Sending notification to owner: {}", owner_id);
         let _ = realtime_notification.send(RealtimeNotification {
-            _recipient_id: owner_id,
-            message,
+            _recipient_id: notification._recipient_id,
+            _sender_id: notification._sender_id,
+            message: notification.message,
             sent_at: stringified_time_difference,
+            link: notification.link,
         });
     } else {
         tx.commit().await?;

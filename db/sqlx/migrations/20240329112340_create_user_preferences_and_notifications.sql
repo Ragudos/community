@@ -33,10 +33,13 @@ CREATE TABLE IF NOT EXISTS user_notification_preferences (
 CREATE TABLE IF NOT EXISTS notifications (
     _id BIGSERIAL PRIMARY KEY,
     _recipient_id BIGINT NOT NULL,
+    _sender_id BIGINT NOT NULL,
     _created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     notification_type NotificationType NOT NULL,
     is_read BOOLEAN NOT NULL DEFAULT FALSE,
+    link TEXT,
     message TEXT NOT NULL,
+    FOREIGN KEY (_sender_id) REFERENCES users(_id) ON DELETE CASCADE,
     FOREIGN KEY (_recipient_id) REFERENCES users(_id) ON DELETE CASCADE
 );
 

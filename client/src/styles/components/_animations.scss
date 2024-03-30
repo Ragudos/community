@@ -10,6 +10,44 @@
     animation: fade-in var(--transition-duration, 250ms) ease-out forwards;
 }
 
+.slide-down {
+    animation: slide-down var(--transition-duration, 250ms) ease-out forwards;
+}
+
+.slide-down-reverse {
+    animation: slide-down var(--transition-duration, 250ms) ease-out forwards reverse;
+}
+
+.slide-up {
+    animation: slide-up var(--transition-duration, 250ms) ease-out forwards;
+}
+
+.slide-up-reverse {
+    animation: slide-up var(--transition-duration, 250ms) ease-out forwards reverse;
+}
+
+@keyframes slide-up {
+    from {
+        transform: translateY(25%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slide-down {
+    from {
+        transform: translateY(-25%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
 @keyframes fade-in {
     from {
         opacity: var(--_max-opacity, 0);

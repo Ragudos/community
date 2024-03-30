@@ -15,6 +15,7 @@
 
     .toaster {
         padding: 1rem;
+        font-size: 0.875rem;
 
         border: 1px solid;
 
@@ -29,7 +30,7 @@
 
         border-radius: $radius;
         border-color: hsl(var(--border) / var(--_border-opacity, 0.5));
-        
+
         position: relative;
 
         --_background: hsl(
@@ -45,7 +46,7 @@
             position: absolute;
 
             inset: 0;
-            
+
             border-radius: inherit;
 
             background-color: var(--_background);
@@ -70,9 +71,7 @@
     }
 
     .toaster[data-type="warning"] {
-        --_background: hsl(
-            var(--warning) / var(--_background-opacity, 0.5)
-        );
+        --_background: hsl(var(--warning) / var(--_background-opacity, 0.5));
         color: hsl(var(--warning-foreground));
         @include layered-shadow(hsl(var(--warning), 0.075), 2);
     }

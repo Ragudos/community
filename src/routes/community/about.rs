@@ -37,7 +37,9 @@ pub async fn about_community_page<'r>(
 
     match community_about {
         Some(community) => {
-            let did_user_request_to_join = CommunityJoinRequest::did_user_request_to_join(&mut db, &community_id, &user._id).await?;
+            let did_user_request_to_join =
+                CommunityJoinRequest::did_user_request_to_join(&mut db, &community_id, &user._id)
+                    .await?;
             let display_name = community.display_name.clone();
             let metadata = SeoMetadata::build()
                 .theme(theme)
@@ -55,6 +57,6 @@ pub async fn about_community_page<'r>(
                 headers: Some(HeaderCount::Many(vec![headers, headers2])),
             })
         }
-        None => Err(ApiResponse::Status(Status::Unauthorized))
+        None => Err(ApiResponse::Status(Status::Unauthorized)),
     }
 }

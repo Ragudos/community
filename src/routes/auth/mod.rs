@@ -10,9 +10,9 @@ use crate::routes::discover;
 use crate::{auth_uri, discover_uri};
 
 pub mod api;
+pub mod catchers;
 pub mod login;
 pub mod register;
-pub mod catchers;
 
 #[get("/")]
 pub fn logged_in(_user: UserJWT, is_boosted: IsBoosted) -> ApiResponse {

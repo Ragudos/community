@@ -11,7 +11,11 @@ use crate::models::users::preferences::Theme;
 use crate::responders::ApiResponse;
 
 #[get("/register", rank = 2)]
-pub fn register_page<'r>(cookie_jar: &CookieJar<'r>, is_boosted: IsBoosted, csrf_token: CsrfToken) -> Result<ApiResponse, ApiResponse> {
+pub fn register_page<'r>(
+    cookie_jar: &CookieJar<'r>,
+    is_boosted: IsBoosted,
+    csrf_token: CsrfToken,
+) -> Result<ApiResponse, ApiResponse> {
     let IsBoosted(is_boosted) = is_boosted;
     let theme = Theme::from_cookie_jar(cookie_jar);
     let metadata = SeoMetadata::build()
@@ -25,9 +29,10 @@ pub fn register_page<'r>(cookie_jar: &CookieJar<'r>, is_boosted: IsBoosted, csrf
 
     Ok(ApiResponse::Render {
         status: Status::Ok,
-        template: Some(
-            Template::render("pages/auth/register", context! { metadata, is_boosted, authenticity_token })
-        ),
-        headers: None
+        template: Some(Template::render(
+            "pages/auth/register",
+            context! { metadata, is_boosted, authenticity_token },
+        )),
+        headers: None,
     })
 }

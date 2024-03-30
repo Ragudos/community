@@ -3,6 +3,7 @@ use std::sync::RwLock;
 
 use controllers::rate_limiter::RateLimiter;
 use models::notifications::RealtimeNotification;
+use responders::ApiResponse;
 use rocket;
 use rocket::figment::value::{Map, Value};
 use rocket::figment::{Figment, Profile, Provider};
@@ -13,27 +14,38 @@ use rocket::{catchers as rocket_catchers, routes as rocket_routes};
 use rocket_csrf_token::{CsrfConfig, Fairing};
 use time::OffsetDateTime;
 
+use crate::catchers as main_catchers;
 use crate::env::{Env, Environment};
 use crate::helpers::db;
 use crate::helpers::get_environment;
 use crate::helpers::handlebars;
-use crate::routes::community::catchers as community_catchers;
-use crate::routes::auth::catchers as auth_catchers;
-use crate::catchers as main_catchers;
 use crate::routes::auth::api::catchers as auth_api_catchers;
+use crate::routes::auth::catchers as auth_catchers;
+use crate::routes::community::catchers as community_catchers;
+use crate::routes::notifications::catchers as notifications_catchers;
 
 pub mod catchers;
 pub mod controllers;
+pub mod csp;
 pub mod env;
 pub mod helpers;
 pub mod models;
 pub mod responders;
 pub mod routes;
 
+#[rocket::get("/test")]
+pub fn test_toast() -> ApiResponse {
+    ApiResponse::Toast(
+        rocket::http::Status::Ok,
+        crate::models::Toast::success(Some("This is a test".to_string())),
+    )
+}
+
 pub fn rocket_from_config(figment: Figment) -> Rocket<Build> {
     let rate_limiter = get_rate_limiter(&figment);
-    let rocket = rocket::custom(figment).manage(rate_limiter)
-        .mount("/", rocket_routes![ routes::page ]);
+    let rocket = rocket::custom(figment)
+        .manage(rate_limiter)
+        .mount("/", rocket_routes![routes::page, test_toast]);
     let rocket = attach_env(rocket);
     let rocket = attach_fairings(rocket);
     let rocket = register_catchers(rocket);
@@ -46,13 +58,18 @@ pub fn rocket_from_config(figment: Figment) -> Rocket<Build> {
     let rocket = attach_user_routes(rocket);
     let rocket = attach_post_routes(rocket);
     let rocket = attact_notification_routes(rocket);
-        
+
     rocket
 }
 
 fn attact_notification_routes(rocket: Rocket<Build>) -> Rocket<Build> {
-    rocket
-        .mount("/notifications", rocket_routes! [routes::notifications::main_notifications, routes::notifications::main_notifications_unauthorized])
+    rocket.mount(
+        "/notifications",
+        rocket_routes![
+            routes::notifications::sse_notifications,
+            routes::notifications::notifications
+        ],
+    )
 }
 
 fn attach_post_routes(rocket: Rocket<Build>) -> Rocket<Build> {
@@ -81,8 +98,7 @@ fn attach_user_routes(rocket: Rocket<Build>) -> Rocket<Build> {
         .mount(
             "/user/api",
             rocket_routes![
-                routes::user::api::malformed_uri_or_logged_out,
-                routes::user::api::img_name::get
+                routes::user::api::img::user_img_endpoint
             ],
         )
 }
@@ -95,7 +111,10 @@ fn attach_create_routes(rocket: Rocket<Build>) -> Rocket<Build> {
         )
         .mount(
             "/create/api",
-            rocket_routes![routes::create::api::community::create_community_endpoint, routes::create::api::community::create_community_unauthorized],
+            rocket_routes![
+                routes::create::api::community::create_community_endpoint,
+                routes::create::api::community::create_community_unauthorized
+            ],
         )
 }
 
@@ -103,7 +122,10 @@ fn attach_discover_routes(rocket: Rocket<Build>) -> Rocket<Build> {
     rocket
         .mount(
             "/discover",
-            rocket_routes![routes::discover::discover_page, routes::discover::unauthorized_discover],
+            rocket_routes![
+                routes::discover::discover_page,
+                routes::discover::unauthorized_discover
+            ],
         )
         .mount(
             "/discover/api",
@@ -188,48 +210,49 @@ fn attach_global_state(rocket: Rocket<Build>) -> Rocket<Build> {
 }
 
 fn attach_static_files(rocket: Rocket<Build>) -> Rocket<Build> {
-    rocket.mount("/build", FileServer::from("build"))
+    rocket
+        .mount("/build", FileServer::from("build"))
         .mount("/assets", FileServer::from("assets"))
 }
 
 fn register_catchers(rocket: Rocket<Build>) -> Rocket<Build> {
     rocket
-        .register(
-            "/",
-            rocket_catchers! [
-                main_catchers::unauthorized_catcher
-            ]
-        )
+        .register("/", rocket_catchers![main_catchers::unauthorized_catcher])
         .register(
             "/community",
-            rocket_catchers! [
+            rocket_catchers![
                 community_catchers::community_page_not_found_get,
                 community_catchers::community_page_unauthorized_get,
-                community_catchers::community_page_internal_server_error_get
-            ]
+                community_catchers::community_page_internal_server_error_get,
+                community_catchers::community_page_forbidden_get
+            ],
         )
         .register(
             "/auth",
-            rocket_catchers! [
+            rocket_catchers![
                 auth_catchers::auth_internal_server_error_get,
                 auth_catchers::auth_api_forbidden
-            ]
+            ],
         )
         .register(
             "/auth/api",
-            rocket_catchers! [
+            rocket_catchers![
                 auth_api_catchers::auth_api_internal_server_error,
                 auth_api_catchers::forbidden_auth_api
-            ]
+            ],
+        )
+        .register(
+            "/notifications",
+            rocket_catchers![notifications_catchers::unauthorized_notifications],
         )
 }
 
 fn attach_fairings(rocket: Rocket<Build>) -> Rocket<Build> {
-     rocket
+    rocket
         .attach(Fairing::new(
-        CsrfConfig::default()
-            .with_cookie_len(32)
-            .with_cookie_name("CSRF-TOKEN"),
+            CsrfConfig::default()
+                .with_cookie_len(32)
+                .with_cookie_name("CSRF-TOKEN"),
         ))
         .attach(db::stage())
         .attach(handlebars::register())
@@ -253,7 +276,7 @@ fn get_rate_limiter(figment: &Figment) -> RateLimiter {
         did_time_accumulator_start: AtomicBool::new(false),
         requests: AtomicU32::new(0),
     };
-    
+
     rate_limiter
 }
 

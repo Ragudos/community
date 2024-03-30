@@ -1,9 +1,9 @@
 use rocket::get;
 use rocket::http::CookieJar;
 use rocket::http::Status;
+use rocket_csrf_token::CsrfToken;
 use rocket_dyn_templates::context;
 use rocket_dyn_templates::Template;
-use rocket_csrf_token::CsrfToken;
 
 use crate::controllers::htmx::IsBoosted;
 use crate::models::seo::metadata::SeoMetadata;
@@ -16,7 +16,7 @@ pub fn community_page<'r>(
     cookie_jar: &CookieJar<'r>,
     user: UserJWT,
     is_boosted: IsBoosted,
-    csrf_token: CsrfToken
+    csrf_token: CsrfToken,
 ) -> Result<ApiResponse, ApiResponse> {
     let IsBoosted(is_boosted) = is_boosted;
     let theme = Theme::from_cookie_jar(cookie_jar);
@@ -27,13 +27,10 @@ pub fn community_page<'r>(
 
     Ok(ApiResponse::Render {
         status: Status::Ok,
-        template: Some(
-            Template::render(
+        template: Some(Template::render(
             "pages/create/community",
-                context! { metadata, user, is_boosted },
-            ),
-        ),
-        headers: None
+            context! { metadata, user, is_boosted },
+        )),
+        headers: None,
     })
 }
-

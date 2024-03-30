@@ -15,7 +15,7 @@ pub fn login_page<'r>(
     cookie_jar: &CookieJar<'r>,
     is_boosted: IsBoosted,
     isredirected: Option<bool>,
-    csrf_token: CsrfToken
+    csrf_token: CsrfToken,
 ) -> Result<ApiResponse, ApiResponse> {
     let IsBoosted(is_boosted) = is_boosted;
     let theme = Theme::from_cookie_jar(cookie_jar);
@@ -30,12 +30,10 @@ pub fn login_page<'r>(
 
     Ok(ApiResponse::Render {
         status: Status::Ok,
-        template: Some(
-            Template::render(
-                "pages/auth/login",
-                context! { metadata, is_boosted, isredirected, authenticity_token },
-            )
-        ),
-        headers: None
+        template: Some(Template::render(
+            "pages/auth/login",
+            context! { metadata, is_boosted, isredirected, authenticity_token },
+        )),
+        headers: None,
     })
 }

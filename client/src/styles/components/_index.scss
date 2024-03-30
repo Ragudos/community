@@ -1,15 +1,3 @@
-.sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border-width: 0;
-}
-
 @import "./main";
 @import "./fonts";
 @import "./layouts";
@@ -22,6 +10,7 @@
 @import "./toast";
 @import "./animations";
 @import "./form";
+@import "./notifications";
 @import "./discover";
 @import "./about_community";
 @import "./settings_community";

@@ -149,24 +149,6 @@ impl Community {
         Ok(t.is_private)
     }
 
-    pub async fn soft_delete(
-        tx: &mut Transaction<'_, Postgres>,
-        community_id: &i64,
-    ) -> Result<(), sqlx::Error> {
-        sqlx::query!(
-            r#"
-                UPDATE communities
-                SET is_deleted = true
-                WHERE _id = $1
-                "#,
-            community_id
-        )
-        .execute(&mut **tx)
-        .await?;
-
-        Ok(())
-    }
-
     /// Hard deletes a community from the database.
     pub async fn delete(
         tx: &mut Transaction<'_, Postgres>,

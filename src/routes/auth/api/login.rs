@@ -37,7 +37,7 @@ pub async fn post<'r>(
     cookie_jar: &CookieJar<'r>,
     rate_limiter: &State<RateLimiter>,
     login_data: Result<Form<LoginFormData<'r>>, Errors<'r>>,
-    csrf_token: CsrfToken
+    csrf_token: CsrfToken,
 ) -> Result<ApiResponse, ApiResponse> {
     rate_limiter.add_to_limit_or_return()?;
 

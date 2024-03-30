@@ -4,12 +4,13 @@ use rocket_csrf_token::CsrfToken;
 use rocket_db_pools::Connection;
 use rocket_dyn_templates::{context, Template};
 
+use crate::create_request_sensitive_action_jwt;
 use crate::helpers::db::DbConn;
 use crate::models::community::schema::Community;
 use crate::models::seo::metadata::SeoMetadata;
 use crate::models::users::preferences::Theme;
+use crate::models::users::schema::UserJWT;
 use crate::responders::ApiResponse;
-use crate::create_request_sensitive_action_jwt;
 
 create_request_sensitive_action_jwt!(RequestDeletionJWT, "/community/");
 
@@ -17,6 +18,7 @@ create_request_sensitive_action_jwt!(RequestDeletionJWT, "/community/");
 pub async fn delete_community_page(
     mut db: Connection<DbConn>,
     cookie_jar: &CookieJar<'_>,
+    user: UserJWT,
     deletion_jwt: Result<RequestDeletionJWT, &str>,
     csrf_token: CsrfToken,
     community_id: i64,
@@ -26,7 +28,7 @@ pub async fn delete_community_page(
         return ApiResponse::Status(Status::Forbidden);
     })?;
 
-    if deletion_jwt.community_id != community_id {
+    if deletion_jwt.community_id != community_id || deletion_jwt.user_id != user._id {
         return Err(ApiResponse::Status(Status::Forbidden));
     }
 

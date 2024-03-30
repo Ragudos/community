@@ -24,6 +24,6 @@ pub fn format_time_difference(date: OffsetDateTime) -> String {
     } else if duration <= Duration::weeks(4) {
         format!("{} week/s ago", duration.whole_weeks())
     } else {
-        String::from("1 month ago")
+        String::from("More than a month ago")
     }
 }

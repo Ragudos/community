@@ -5,6 +5,23 @@ use crate::helpers::db::DbConn;
 use crate::models::users::schema::UserTable;
 
 impl UserTable {
+    pub async fn get_display_image(
+        db: &mut Connection<DbConn>,
+        user_id: i64,
+    ) -> Result<Option<String>, sqlx::Error> {
+        Ok(sqlx::query!(
+            r#"
+                SELECT display_image
+                FROM users
+                WHERE _id = $1
+                "#,
+            user_id
+        )
+        .fetch_one(&mut ***db)
+        .await?
+        .display_image)
+    }
+
     pub async fn is_name_taken(
         db: &mut Connection<DbConn>,
         display_name: &str,

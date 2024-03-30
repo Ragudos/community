@@ -7,6 +7,7 @@
 }
 
 @include themify($themes) {
+    --red: #{color_in_theme("reed")};
     color-scheme: $theme_name;
     --primary: #{color_in_theme("primary")};
     --primary-foreground: #{color_in_theme("primary-foreground")};
@@ -73,7 +74,7 @@ main {
     @include cover_background;
 }
 
-#page-load-bar {
+#page-progress-bar {
     position: fixed;
     top: 0;
     margin-inline: 0;
@@ -110,7 +111,7 @@ main {
     padding: 1rem;
 
     background-color: hsl(var(--warning) / var(--_background-opacity, 0.5));
-    color: hsl(var(--warning-foreground) /var(--_text-opacity, 1));
+    color: hsl(var(--warning-foreground) / var(--_text-opacity, 1));
 
     border: 1px solid hsl(var(--warning));
     border-radius: calc(var(--radius) / 2);
@@ -131,9 +132,26 @@ main {
 }
 
 .p-0 {
-    padding: 0 !important; 
+    padding: 0 !important;
 }
 
-svg.fill {
-    fill: currentColor;
+svg {
+    will-change: color;
+    transition-property: color;
+    transition-duration: var(--animation-duration, 250ms);
+}
+
+.notifier {
+    width: fit-content;
+    
+    padding: 0.025rem 0.075rem;
+
+    border-radius: 50%;
+
+    color: hsl(var(--text) / var(--_text-opacity, 1));
+    background-color: hsl(var(--red));
+
+    font-size: 0.675rem;
+    font-weight: 400;
+    font-style: normal;
 }

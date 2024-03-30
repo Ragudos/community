@@ -92,10 +92,12 @@ impl Notification {
             SELECT
             _id,
             _recipient_id,
+            _sender_id,
             _created_at,
             notification_type AS "notification_type: NotificationType",
             is_read,
-            message
+            message,
+            link
             FROM notifications
             WHERE _recipient_id = $1
             AND is_read = true
@@ -118,10 +120,12 @@ impl Notification {
             SELECT
             _id,
             _recipient_id,
+            _sender_id,
             _created_at,
             notification_type AS "notification_type: NotificationType",
             is_read,
-            message
+            message,
+            link
             FROM notifications
             WHERE _recipient_id = $1
             AND is_read = false
@@ -144,10 +148,12 @@ impl Notification {
             SELECT
             _id,
             _recipient_id,
+            _sender_id,
             _created_at,
             notification_type AS "notification_type: NotificationType",
             is_read,
-            message
+            message,
+            link
             FROM notifications
             WHERE _recipient_id = $1
             ORDER BY _created_at DESC
@@ -233,25 +239,31 @@ impl Notification {
     pub async fn create(
         tx: &mut Transaction<'_, Postgres>,
         recipient_id: &i64,
+        sender_id: &i64,
         notification_type: NotificationType,
         message: &str,
+        link: Option<&str>
     ) -> Result<Self, sqlx::Error> {
         Ok(sqlx::query_as!(
             Notification,
             r#"
-            INSERT INTO notifications (_recipient_id, notification_type, message)
-            VALUES ($1, $2, $3)
+            INSERT INTO notifications (_recipient_id, _sender_id, notification_type, message, link)
+            VALUES ($1, $2, $3, $4, $5)
             RETURNING
             _id,
             _recipient_id,
+            _sender_id,
             _created_at,
             notification_type AS "notification_type: NotificationType",
             is_read,
-            message
+            message,
+            link
             "#,
             recipient_id,
+            sender_id,
             notification_type as NotificationType,
             message,
+            link
         )
         .fetch_one(&mut **tx)
         .await?)

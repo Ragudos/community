@@ -1,9 +1,3 @@
-/// Subject to future change.
-/// It'd be better to mark a community as
-/// to_be_deleted and delete all
-/// its relevant data one-by-one using a CRON job
-/// to avoid overloading the server since we need to
-/// images, videos, etc.
 use rocket::delete;
 use rocket::form::{Errors, Form};
 use rocket::http::{CookieJar, Status};
@@ -43,7 +37,6 @@ pub async fn delete_community_endpoint<'r>(
     // We just return a status code since if this is true,
     // the user made the request not from our page.
     // The process for deletion is like this:
-
     // 1. Request for deletion from /community/<community_id>/settings
     // 2. If approved (the user is the owner of the community), create a cookie
     // containing information about the community and the user, and redirect them to the page
@@ -64,6 +57,7 @@ pub async fn delete_community_endpoint<'r>(
         // gets access to their logged in device.
 
         cookie_jar.remove_private(delete_jwt.to_cookie()?);
+        let time_to_reload = 3;
 
         return Ok(ApiResponse::Render {
             status: Status::UnprocessableEntity,
@@ -76,7 +70,9 @@ pub async fn delete_community_endpoint<'r>(
                             message: "The password you entered is incorrect.".to_string(),
                         },
                     ],
-                    toast: Toast::warning("We revoked your access to this page to prevent brute-force attacks. Please try again by going back to settings.".to_string()),
+                    toast: Toast::warning(format!(
+                        "We revoked your access to this page. You will be redirected back to settings in {}s.", time_to_reload
+                    )),
                     should_refresh: true
                 },
             )),
@@ -92,7 +88,7 @@ pub async fn delete_community_endpoint<'r>(
 
     // For now, we just remove it for good from the database since
     // we haven't implemented media files yet.
-    Community::soft_delete(&mut tx, &delete_jwt.community_id).await?;
+    Community::delete(&mut tx, &delete_jwt.community_id).await?;
 
     tx.commit().await?;
 

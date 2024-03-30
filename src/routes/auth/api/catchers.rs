@@ -9,7 +9,7 @@ pub fn auth_api_internal_server_error() -> Template {
         "partials/toast",
         context! {
             toast: Toast::error(Some("An internal server error occurred. Please try again later.".to_string()))
-        }
+        },
     )
 }
 
@@ -19,6 +19,6 @@ pub fn forbidden_auth_api() -> Template {
         "partials/toast",
         context! {
             toast: Toast::error(Some("You are not authorized to perform this action. Perhaps the CSRF-TOKEN was removed. Please try refreshing the page.".to_string()))
-        }
+        },
     )
 }

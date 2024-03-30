@@ -85,7 +85,8 @@
         border-radius: var(--radius);
 
         li:not(:last-child) {
-            border-bottom: 1px solid hsl(var(--border) / var(--_border-opacity, 0.675));
+            border-bottom: 1px solid
+                hsl(var(--border) / var(--_border-opacity, 0.675));
         }
 
         li {

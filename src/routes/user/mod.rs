@@ -14,6 +14,7 @@ use crate::responders::ApiResponse;
 use crate::routes::auth::login;
 
 pub mod api;
+pub mod catchers;
 
 #[get("/<id>")]
 pub fn page<'r>(

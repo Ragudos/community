@@ -11,7 +11,6 @@
     position: relative;
 
     max-width: max-content;
-
     cursor: pointer;
 }
 
@@ -19,6 +18,7 @@
     position: absolute;
     z-index: 20;
     right: 0;
+    cursor: auto;
 }
 
 .dropdown > .dropdown-wrapper > * {
@@ -38,16 +38,17 @@
         white-space: nowrap;
     }
 
+    backdrop-filter: blur(1rem);
+
     &::before {
         content: "";
         position: absolute;
         inset: 0;
 
         background-color: hsl(
-            var(--background) /
-            var(--_background-opacity, 0.75)
+            var(--background) / var(--_background-opacity, 0.87)
         );
-        backdrop-filter: blur(2rem);
+        backdrop-filter: blur(1rem);
 
         border-radius: inherit;
 
@@ -69,7 +70,8 @@
     gap: 0.25rem;
 
     li {
-        button, a {
+        button,
+        a {
             min-width: auto;
             min-height: auto;
 

@@ -63,7 +63,7 @@ pub async fn change_join_process_endpoint<'r>(
                         },
                     ],
                     toast: Toast::warning(format!(
-                        "We revoked your access to this page to prevent brute-force attacks. You will be redirected back to settings in {}s.", time_to_reload
+                        "We revoked your access to this page. You will be redirected back to settings in {}s.", time_to_reload
                     )),
                     should_refresh: true,
                     time_to_reload
