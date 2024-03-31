@@ -1,5 +1,6 @@
-use colored::Colorize;
 use std::io::Write;
+
+use colored::Colorize;
 
 pub struct Config {
     pub input_path: String,
@@ -20,15 +21,10 @@ impl Config {
 pub fn run(config: &Config) -> Result<(), Box<dyn std::error::Error>> {
     let input_path = &config.input_path;
     let input_metadata = std::fs::metadata(input_path)?;
-    let mut cfg = minify_html::Cfg::new();
+    let mut cfg = minify_html::Cfg::spec_compliant();
 
-    cfg.preserve_brace_template_syntax = true;
     cfg.minify_css = true;
     cfg.minify_js = true;
-    cfg.keep_spaces_between_attributes = true;
-    cfg.do_not_minify_doctype = true;
-    cfg.keep_closing_tags = true;
-    cfg.ensure_spec_compliant_unquoted_attribute_values = true;
 
     if input_metadata.is_file() {
         minify_file(input_path, &cfg)?;
@@ -40,25 +36,35 @@ pub fn run(config: &Config) -> Result<(), Box<dyn std::error::Error>> {
 }
 
 /// Minify a file
-fn minify_file(file_path: &str, cfg: &minify_html::Cfg) -> Result<(), Box<dyn std::error::Error>> {
+fn minify_file(
+    file_path: &str,
+    cfg: &minify_html::Cfg,
+) -> Result<(), Box<dyn std::error::Error>> {
     let contents = std::fs::read(file_path)?;
     let minified_html = minify_html::minify(&contents, cfg);
 
     let path = std::path::Path::new(file_path);
-    let file_name_of_path = path.to_str().expect("Expected file name to exist");
+    let file_name_of_path = path
+        .to_str()
+        .expect("Expected file name to exist");
     let root_dir_name = std::path::Path::new(file_path)
         .parent()
         .and_then(|parent| parent.components().nth(0))
         .map(|c| c.as_os_str().to_str().unwrap())
         .unwrap_or_default();
-    let file_path_without_root = path.parent().unwrap().strip_prefix(root_dir_name)?;
-    let output_dir = std::path::PathBuf::from("templates").join(file_path_without_root);
+    let file_path_without_root = path
+        .parent()
+        .unwrap()
+        .strip_prefix(root_dir_name)?;
+    let output_dir =
+        std::path::PathBuf::from("templates").join(file_path_without_root);
 
     if !output_dir.exists() {
         std::fs::create_dir_all(&output_dir)?;
     }
 
-    let outpule_file_path = output_dir.join(path.file_name().unwrap().to_str().unwrap());
+    let outpule_file_path =
+        output_dir.join(path.file_name().unwrap().to_str().unwrap());
     let mut file = std::fs::File::create(outpule_file_path.clone())?;
 
     file.write_all(&minified_html)?;
@@ -69,7 +75,10 @@ fn minify_file(file_path: &str, cfg: &minify_html::Cfg) -> Result<(), Box<dyn st
 }
 
 /// Minify a directory
-fn minify_dir(dir_path: &str, cfg: &minify_html::Cfg) -> Result<(), Box<dyn std::error::Error>> {
+fn minify_dir(
+    dir_path: &str,
+    cfg: &minify_html::Cfg,
+) -> Result<(), Box<dyn std::error::Error>> {
     let mut file_paths: Vec<std::path::PathBuf> = Vec::new();
 
     collect_filenames_recursively(dir_path, &mut file_paths)?;
@@ -90,7 +99,9 @@ fn collect_filenames_recursively(
     for entry in std::fs::read_dir(path)? {
         let entry = entry?;
         let path = entry.path();
-        let path_name = path.to_str().expect("Expected path to have a name");
+        let path_name = path
+            .to_str()
+            .expect("Expected path to have a name");
 
         if path.is_dir() {
             collect_filenames_recursively(path_name, files)?;

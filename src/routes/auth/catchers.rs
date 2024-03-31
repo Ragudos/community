@@ -1,7 +1,9 @@
 use rocket::{catch, Request};
 use rocket_dyn_templates::{context, Template};
 
-use crate::models::{seo::metadata::SeoMetadata, users::preferences::Theme, Toast};
+use crate::models::seo::metadata::SeoMetadata;
+use crate::models::users::preferences::Theme;
+use crate::models::Toast;
 
 #[catch(500)]
 pub fn auth_internal_server_error_get(request: &Request<'_>) -> Template {

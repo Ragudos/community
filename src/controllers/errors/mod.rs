@@ -2,8 +2,7 @@ use std::num::ParseIntError;
 
 use rocket::form::{Errors, Form, FromForm};
 use rocket::http::Status;
-use rocket_dyn_templates::context;
-use rocket_dyn_templates::Template;
+use rocket_dyn_templates::{context, Template};
 use serde::{Deserialize, Serialize};
 
 use crate::models::{Toast, ToastTypes};
@@ -34,7 +33,10 @@ where
 
             ApiResponse::Render {
                 status: Status::UnprocessableEntity,
-                template: Some(Template::render(error_template_name, context! { errors })),
+                template: Some(Template::render(
+                    error_template_name,
+                    context! { errors },
+                )),
                 headers: None,
             }
         })?

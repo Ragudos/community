@@ -1,5 +1,5 @@
-use rocket::http::Status;
-use rocket::{get, http::CookieJar};
+use rocket::get;
+use rocket::http::{CookieJar, Status};
 use rocket_csrf_token::CsrfToken;
 use rocket_db_pools::Connection;
 use rocket_dyn_templates::{context, Template};
@@ -12,7 +12,10 @@ use crate::models::users::preferences::Theme;
 use crate::models::users::schema::UserJWT;
 use crate::responders::ApiResponse;
 
-create_request_sensitive_action_jwt!(RequestChangeJoinProcessJWT, "/community/");
+create_request_sensitive_action_jwt!(
+    RequestChangeJoinProcessJWT,
+    "/community/"
+);
 
 #[get("/<community_id>/change-join-process")]
 pub async fn change_join_process_page<'r>(
@@ -34,18 +37,18 @@ pub async fn change_join_process_page<'r>(
         return Err(ApiResponse::Status(Status::Forbidden));
     }
 
-    let authenticity_token = csrf_token.authenticity_token().map_err(|error| {
-        eprintln!("Error: {}", error);
-        return ApiResponse::Status(Status::InternalServerError);
-    })?;
+    let authenticity_token =
+        csrf_token.authenticity_token().map_err(|error| {
+            eprintln!("Error: {}", error);
+            return ApiResponse::Status(Status::InternalServerError);
+        })?;
 
-    let Some(community_name) =
-        Community::get_name(&mut db, &community_id)
-            .await
-            .map_err(|error| {
-                eprintln!("Error: {}", error);
-                return ApiResponse::Status(Status::InternalServerError);
-            })?
+    let Some(community_name) = Community::get_name(&mut db, &community_id)
+        .await
+        .map_err(|error| {
+            eprintln!("Error: {}", error);
+            return ApiResponse::Status(Status::InternalServerError);
+        })?
     else {
         return Err(ApiResponse::Status(Status::NotFound));
     };

@@ -1,0 +1,32 @@
+{{#if is_boosted}}
+<head>
+    {{> partials/head/main}}
+    {{> partials/head/metadata}}
+    <link hx-preserve="true" rel="stylesheet"
+        href="/build/styles/discover.min.css" />
+</head>
+
+{{#if isfromauth}}
+<header id="header" hx-swap-oob="true">
+    {{> partials/headers/logged_in}}
+</header>
+{{/if}}
+
+<aside id="community-header" hx-swap-oob="true"></aside>
+{{> partials/discover}}
+{{else}}
+
+{{#> layouts/main}}
+{{#*inline "additional_head_content"}}
+<link hx-preserve="true" rel="stylesheet"
+    href="/build/styles/discover.min.css" />
+{{/inline}}
+{{#*inline "header"}}
+<header id="header">
+    {{> partials/headers/logged_in}}
+</header>
+<aside id="community-header"></aside>
+{{/inline}}
+{{> partials/discover}}
+{{/layouts/main}}
+{{/if}}

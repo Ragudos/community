@@ -1,16 +1,15 @@
 use rocket::fairing::Fairing;
-use rocket_dyn_templates::{
-    handlebars::{
-        handlebars_helper, BlockContext, BlockParams, Context, Handlebars, Helper, Output,
-        RenderContext, RenderError, Renderable,
-    },
-    Template,
+use rocket_dyn_templates::handlebars::{
+    handlebars_helper, BlockContext, BlockParams, Context, Handlebars, Helper,
+    Output, RenderContext, RenderError, Renderable,
 };
+use rocket_dyn_templates::Template;
 use serde_json::Value;
 use time::OffsetDateTime;
 
 use crate::controllers::format_time_difference;
 
+handlebars_helper!(contains: |x: Value, y: Value| x.as_array().unwrap().contains(&y));
 handlebars_helper!(num_abbr: |x: isize| {
     if x < 1_000 {
         x.to_string()
@@ -43,7 +42,12 @@ pub fn breadcrumbs_helper<'reg, 'rc>(
     rc: &mut RenderContext<'reg, 'rc>,
     out: &mut dyn Output,
 ) -> Result<(), RenderError> {
-    let offset: i64 = c.data().get("offset").and_then(|v| v.as_i64()).unwrap_or(0) + 1;
+    let offset: i64 = c
+        .data()
+        .get("offset")
+        .and_then(|v| v.as_i64())
+        .unwrap_or(0) +
+        1;
     let total_pages: i64 = c
         .data()
         .get("page_count")
@@ -108,7 +112,9 @@ pub fn breadcrumbs_helper<'reg, 'rc>(
             rc.pop_block();
             let _ = out.write("<span>...</span>");
 
-            for i in total_pages - MAX_BREAD_CRUMBS_IN_MIDDLE + 1..total_pages + 1 {
+            for i in
+                total_pages - MAX_BREAD_CRUMBS_IN_MIDDLE + 1..total_pages + 1
+            {
                 let mut block_context = BlockContext::new();
                 let mut block_param = BlockParams::new();
                 block_param.add_value("value", Value::from(i))?;
@@ -173,8 +179,12 @@ pub fn register() -> impl Fairing {
         engines
             .handlebars
             .register_helper("num_abbr", Box::new(num_abbr));
-        engines.handlebars.register_helper("add", Box::new(add));
-        engines.handlebars.register_helper("sub", Box::new(sub));
+        engines
+            .handlebars
+            .register_helper("add", Box::new(add));
+        engines
+            .handlebars
+            .register_helper("sub", Box::new(sub));
         engines
             .handlebars
             .register_helper("modulo", Box::new(modulo));
@@ -184,8 +194,12 @@ pub fn register() -> impl Fairing {
         engines
             .handlebars
             .register_helper("multiply", Box::new(multiply));
-        engines.handlebars.register_helper("max", Box::new(max));
-        engines.handlebars.register_helper("min", Box::new(min));
+        engines
+            .handlebars
+            .register_helper("max", Box::new(max));
+        engines
+            .handlebars
+            .register_helper("min", Box::new(min));
         engines
             .handlebars
             .register_helper("breadcrumbs", Box::new(breadcrumbs_helper));
@@ -196,5 +210,8 @@ pub fn register() -> impl Fairing {
             "format_datetime_difference",
             Box::new(format_datetime_difference),
         );
+        engines
+            .handlebars
+            .register_helper("contains", Box::new(contains));
     })
 }

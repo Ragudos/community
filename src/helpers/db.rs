@@ -1,8 +1,6 @@
 use bcrypt::{hash, DEFAULT_COST};
-use rocket::{
-    fairing::{AdHoc, Result},
-    Build, Rocket,
-};
+use rocket::fairing::{AdHoc, Result};
+use rocket::{Build, Rocket};
 use rocket_db_pools::Database;
 use sqlx::query;
 
@@ -14,13 +12,18 @@ pub struct DbConn(sqlx::PgPool);
 
 async fn run_migrations(rocket: Rocket<Build>) -> Result {
     match DbConn::fetch(&rocket) {
-        Some(db) => match sqlx::migrate!("db/sqlx/migrations").run(&**db).await {
-            Ok(_) => Ok(rocket),
-            Err(e) => {
-                eprintln!("Failed to run migrations: {:?}", e);
-                Err(rocket)
+        Some(db) => {
+            match sqlx::migrate!("db/sqlx/migrations")
+                .run(&**db)
+                .await
+            {
+                Ok(_) => Ok(rocket),
+                Err(e) => {
+                    eprintln!("Failed to run migrations: {:?}", e);
+                    Err(rocket)
+                }
             }
-        },
+        }
         None => Err(rocket),
     }
 }

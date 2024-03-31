@@ -1,9 +1,7 @@
 use rocket::get;
-use rocket::http::CookieJar;
-use rocket::http::Status;
+use rocket::http::{CookieJar, Status};
 use rocket::response::Redirect;
-use rocket_dyn_templates::context;
-use rocket_dyn_templates::Template;
+use rocket_dyn_templates::{context, Template};
 
 use crate::auth_uri;
 use crate::controllers::htmx::IsBoosted;
@@ -56,5 +54,7 @@ pub fn malformed_uid(
 /// endpoint has forwarded.
 #[get("/<_..>", rank = 4)]
 pub fn logged_out() -> ApiResponse {
-    ApiResponse::Redirect(Redirect::to(auth_uri!(login::login_page(Some(true)))))
+    ApiResponse::Redirect(Redirect::to(auth_uri!(login::login_page(Some(
+        true
+    )))))
 }

@@ -1,9 +1,7 @@
 use rocket::get;
-use rocket::http::CookieJar;
-use rocket::http::Status;
+use rocket::http::{CookieJar, Status};
 use rocket_csrf_token::CsrfToken;
-use rocket_dyn_templates::context;
-use rocket_dyn_templates::Template;
+use rocket_dyn_templates::{context, Template};
 
 use crate::controllers::htmx::IsBoosted;
 use crate::models::seo::metadata::SeoMetadata;
@@ -23,10 +21,11 @@ pub fn login_page<'r>(
         .theme(theme)
         .title("Sign In to Community")
         .finalize();
-    let authenticity_token = csrf_token.authenticity_token().map_err(|error| {
-        eprintln!("Error generating authenticity token: {:?}", error);
-        return ApiResponse::Status(Status::InternalServerError);
-    })?;
+    let authenticity_token =
+        csrf_token.authenticity_token().map_err(|error| {
+            eprintln!("Error generating authenticity token: {:?}", error);
+            return ApiResponse::Status(Status::InternalServerError);
+        })?;
 
     Ok(ApiResponse::Render {
         status: Status::Ok,

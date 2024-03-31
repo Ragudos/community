@@ -1,0 +1,27 @@
+<input type="hidden" id="communities-offset" hx-swap-oob="true" name="offset"
+    value="{{offset}}" />
+<h1 class="sr-only">Discover Communities</h1>
+{{#if did_error}}
+{{> partials/discover/error}}
+{{else}}
+{{#if (eq (len communities) 0)}}
+{{> partials/discover/empty}}
+{{else}}
+<div class="discover-grid">
+    {{#each communities}}
+    {{> partials/discover/preview_card community=this}}
+    {{/each}}
+</div>
+{{#unless (lte pagination 1)}}
+{{#if (eq offset 0)}}
+{{> partials/discover/breadcrumbs_prev_btn}}
+<div class="breadcrumbs">
+    {{#breadcrumbs offset pagination}}
+    {{> partials/discover/breadcrumbs_btn}}
+    {{/breadcrumbs}}
+</div>
+{{> partials/discover/breadcrumbs_prev_btn}}
+{{/if}}
+{{/unless}}
+{{/if}}
+{{/if}}

@@ -4,24 +4,23 @@ use std::sync::RwLock;
 use controllers::rate_limiter::RateLimiter;
 use models::notifications::RealtimeNotification;
 use responders::ApiResponse;
-use rocket;
 use rocket::figment::value::{Map, Value};
 use rocket::figment::{Figment, Profile, Provider};
-use rocket::fs::FileServer;
-use rocket::Build;
-use rocket::Rocket;
-use rocket::{catchers as rocket_catchers, routes as rocket_routes};
+use rocket::shield::Shield;
+use rocket::{
+    self, catchers as rocket_catchers, routes as rocket_routes, Build, Rocket,
+};
 use rocket_csrf_token::{CsrfConfig, Fairing};
+use static_files::{asset_files, build_files};
 use time::OffsetDateTime;
 
 use crate::catchers as main_catchers;
 use crate::env::{Env, Environment};
-use crate::helpers::db;
-use crate::helpers::get_environment;
-use crate::helpers::handlebars;
+use crate::helpers::{db, get_environment, handlebars};
 use crate::routes::auth::api::catchers as auth_api_catchers;
 use crate::routes::auth::catchers as auth_catchers;
 use crate::routes::community::catchers as community_catchers;
+use crate::routes::notifications::api::catchers as notifications_api_catchers;
 use crate::routes::notifications::catchers as notifications_catchers;
 
 pub mod catchers;
@@ -32,6 +31,7 @@ pub mod helpers;
 pub mod models;
 pub mod responders;
 pub mod routes;
+pub mod static_files;
 
 #[rocket::get("/test")]
 pub fn test_toast() -> ApiResponse {
@@ -45,11 +45,13 @@ pub fn rocket_from_config(figment: Figment) -> Rocket<Build> {
     let rate_limiter = get_rate_limiter(&figment);
     let rocket = rocket::custom(figment)
         .manage(rate_limiter)
-        .mount("/", rocket_routes![routes::page, test_toast]);
+        .mount(
+            "/",
+            rocket_routes![routes::page, test_toast, asset_files, build_files],
+        );
     let rocket = attach_env(rocket);
     let rocket = attach_fairings(rocket);
     let rocket = register_catchers(rocket);
-    let rocket = attach_static_files(rocket);
     let rocket = attach_global_state(rocket);
     let rocket = attach_auth_routes(rocket);
     let rocket = attach_community_routes(rocket);
@@ -64,10 +66,10 @@ pub fn rocket_from_config(figment: Figment) -> Rocket<Build> {
 
 fn attact_notification_routes(rocket: Rocket<Build>) -> Rocket<Build> {
     rocket.mount(
-        "/notifications",
+        "/notifications/api",
         rocket_routes![
-            routes::notifications::sse_notifications,
-            routes::notifications::notifications
+            routes::notifications::api::sse_notifications,
+            routes::notifications::api::notifications
         ],
     )
 }
@@ -97,9 +99,7 @@ fn attach_user_routes(rocket: Rocket<Build>) -> Rocket<Build> {
         )
         .mount(
             "/user/api",
-            rocket_routes![
-                routes::user::api::img::user_img_endpoint
-            ],
+            rocket_routes![routes::user::api::img::user_img_endpoint],
         )
 }
 
@@ -129,10 +129,7 @@ fn attach_discover_routes(rocket: Rocket<Build>) -> Rocket<Build> {
         )
         .mount(
             "/discover/api",
-            rocket_routes![
-                routes::discover::api::discover_endpoint,
-                routes::discover::api::discover_endpoint_unauthorized
-            ],
+            rocket_routes![routes::discover::api::discover_endpoint,],
         )
 }
 
@@ -177,42 +174,28 @@ fn attach_community_routes(rocket: Rocket<Build>) -> Rocket<Build> {
         .mount(
             "/community/api",
             rocket_routes![
-                routes::community::api::logged_out,
                 routes::community::api::rename::rename_endpoint,
-                routes::community::api::rename::rename_unauthorized,
                 routes::community::api::rename::non_htmx_rename_endpoint,
-                routes::community::api::rename::non_htmx_rename_unauthorized,
                 routes::community::api::request_deletion::request_deletion_endpoint,
-                routes::community::api::request_deletion::unauthorized_request_deletion,
                 routes::community::api::request_change_join_process::request_change_join_process_endpoint,
-                routes::community::api::request_change_join_process::unauthorized_request_change_join_process,
                 routes::community::api::change_join_process::change_join_process_endpoint,
-                routes::community::api::change_join_process::change_join_process_unauthorized_endpoint,
                 routes::community::api::delete_community::delete_community_endpoint,
-                routes::community::api::delete_community::unauthorized_delete_community,
                 routes::community::api::leave_community::leave_community_endpoint,
-                routes::community::api::leave_community::unauthorized_leave_community,
             ],
         )
         .mount(
             "/community/api/join",
             rocket_routes![
                 routes::community::api::join::public::public_join_post,
-                routes::community::api::join::public::unauthorized_join_public,
                 routes::community::api::join::private::private_join_post,
-                routes::community::api::join::private::unauthorized_join_private,
             ],
         )
 }
 
 fn attach_global_state(rocket: Rocket<Build>) -> Rocket<Build> {
-    rocket.manage(rocket::tokio::sync::broadcast::channel::<RealtimeNotification>(1024).0)
-}
-
-fn attach_static_files(rocket: Rocket<Build>) -> Rocket<Build> {
-    rocket
-        .mount("/build", FileServer::from("build"))
-        .mount("/assets", FileServer::from("assets"))
+    rocket.manage(
+        rocket::tokio::sync::broadcast::channel::<RealtimeNotification>(1024).0,
+    )
 }
 
 fn register_catchers(rocket: Rocket<Build>) -> Rocket<Build> {
@@ -243,11 +226,26 @@ fn register_catchers(rocket: Rocket<Build>) -> Rocket<Build> {
         )
         .register(
             "/notifications",
-            rocket_catchers![notifications_catchers::unauthorized_notifications],
+            rocket_catchers![
+                notifications_catchers::unauthorized_notifications
+            ],
+        )
+        .register(
+            "/notifications/api",
+            rocket_catchers![
+                notifications_api_catchers::unauthorized_api_notifications
+            ],
         )
 }
 
 fn attach_fairings(rocket: Rocket<Build>) -> Rocket<Build> {
+    let shield = Shield::new()
+        .enable(rocket::shield::Frame::Deny)
+        .enable(rocket::shield::XssFilter::Disable)
+        .enable(rocket::shield::NoSniff::default())
+        .enable(rocket::shield::Referrer::OriginWhenCrossOrigin)
+        .enable(rocket::shield::Permission::default());
+
     rocket
         .attach(Fairing::new(
             CsrfConfig::default()
@@ -256,6 +254,7 @@ fn attach_fairings(rocket: Rocket<Build>) -> Rocket<Build> {
         ))
         .attach(db::stage())
         .attach(handlebars::register())
+        .attach(shield)
 }
 
 fn get_rate_limiter(figment: &Figment) -> RateLimiter {
@@ -290,8 +289,10 @@ fn attach_env(rocket: Rocket<Build>) -> Rocket<Build> {
 
 pub fn create_config(env: Env) -> Figment {
     let db_url = dotenv::var("DATABASE_URL").expect("DATABASE_URL must be set");
-    let secret_key = dotenv::var("ROCKET_SECRET_KEY").expect("ROCKET_SECRET_KEY must be set");
-    let service_account_path = dotenv::var("SERVICE_ACCOUNT").expect("SERVICE_ACCOUNT must be set");
+    let secret_key = dotenv::var("ROCKET_SECRET_KEY")
+        .expect("ROCKET_SECRET_KEY must be set");
+    let service_account_path =
+        dotenv::var("SERVICE_ACCOUNT").expect("SERVICE_ACCOUNT must be set");
 
     let mut db_config: Map<_, Value> = Map::new();
     let mut pg_config: Map<_, Value> = Map::new();

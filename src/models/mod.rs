@@ -67,3 +67,4 @@ impl Toast {
 pub const JWT_NAME: &str = "CommunityAuthSession__jwt";
 pub const HOMEPAGE_COMMUNITY_LIMIT: i64 = 12;
 pub const COMMUNITY_POST_LIMIT: i64 = 20;
+pub const NOTIFICATIONS_LIMIT: i64 = 5;

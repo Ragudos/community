@@ -69,7 +69,7 @@ impl CommunityAbout {
                         SELECT _community_id, COALESCE(COUNT(*), 0) AS total_admins
                         FROM community_memberships
                         WHERE role = 'admin'
-                        
+
                         GROUP BY _community_id
                     ) ca ON c2._id = ca._community_id
 
@@ -288,7 +288,7 @@ impl Community {
                 COALESCE(COUNT(*), 0) AS total_members,
                 role AS "role: _"
                 FROM community_memberships
-                WHERE _user_id = 
+                WHERE _user_id =
             "#,
         );
         query.push_bind(user_id);
@@ -310,7 +310,7 @@ impl Community {
                     ENS AS _joined_at
                 FROM communities a
                 JOIN community_memberships b ON a._id = b._community_id
-                WHERE b._user_id = 
+                WHERE b._user_id =
             "#,
         );
         query.push_bind(user_id);
@@ -327,7 +327,7 @@ impl Community {
                 WHERE c._id = (
                     SELECT _community_id
                     FROM community_memberships
-                    WHERE _user_id = 
+                    WHERE _user_id =
                 "#,
             );
             query.push_bind(user_id);
@@ -335,26 +335,28 @@ impl Community {
         } else if !get_joined_by_user && get_owned_by_user {
             query.push(
                 r#"
-                WHERE c.owner_id = 
+                WHERE c.owner_id =
                 "#,
             );
             query.push_bind(user_id);
         }
 
         if let Some(display_name) = display_name {
-            query.push(
-                r#"
-                AND similarity(c.display_name,
-                "#,
-            );
-            query.push_bind(display_name);
-            query.push(") > 0.1");
+            if !display_name.is_empty() {
+                query.push(
+                    r#"
+                    AND similarity(display_name,
+                    "#,
+                );
+                query.push_bind(display_name);
+                query.push(") > 0.1");
+            }
         }
 
         if let Some(categories) = categories {
             query.push(
                 r#"
-                AND categories @> 
+                AND categories @>
                 "#,
             );
             query.push_bind(categories);
@@ -363,7 +365,7 @@ impl Community {
         query.push(
             r#"
             ORDER BY _joined_at DESC
-            LIMIT 
+            LIMIT
             "#,
         );
         query.push_bind(limit);
@@ -384,33 +386,40 @@ impl Community {
     ) -> Result<Option<BigDecimal>, sqlx::Error> {
         let mut query = QueryBuilder::new(
             r#"
-            SELECT CEIL(COUNT(*)::NUMERIC / ?) AS count
-            FROM communityies
+            SELECT CEIL(COUNT(*)::NUMERIC /
+            "#,
+        );
+        query.push_bind(limit);
+        query.push(
+            r#"
+            ) AS count
+            FROM communities
             WHERE (
                 (display_name IS NOT NULL AND display_image != '')
                 OR (cover_Image IS NOT NULL AND cover_image != '')
             )
             "#,
         );
-        query.push_bind(limit);
 
         if let Some(categories) = categories {
             query.push(
                 r#"
-                AND categories @> 
+                AND categories @>
                 "#,
             );
-            query.push_bind(categories);
+            query.push_bind(categories as &[CommunityCategory]);
         }
 
         if let Some(display_name) = display_name {
-            query.push(
-                r#"
-                AND similarity(display_name,
-                "#,
-            );
-            query.push_bind(display_name);
-            query.push(") > 0.1");
+            if !display_name.is_empty() {
+                query.push(
+                    r#"
+                    AND similarity(display_name,
+                    "#,
+                );
+                query.push_bind(display_name);
+                query.push(") > 0.1");
+            }
         }
 
         Ok(query
@@ -451,7 +460,7 @@ impl Community {
                 LEFT JOIN (
                     SELECT _community_id, COALESCE(COUNT(*), 0) AS total_members
                     FROM community_memberships
-                    
+
                     GROUP BY _community_id
                 ) m ON c._id = m._community_id
 
@@ -502,20 +511,22 @@ impl Community {
         if let Some(categories) = categories {
             query.push(
                 r#"
-                AND categories @> 
+                AND categories @>
                 "#,
             );
             query.push_bind(categories);
         }
 
         if let Some(display_name) = display_name {
-            query.push(
-                r#"
-                AND similarity(display_name,
-                "#,
-            );
-            query.push_bind(display_name);
-            query.push(") > 0.1");
+            if !display_name.is_empty() {
+                query.push(
+                    r#"
+                    AND similarity(display_name,
+                    "#,
+                );
+                query.push_bind(display_name);
+                query.push(") > 0.1");
+            }
         }
 
         query.push(

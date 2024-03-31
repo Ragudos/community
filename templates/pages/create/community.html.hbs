@@ -1,0 +1,27 @@
+{{#if is_boostes}}
+
+<head>
+    {{> partials/head/main}}
+{{> partials/head/metadata}}
+</head>
+<aside id="community-header" hx-swap-oob="true"></aside>
+<div class="min-h-screen ce-wrapper">
+    <div class="container fade-me-out fade-me-in create-community-container">
+        {{> partials/create/community}}
+    </div>
+</div>
+{{else}}
+{{#> layouts/main}}
+{{#*inline "header"}}
+<header id="header">
+    {{> partials/headers/logged_in}}
+</header>
+<aside id="community-header"></aside>
+{{/inline}}
+<div class="min-h-screen ce-wrapper">
+    <div class="container fade-me-out fade-me-in create-community-container">
+        {{> partials/create/community}}
+    </div>
+</div>
+{{/layouts/main}}
+{{/if}}

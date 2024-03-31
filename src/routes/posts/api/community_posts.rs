@@ -4,8 +4,7 @@ use rocket_db_pools::Connection;
 use rocket_dyn_templates::{context, Template};
 
 use crate::helpers::db::DbConn;
-use crate::models::community::schema::CommunityPost;
-use crate::models::community::schema::CommunityPreview;
+use crate::models::community::schema::{CommunityPost, CommunityPreview};
 use crate::models::users::schema::UserJWT;
 use crate::models::COMMUNITY_POST_LIMIT;
 use crate::responders::ApiResponse;
@@ -24,12 +23,16 @@ pub async fn get<'r>(
         return Ok(ApiResponse::Status(Status::BadRequest));
     }
 
-    let Some(community_preview) = CommunityPreview::get(&mut db, &community_id, &user._id).await?
+    let Some(community_preview) =
+        CommunityPreview::get(&mut db, &community_id, &user._id).await?
     else {
         return Ok(ApiResponse::Status(Status::Forbidden));
     };
 
-    if !community_preview.is_viewer_a_member.unwrap_or(false) {
+    if !community_preview
+        .is_viewer_a_member
+        .unwrap_or(false)
+    {
         return Ok(ApiResponse::Status(Status::Forbidden));
     }
 

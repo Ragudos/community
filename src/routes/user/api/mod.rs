@@ -1,2 +1,2 @@
-pub mod img;
 pub mod catchers;
+pub mod img;

@@ -3,9 +3,9 @@ use serde::Serialize;
 
 use super::db::enums::CommunityCategory;
 
-#[derive(FromForm, Serialize)]
+#[derive(FromForm, Serialize, Clone, Debug)]
 pub struct ListQuery<'r> {
     pub search: Option<&'r str>,
-    pub category: Option<Vec<CommunityCategory>>,
+    pub category: Option<CommunityCategory>,
     pub offset: Option<i64>,
 }

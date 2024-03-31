@@ -1,7 +1,8 @@
 use rocket::FromForm;
 
 use crate::controllers::validate::{
-    validate_ascii_text, validate_honeypot, validate_password, validate_password_with_confirmation,
+    validate_ascii_text, validate_honeypot, validate_password,
+    validate_password_with_confirmation,
 };
 
 #[derive(FromForm, Debug)]

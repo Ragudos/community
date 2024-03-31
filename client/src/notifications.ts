@@ -1,12 +1,14 @@
 export function initNotifications() {
-    const metaLoggedinIndicator = document.querySelector(
-        "meta[name='is_logged_in']",
-    );
-    const isLoggedin =
-        metaLoggedinIndicator &&
-        metaLoggedinIndicator.getAttribute("content") === "true";
+    window.startReceivingNotifications = function () {
+        const metaLoggedinIndicator = document.querySelector(
+            "meta[name='is_logged_in']",
+        );
+        const isLoggedin =
+            metaLoggedinIndicator &&
+            metaLoggedinIndicator.getAttribute("content") === "true";
 
-    maybeStartNotifications(isLoggedin);
+        maybeStartNotifications(isLoggedin);
+    };
 }
 
 const NOTIFICATIONS_STATE = {
@@ -19,7 +21,7 @@ function maybeStartNotifications(isLoggedin: boolean) {
     }
 
     let retryTime = 1;
-    const uri = "/notifications/sse";
+    const uri = "/notifications/api/sse";
 
     function resetRetryTime() {
         retryTime = 1;

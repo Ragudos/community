@@ -85,6 +85,8 @@ impl Notification {
     pub async fn get_all_read_notifications_of_user(
         conn: &mut Connection<DbConn>,
         user_id: &i64,
+        limit: &i64,
+        offset: &i64,
     ) -> Result<Vec<Self>, sqlx::Error> {
         Ok(sqlx::query_as!(
             Notification,
@@ -102,8 +104,11 @@ impl Notification {
             WHERE _recipient_id = $1
             AND is_read = true
             ORDER BY _created_at DESC
+            LIMIT $2 OFFSET $3
             "#,
             user_id,
+            limit,
+            offset
         )
         .fetch_all(&mut ***conn)
         .await?)
@@ -113,6 +118,8 @@ impl Notification {
     pub async fn get_all_unread_notifications_of_user(
         conn: &mut Connection<DbConn>,
         user_id: &i64,
+        limit: &i64,
+        offset: &i64,
     ) -> Result<Vec<Self>, sqlx::Error> {
         Ok(sqlx::query_as!(
             Notification,
@@ -130,8 +137,11 @@ impl Notification {
             WHERE _recipient_id = $1
             AND is_read = false
             ORDER BY _created_at DESC
+            LIMIT $2 OFFSET $3
             "#,
             user_id,
+            limit,
+            offset
         )
         .fetch_all(&mut ***conn)
         .await?)
@@ -141,6 +151,8 @@ impl Notification {
     pub async fn get_all_notifications_of_user(
         conn: &mut Connection<DbConn>,
         user_id: &i64,
+        limit: &i64,
+        offset: &i64,
     ) -> Result<Vec<Self>, sqlx::Error> {
         Ok(sqlx::query_as!(
             Notification,
@@ -157,8 +169,11 @@ impl Notification {
             FROM notifications
             WHERE _recipient_id = $1
             ORDER BY _created_at DESC
+            LIMIT $2 OFFSET $3
             "#,
             user_id,
+            limit,
+            offset
         )
         .fetch_all(&mut ***conn)
         .await?)
@@ -242,7 +257,7 @@ impl Notification {
         sender_id: &i64,
         notification_type: NotificationType,
         message: &str,
-        link: Option<&str>
+        link: Option<&str>,
     ) -> Result<Self, sqlx::Error> {
         Ok(sqlx::query_as!(
             Notification,

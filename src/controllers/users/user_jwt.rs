@@ -2,10 +2,9 @@ use rocket::http::{Cookie, SameSite};
 use rocket_db_pools::Connection;
 use time::{Duration, OffsetDateTime};
 
-use crate::{
-    helpers::db::DbConn,
-    models::{users::schema::UserJWT, JWT_NAME},
-};
+use crate::helpers::db::DbConn;
+use crate::models::users::schema::UserJWT;
+use crate::models::JWT_NAME;
 
 impl UserJWT {
     pub fn to_cookie(&self) -> Result<Cookie<'static>, serde_json::Error> {
@@ -17,11 +16,16 @@ impl UserJWT {
             .secure(true)
             .http_only(true)
             .same_site(SameSite::Strict)
-            .expires(OffsetDateTime::now_utc().saturating_add(Duration::days(7)))
+            .expires(
+                OffsetDateTime::now_utc().saturating_add(Duration::days(7)),
+            )
             .build())
     }
 
-    pub async fn verify(&self, db: &mut Connection<DbConn>) -> Result<bool, sqlx::Error> {
+    pub async fn verify(
+        &self,
+        db: &mut Connection<DbConn>,
+    ) -> Result<bool, sqlx::Error> {
         Ok(sqlx::query!(
             r#"
                     SELECT

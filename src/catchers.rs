@@ -1,5 +1,5 @@
-use rocket::Request;
-use rocket::{catch, response::Redirect};
+use rocket::response::Redirect;
+use rocket::{catch, Request};
 use rocket_dyn_templates::{context, Template};
 
 use crate::auth_uri;
@@ -17,7 +17,8 @@ pub fn internal_server_error(request: &Request<'_>) -> Template {
         .headers()
         .get_one("Toaster")
         .map_or(false, |s| s == "true");
-    let message = *request.local_cache(|| "Something went wrong. Please try again later.");
+    let message = *request
+        .local_cache(|| "Something went wrong. Please try again later.");
 
     if is_toaster {
         Template::render(

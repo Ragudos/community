@@ -1,8 +1,6 @@
-use rocket::{
-    http::Status,
-    response::{Responder, Result},
-    Response,
-};
+use rocket::http::Status;
+use rocket::response::{Responder, Result};
+use rocket::Response;
 
 #[derive(Debug)]
 pub struct HtmxRefresh;

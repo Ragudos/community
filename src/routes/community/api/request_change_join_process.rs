@@ -1,7 +1,7 @@
 use rocket::form::{Errors, Form};
-use rocket::http::Status;
+use rocket::http::{CookieJar, Status};
+use rocket::post;
 use rocket::response::Redirect;
-use rocket::{http::CookieJar, post};
 use rocket_csrf_token::CsrfToken;
 use rocket_db_pools::Connection;
 
@@ -38,16 +38,12 @@ pub async fn request_change_join_process_endpoint<'r>(
     }
 
     let request_change_join_process_jwt =
-        RequestChangeJoinProcessJWT::new(form.community_id, user._id).to_cookie()?;
+        RequestChangeJoinProcessJWT::new(form.community_id, user._id)
+            .to_cookie()?;
 
     cookie_jar.add_private(request_change_join_process_jwt);
 
     Ok(ApiResponse::Redirect(Redirect::to(community_uri!(
         change_join_process::change_join_process_page(form.community_id)
     ))))
-}
-
-#[post("/request-change-join-process", rank = 2)]
-pub fn unauthorized_request_change_join_process() -> Status {
-    Status::Unauthorized
 }

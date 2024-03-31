@@ -37,16 +37,12 @@ pub async fn request_deletion_endpoint<'r>(
     }
 
     let request_deletion_token =
-        RequestDeletionJWT::new(form.community_id.clone(), user._id.clone()).to_cookie()?;
+        RequestDeletionJWT::new(form.community_id.clone(), user._id.clone())
+            .to_cookie()?;
 
     cookie_jar.add_private(request_deletion_token);
 
     Ok(ApiResponse::Redirect(Redirect::to(community_uri!(
         delete_community::delete_community_page(form.community_id)
     ))))
-}
-
-#[post("/request-deletion", rank = 2)]
-pub fn unauthorized_request_deletion() -> Status {
-    Status::Unauthorized
 }

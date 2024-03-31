@@ -50,7 +50,10 @@ struct ToastTrigger {
 }
 
 impl<'a> Responder<'a, 'static> for ApiResponse {
-    fn respond_to(self, request: &'a rocket::Request<'_>) -> rocket::response::Result<'static> {
+    fn respond_to(
+        self,
+        request: &'a rocket::Request<'_>,
+    ) -> rocket::response::Result<'static> {
         match self {
             ApiResponse::Toast(status, toast) => {
                 let trigger_header = ToastTrigger { toast };
@@ -65,8 +68,12 @@ impl<'a> Responder<'a, 'static> for ApiResponse {
                 response
             }
             ApiResponse::Status(status) => status.respond_to(request),
-            ApiResponse::HtmxRedirect(htmx_redirect) => htmx_redirect.respond_to(request),
-            ApiResponse::HtmxRefresh(htmx_refresh) => htmx_refresh.respond_to(request),
+            ApiResponse::HtmxRedirect(htmx_redirect) => {
+                htmx_redirect.respond_to(request)
+            }
+            ApiResponse::HtmxRefresh(htmx_refresh) => {
+                htmx_refresh.respond_to(request)
+            }
             ApiResponse::Redirect(redirect) => redirect.respond_to(request),
             ApiResponse::Render {
                 status,

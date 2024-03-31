@@ -53,11 +53,6 @@ pub async fn non_htmx_rename_endpoint<'r>(
     )))
 }
 
-#[post("/rename", rank = 2)]
-pub fn non_htmx_rename_unauthorized() -> Status {
-    Status::Unauthorized
-}
-
 #[put("/rename", data = "<form>")]
 pub async fn rename_endpoint<'r>(
     mut db: Connection<DbConn>,
@@ -65,7 +60,10 @@ pub async fn rename_endpoint<'r>(
     form: Result<Form<EditDisplayName<'r>>, Errors<'r>>,
     csrf_token: CsrfToken,
 ) -> Result<ApiResponse, ApiResponse> {
-    let form = extract_data_or_return_response(form, "partials/community/settings/rename_error")?;
+    let form = extract_data_or_return_response(
+        form,
+        "partials/community/settings/rename_error",
+    )?;
 
     csrf_token.verify(&form.authenticity_token.to_string())?;
 
@@ -87,7 +85,8 @@ pub async fn rename_endpoint<'r>(
 
     let mut tx = db.begin().await?;
 
-    Community::update_name(&mut tx, &form.community_id, &form.display_name).await?;
+    Community::update_name(&mut tx, &form.community_id, &form.display_name)
+        .await?;
 
     tx.commit().await?;
 
@@ -102,9 +101,4 @@ pub async fn rename_endpoint<'r>(
         )),
         headers: None,
     })
-}
-
-#[put("/rename", rank = 2)]
-pub fn rename_unauthorized() -> Status {
-    Status::Unauthorized
 }

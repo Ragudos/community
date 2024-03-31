@@ -1,13 +1,14 @@
 use rocket::form::{Errors, Form};
 use rocket::http::{Header, Status};
-use rocket::post;
-use rocket::State;
+use rocket::{post, State};
 use rocket_csrf_token::CsrfToken;
 use rocket_db_pools::Connection;
 use rocket_dyn_templates::{context, Template};
 use sqlx::Acquire;
 
-use crate::controllers::errors::{extract_data_or_return_response, ValidationError};
+use crate::controllers::errors::{
+    extract_data_or_return_response, ValidationError,
+};
 use crate::controllers::rate_limiter::{RateLimiter, RateLimiterTrait};
 use crate::helpers::db::DbConn;
 use crate::models::community::forms::CreateCommunity;
@@ -24,8 +25,10 @@ pub async fn create_community_endpoint<'r>(
     rate_limiter: &State<RateLimiter>,
     csrf_token: CsrfToken,
 ) -> Result<ApiResponse, ApiResponse> {
-    let community_info =
-        extract_data_or_return_response(community_info, "partials/auth/login_error")?;
+    let community_info = extract_data_or_return_response(
+        community_info,
+        "partials/auth/login_error",
+    )?;
 
     csrf_token.verify(&community_info.authenticity_token.to_string())?;
     rate_limiter.add_to_limit_or_return()?;

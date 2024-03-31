@@ -1,9 +1,7 @@
 use rocket::get;
-use rocket::http::CookieJar;
-use rocket::http::Status;
+use rocket::http::{CookieJar, Status};
 use rocket_csrf_token::CsrfToken;
-use rocket_dyn_templates::context;
-use rocket_dyn_templates::Template;
+use rocket_dyn_templates::{context, Template};
 
 use crate::controllers::htmx::IsBoosted;
 use crate::models::seo::metadata::SeoMetadata;

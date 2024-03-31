@@ -6,7 +6,9 @@ use rocket_db_pools::Connection;
 use rocket_dyn_templates::{context, Template};
 use sqlx::Acquire;
 
-use crate::controllers::errors::{extract_data_or_return_response, ValidationError};
+use crate::controllers::errors::{
+    extract_data_or_return_response, ValidationError,
+};
 use crate::helpers::db::DbConn;
 use crate::models::community::forms::ChangeJoinProcessCommunity;
 use crate::models::community::schema::{Community, CommunityJoinRequest};
@@ -38,7 +40,8 @@ pub async fn change_join_process_endpoint<'r>(
         return Ok(ApiResponse::Status(Status::Forbidden));
     }
 
-    let Some(password_struct) = UserCredentials::get_password_hash(&mut db, &user._id).await?
+    let Some(password_struct) =
+        UserCredentials::get_password_hash(&mut db, &user._id).await?
     else {
         return Ok(ApiResponse::Status(Status::InternalServerError));
     };
@@ -74,14 +77,18 @@ pub async fn change_join_process_endpoint<'r>(
     }
 
     let Some(community_name) =
-        Community::get_name(&mut db, &change_join_process_jwt.community_id).await?
+        Community::get_name(&mut db, &change_join_process_jwt.community_id)
+            .await?
     else {
         return Err(ApiResponse::Status(Status::InternalServerError));
     };
     let mut tx = db.begin().await?;
 
-    let is_private =
-        Community::change_join_process(&mut tx, &change_join_process_jwt.community_id).await?;
+    let is_private = Community::change_join_process(
+        &mut tx,
+        &change_join_process_jwt.community_id,
+    )
+    .await?;
 
     // This means that the community is now public and was previously private, so we delete all join requests if any.
     if !is_private {
@@ -106,9 +113,4 @@ pub async fn change_join_process_endpoint<'r>(
         )),
         headers: None,
     })
-}
-
-#[put("/change-join-process", rank = 2)]
-pub fn change_join_process_unauthorized_endpoint() -> ApiResponse {
-    ApiResponse::Status(Status::Forbidden)
 }

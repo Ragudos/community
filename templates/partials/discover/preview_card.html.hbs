@@ -1,0 +1,24 @@
+<a hx-swap="innerHTML swap:250ms" style="min-width: auto; min-height: auto;"
+    hx-target="main" hx-target-error="body"
+    rel="noreferrer noopener"
+    href="/community/{{community._id}}/about?includeheader=true"
+    class="discover-card">
+    <div role="presentation"
+        style="background-image: url({{community.cover_image}})"
+        class="discover-cover-image background"></div>
+    <div class="discover-cc">
+        <div class="discover-nc">
+            <img src="{{community.display_image}}"
+                alt="{{community.display_name}}'s display image" width="40"
+                height="40" />
+            <span class="discover-name">{{community.display_name}}</span>
+        </div>
+        <p class="discover-desc">{{community.description}}</p>
+        <div class="discover-metadata">
+            <span>{{#if
+                community.is_private}}Private{{else}}Public{{/if}}</span>
+            <span>•</span>
+            <span>{{(num_abbr community.total_members)}} member/s</span>
+        </div>
+    </div>
+</a>

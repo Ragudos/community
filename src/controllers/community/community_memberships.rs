@@ -49,6 +49,7 @@ impl CommunityMembership {
 
         Ok(())
     }
+
     pub async fn get_total(
         db: &mut Connection<DbConn>,
         id: &i64,

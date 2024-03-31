@@ -1,9 +1,11 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{helpers::get_environment, models::users::preferences::Theme};
+use crate::helpers::get_environment;
+use crate::models::users::preferences::Theme;
 
 const SITE_NAME: &str = "Community";
-const DESCRIPTION: &str = "Community is a social media platform for communities.";
+const DESCRIPTION: &str =
+    "Community is a social media platform for communities.";
 
 #[derive(Default, Serialize, Deserialize, Clone)]
 pub struct OpenGraphImage<'r> {

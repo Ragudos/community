@@ -2,7 +2,9 @@ use rocket_db_pools::Connection;
 use sqlx::{Postgres, Transaction};
 
 use crate::helpers::db::DbConn;
-use crate::models::users::schema::{EmailStruct, FullName, PasswordStruct, UserCredentials};
+use crate::models::users::schema::{
+    EmailStruct, FullName, PasswordStruct, UserCredentials,
+};
 
 impl UserCredentials {
     /// must be accessed after user is verified using 2FA or password.

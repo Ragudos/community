@@ -1,0 +1,108 @@
+<aside id="discover-filters">
+    <div class="container discover-filters-container">
+        <input id="communities-offset" type="hidden" name="offset"
+            value="{{offset}}" />
+        <div data-loading-states data-loading-delay="250"
+            class="search-input-container">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                fill="currentColor" class="w-5 h-5">
+                <path fill-rule="evenodd"
+                    d="M9 3.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11ZM2 9a7 7 0 1 1 12.452 4.391l3.328 3.329a.75.75 0 1 1-1.06 1.06l-3.329-3.328A7 7 0 0 1 2 9Z"
+                    clip-rule="evenodd" />
+            </svg>
+            <input name="search" value="{{query}}" hx-get="/discover/api"
+                hx-target="#section-of-communities"
+                hx-include="[name='category']"
+                hx-sync="#search-input:replace,[name='categories']:replace"
+                id="search-input" type="search" name="search"
+                title="Search by name" placeholder="Search by name"
+                autocomplete="off" autocapitalize="off" data-loading-disable
+                hx-trigger="input delay:500ms, search" />
+            <span role="presentation" class="spinner" data-loading-class="spin"
+                data-loading></span>
+        </div>
+        <div class="discover-filters">
+            <div class="category-filters-container">
+                <div class="category-filters">
+                    {{#each categories}}
+                    {{#if ../active_categories}}
+                    {{#if (contains ../active_categories value)}}
+                    <label aria-label="{{value}}"
+                        class="btn category-filter active">
+                        <input type="radio" name="category" value="{{value}}"
+                            checked
+                            hx-get="/discover/api" hx-trigger="change"
+                            hx-include="[name=category],#search-input"
+                            hx-sync="[name=category],#search-input,[data-change-offset]"
+                            hx-target="#section-of-communities"
+                            hx-target-error="#nothing" />
+                        <span>{{name}}</span>
+                    </label>
+                    {{else}}
+                    <label aria-label="{{value}}" class="btn category-filter">
+                        <input type="radio" name="category" value="{{value}}"
+                            hx-get="/discover/api" hx-trigger="change"
+                            hx-include="[name=category],#search-input"
+                            hx-sync="[name=category],#search-input,[data-change-offset]"
+                            hx-target="#section-of-communities"
+                            hx-target-error="#nothing" />
+                        <span>{{name}}</span>
+                    </label>
+                    {{/if}}
+                    {{else}}
+                    {{#if (eq value "")}}
+                    <label aria-label="{{value}}"
+                        class="btn category-filter active">
+                        <input type="radio" name="category" value="{{value}}"
+                            checked
+                            hx-get="/discover/api" hx-trigger="change"
+                            hx-include="[name=category],#search-input"
+                            hx-sync="[name=category],#search-input,[data-change-offset]"
+                            hx-target="#section-of-communities"
+                            hx-target-error="#nothing" />
+                        <span>{{name}}</span>
+                    </label>
+                    {{else}}
+                    <label aria-label="{{value}}"
+                        class="btn category-filter active">
+                        <input type="radio" name="category" value="{{value}}"
+                            hx-get="/discover/api" hx-trigger="change"
+                            hx-include="[name=category],#search-input"
+                            hx-sync="[name=category],#search-input,[data-change-offset]"
+                            hx-target="#section-of-communities"
+                            hx-target-error="#nothing" />
+                        <span>{{name}}</span>
+                    </label>
+                    {{/if}}
+                    {{/if}}
+                    {{/each}}
+                </div>
+            </div>
+        </div>
+    </div>
+</aside>
+<section class="container" id="section-of-communities">
+    <h1 class="sr-only">Discover Communities</h1>
+    {{#if did_error}}
+    {{> partials/discover/error}}
+    {{else}}
+    {{#if (eq (len communities) 0)}}
+    {{> partials/discover/empty}}
+    {{else}}
+    <div class="discover-grid">
+        {{#each communities}}
+        {{> partials/discover/preview_card community=this}}
+        {{/each}}
+    </div>
+    {{#unless (lte pagination 1)}}
+    {{> partials/discover/breadcrumbs_prev_btn}}
+    <div class="breadcrumbs">
+        {{#breadcrumbs offset pagination}}
+        {{> partials/discover/breadcrumbs_btn}}
+        {{/breadcrumbs}}
+    </div>
+    {{> partials/discover/breadcrumbs_next_btn}}
+    {{/unless}}
+    {{/if}}
+    {{/if}}
+</section>

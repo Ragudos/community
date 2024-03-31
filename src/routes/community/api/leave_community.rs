@@ -22,24 +22,26 @@ pub async fn leave_community_endpoint<'r>(
     form: Result<Form<LeaveCommunity<'r>>, Errors<'r>>,
     csrf_token: CsrfToken,
 ) -> Result<ApiResponse, ApiResponse> {
-    let form =
-        extract_data_or_return_response(form, "partials/community/settings/request_leave_error")?;
+    let form = extract_data_or_return_response(
+        form,
+        "partials/community/settings/request_leave_error",
+    )?;
 
     csrf_token.verify(&form.authenticity_token.to_string())?;
 
     let mut tx = db.begin().await?;
 
     // Future: If points and leaderboards are implemented, remove the user's points from the community's leaderboard.
-    CommunityMembership::remove_user_from_community(&mut tx, &form.community_id, &user._id).await?;
+    CommunityMembership::remove_user_from_community(
+        &mut tx,
+        &form.community_id,
+        &user._id,
+    )
+    .await?;
 
     tx.commit().await?;
 
     Ok(ApiResponse::Redirect(Redirect::to(community_uri!(
         about::about_community_page(form.community_id, _)
     ))))
-}
-
-#[post("/leave-community", rank = 2)]
-pub fn unauthorized_leave_community() -> Status {
-    Status::Unauthorized
 }

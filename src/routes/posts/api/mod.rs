@@ -2,10 +2,9 @@ use rocket::get;
 use rocket::http::Status;
 use rocket_dyn_templates::{context, Template};
 
-use crate::{
-    models::{users::schema::UserJWT, Toast, ToastTypes},
-    responders::ApiResponse,
-};
+use crate::models::users::schema::UserJWT;
+use crate::models::{Toast, ToastTypes};
+use crate::responders::ApiResponse;
 
 pub mod community_posts;
 pub mod post_info;

@@ -1,0 +1,17 @@
+{{#> layouts/main}}
+{{#*inline "additional_head_content"}}
+{{#> more_head_content}}
+{{/more_head_content}}
+{{/inline}}
+{{#*inline "header"}}
+<header class="fade-me-in fade-me-out" id="header">
+    {{> partials/headers/logged_in}}
+</header>
+<aside class="fade-me-in fade-me-out" id="community-header">
+    {{#if community}}
+    {{> partials/headers/community}}
+    {{/if}}
+</aside>
+{{/inline}}
+{{> @partial-block}}
+{{/layouts/main}}

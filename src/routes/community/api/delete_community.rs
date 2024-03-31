@@ -6,7 +6,9 @@ use rocket_db_pools::Connection;
 use rocket_dyn_templates::{context, Template};
 use sqlx::Acquire;
 
-use crate::controllers::errors::{extract_data_or_return_response, ValidationError};
+use crate::controllers::errors::{
+    extract_data_or_return_response, ValidationError,
+};
 use crate::helpers::db::DbConn;
 use crate::models::community::forms::DeleteCommunity;
 use crate::models::community::schema::Community;
@@ -46,7 +48,8 @@ pub async fn delete_community_endpoint<'r>(
         return Ok(ApiResponse::Status(Status::Forbidden));
     }
 
-    let Some(password_struct) = UserCredentials::get_password_hash(&mut db, &user._id).await?
+    let Some(password_struct) =
+        UserCredentials::get_password_hash(&mut db, &user._id).await?
     else {
         return Ok(ApiResponse::Status(Status::InternalServerError));
     };
@@ -80,7 +83,9 @@ pub async fn delete_community_endpoint<'r>(
         });
     }
 
-    let Some(community_name) = Community::get_name(&mut db, &delete_jwt.community_id).await? else {
+    let Some(community_name) =
+        Community::get_name(&mut db, &delete_jwt.community_id).await?
+    else {
         return Ok(ApiResponse::Status(Status::InternalServerError));
     };
 
@@ -102,9 +107,4 @@ pub async fn delete_community_endpoint<'r>(
         )),
         headers: None,
     })
-}
-
-#[delete("/delete-community", rank = 2)]
-pub fn unauthorized_delete_community() -> ApiResponse {
-    ApiResponse::Status(Status::Unauthorized)
 }

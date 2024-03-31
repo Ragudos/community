@@ -1,8 +1,7 @@
-use rocket::{
-    http::{uri::Reference, Status},
-    response::{Responder, Result},
-    Response,
-};
+use rocket::http::uri::Reference;
+use rocket::http::Status;
+use rocket::response::{Responder, Result};
+use rocket::Response;
 #[derive(Debug)]
 pub struct HtmxRedirect(Status, Option<Reference<'static>>);
 

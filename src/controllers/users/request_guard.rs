@@ -12,7 +12,9 @@ use crate::models::JWT_NAME;
 impl<'r> FromRequest<'r> for UserJWT {
     type Error = &'r str;
 
-    async fn from_request(request: &'r Request<'_>) -> Outcome<UserJWT, Self::Error> {
+    async fn from_request(
+        request: &'r Request<'_>,
+    ) -> Outcome<UserJWT, Self::Error> {
         let Some(cookie) = request.cookies().get_private(JWT_NAME) else {
             return Outcome::Forward(Status::Unauthorized);
         };
@@ -22,7 +24,9 @@ impl<'r> FromRequest<'r> for UserJWT {
             request.cookies().remove_private(JWT_NAME);
             return Outcome::Forward(Status::Unauthorized);
         };
-        let Outcome::Success(mut db) = Connection::<DbConn>::from_request(request).await else {
+        let Outcome::Success(mut db) =
+            Connection::<DbConn>::from_request(request).await
+        else {
             request.local_cache(|| Some("Failed to connect to the database."));
 
             return Outcome::Error((
@@ -41,7 +45,10 @@ impl<'r> FromRequest<'r> for UserJWT {
         } else {
             request.local_cache(|| Some("Failed to verify the JWT."));
 
-            return Outcome::Error((Status::InternalServerError, "Failed to verify the JWT."));
+            return Outcome::Error((
+                Status::InternalServerError,
+                "Failed to verify the JWT.",
+            ));
         }
     }
 }

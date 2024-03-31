@@ -15,7 +15,8 @@
 }
 
 .slide-down-reverse {
-    animation: slide-down var(--transition-duration, 250ms) ease-out forwards reverse;
+    animation: slide-down var(--transition-duration, 250ms) ease-out forwards
+        reverse;
 }
 
 .slide-up {
@@ -23,12 +24,13 @@
 }
 
 .slide-up-reverse {
-    animation: slide-up var(--transition-duration, 250ms) ease-out forwards reverse;
+    animation: slide-up var(--transition-duration, 250ms) ease-out forwards
+        reverse;
 }
 
 @keyframes slide-up {
     from {
-        transform: translateY(25%);
+        transform: translateY(5%);
         opacity: 0;
     }
     to {
@@ -39,7 +41,7 @@
 
 @keyframes slide-down {
     from {
-        transform: translateY(-25%);
+        transform: translateY(-5%);
         opacity: 0;
     }
     to {

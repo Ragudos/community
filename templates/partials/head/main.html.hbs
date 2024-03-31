@@ -1,0 +1,40 @@
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta http-equiv="X-UA-Compatible" content="ie=edge" /><link rel="preload"
+    href="/build/styles/fonts.min.css" as="style" />
+<link rel="stylesheet" href="/build/styles/fonts.min.css" />
+<link rel="preload" href="/build/styles/resets.min.css" as="style" />
+<link rel="stylesheet" href="/build/styles/resets.min.css" />
+<link rel="preload" href="/build/styles/main.min.css" as="style" />
+<link rel="stylesheet" href="/build/styles/main.min.css" />
+<script src="/assets/scripts/htmx.min.js"></script>
+<script src="/assets/scripts/htmx-head.min.js"></script>
+<script src="/assets/scripts/htmx-loading.min.js"></script>
+<script src="/assets/scripts/htmx-response-target.min.js"></script>
+<script src="/build/index.min.js" type="module"></script>
+<style>
+    [data-loading] {
+        display: none
+    }
+
+    .hidden {
+        display: none !important
+    }
+
+    .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border-width: 0;
+    }
+</style>
+{{#unless (eq (len stylesheets) 0)}}
+{{#each stylesheets as |stylesheet|}}
+<link rel="stylesheet" href="{{stylesheet}}">
+{{/each}}
+{{/unless}}

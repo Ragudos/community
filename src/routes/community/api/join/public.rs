@@ -25,11 +25,16 @@ pub async fn public_join_post<'r>(
     form: Result<Form<JoinPublicCommunity<'r>>, Errors<'r>>,
     csrf_token: CsrfToken,
 ) -> Result<ApiResponse, ApiResponse> {
-    let form = extract_data_or_return_response(form, "partials/community/join/public_error")?;
+    let form = extract_data_or_return_response(
+        form,
+        "partials/community/join/public_error",
+    )?;
 
     csrf_token.verify(&form.authenticity_token.to_string())?;
 
-    if let Some(is_private) = Community::is_private(&mut db, &form.community_id).await? {
+    if let Some(is_private) =
+        Community::is_private(&mut db, &form.community_id).await?
+    {
         if is_private {
             return Err(ApiResponse::Render {
                 status: Status::Forbidden,
@@ -61,7 +66,13 @@ pub async fn public_join_post<'r>(
         });
     }
 
-    if CommunityMembership::is_user_a_member(&mut db, &form.community_id, &user._id).await? {
+    if CommunityMembership::is_user_a_member(
+        &mut db,
+        &form.community_id,
+        &user._id,
+    )
+    .await?
+    {
         return Err(ApiResponse::Render {
             status: Status::Forbidden,
             template: Some(Template::render(
@@ -81,11 +92,11 @@ pub async fn public_join_post<'r>(
     tx.commit().await?;
 
     Ok(ApiResponse::Redirect(Redirect::to(community_uri!(
-        community::community_page(form.community_id, Some(true), Some(false), _)
+        community::community_page(
+            form.community_id,
+            Some(true),
+            Some(false),
+            _
+        )
     ))))
-}
-
-#[post("/public", rank = 2)]
-pub fn unauthorized_join_public() -> ApiResponse {
-    ApiResponse::Status(Status::Unauthorized)
 }

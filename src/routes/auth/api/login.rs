@@ -7,7 +7,9 @@ use rocket_csrf_token::CsrfToken;
 use rocket_db_pools::Connection;
 use rocket_dyn_templates::{context, Template};
 
-use crate::controllers::errors::{extract_data_or_return_response, ValidationError};
+use crate::controllers::errors::{
+    extract_data_or_return_response, ValidationError,
+};
 use crate::controllers::htmx::redirect::HtmxRedirect;
 use crate::controllers::htmx::IsHTMX;
 use crate::controllers::rate_limiter::{RateLimiter, RateLimiterTrait};
@@ -22,9 +24,9 @@ use crate::routes::discover;
 #[post("/login")]
 pub fn logged_in(_user: UserJWT, is_htmx: IsHTMX) -> ApiResponse {
     match is_htmx {
-        IsHTMX(true) => ApiResponse::HtmxRedirect(HtmxRedirect::to(discover_uri!(
-            discover::discover_page(Some(true), _)
-        ))),
+        IsHTMX(true) => ApiResponse::HtmxRedirect(HtmxRedirect::to(
+            discover_uri!(discover::discover_page(Some(true), _)),
+        )),
         IsHTMX(false) => ApiResponse::Redirect(Redirect::to(discover_uri!(
             discover::discover_page(Some(true), _)
         ))),
@@ -41,12 +43,18 @@ pub async fn post<'r>(
 ) -> Result<ApiResponse, ApiResponse> {
     rate_limiter.add_to_limit_or_return()?;
 
-    let login_data = extract_data_or_return_response(login_data, "partials/auth/login_error")?;
+    let login_data = extract_data_or_return_response(
+        login_data,
+        "partials/auth/login_error",
+    )?;
 
     csrf_token.verify(&login_data.authenticity_token.to_string())?;
 
-    if let Some(password_struct) =
-        UserCredentials::get_password_hash_by_name(&mut db, &login_data.display_name).await?
+    if let Some(password_struct) = UserCredentials::get_password_hash_by_name(
+        &mut db,
+        &login_data.display_name,
+    )
+    .await?
     {
         if !verify(login_data.password, &password_struct.password_hash)? {
             return Err(ApiResponse::Render {

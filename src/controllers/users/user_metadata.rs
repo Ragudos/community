@@ -28,7 +28,10 @@ impl UserMetadata {
         .await?)
     }
 
-    pub async fn create(tx: &mut Transaction<'_, Postgres>, id: &i64) -> Result<(), sqlx::Error> {
+    pub async fn create(
+        tx: &mut Transaction<'_, Postgres>,
+        id: &i64,
+    ) -> Result<(), sqlx::Error> {
         let _ = sqlx::query!(
             r#"
                 INSERT INTO user_metadata (_id)

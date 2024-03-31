@@ -1,0 +1,24 @@
+<title>{{ metadata.title }}</title>
+<meta name="title" content="{{ metadata.title }}" />
+<meta name="description" content="{{ metadata.description }}" />
+{{#unless metadata.open_graph}}
+<meta name="og:title" content="{{metadata.title}}" />
+<meta name="og:description" content="{{metdata.description}}" />
+{{else}}
+<meta name="og:title" content="{{metadata.open_graph.title}}" />
+<meta name="og:title" content="{{metadata.open_graph.description}}" />
+{{#if metadata.open_graph.image}}
+<meta name="og:image" content="{{metadata.open_graph.image.url}}" />
+<meta name="og:image:secure_url" content="{{metadata.open_graph.image.url}}" />
+<meta name="og:image:width" content="{{metadata.open_graph.image.width}}" />
+<meta name="og:image:height" content="{{metadata.open_graph.image.height}}" />
+<meta name="og:image:alt" content="{{metadata.open_graph.image.alt}}" />
+{{/if}}
+{{/unless}}
+<meta property="og:site_name" content="{{ metadata.site_name }}" />
+<meta name="environment" content="{{ metadata.env }}" />
+{{#if user}}
+<meta name="is_logged_in" content="true" />
+{{else}}
+<meta name="is_logged_in" content="fase" />
+{{/if}}

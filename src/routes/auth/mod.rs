@@ -17,9 +17,9 @@ pub mod register;
 #[get("/")]
 pub fn logged_in(_user: UserJWT, is_boosted: IsBoosted) -> ApiResponse {
     match is_boosted {
-        IsBoosted(true) => ApiResponse::HtmxRedirect(HtmxRedirect::to(discover_uri!(
-            discover::discover_page(Some(true), _)
-        ))),
+        IsBoosted(true) => ApiResponse::HtmxRedirect(HtmxRedirect::to(
+            discover_uri!(discover::discover_page(Some(true), _)),
+        )),
         IsBoosted(false) => ApiResponse::Redirect(Redirect::to(discover_uri!(
             discover::discover_page(Some(true), _)
         ))),
@@ -29,9 +29,9 @@ pub fn logged_in(_user: UserJWT, is_boosted: IsBoosted) -> ApiResponse {
 #[get("/login")]
 pub fn redirect_login(_user: UserJWT, is_boosted: IsBoosted) -> ApiResponse {
     match is_boosted {
-        IsBoosted(true) => ApiResponse::HtmxRedirect(HtmxRedirect::to(discover_uri!(
-            discover::discover_page(Some(true), _)
-        ))),
+        IsBoosted(true) => ApiResponse::HtmxRedirect(HtmxRedirect::to(
+            discover_uri!(discover::discover_page(Some(true), _)),
+        )),
         IsBoosted(false) => ApiResponse::Redirect(Redirect::to(discover_uri!(
             discover::discover_page(Some(true), _)
         ))),
@@ -41,9 +41,9 @@ pub fn redirect_login(_user: UserJWT, is_boosted: IsBoosted) -> ApiResponse {
 #[get("/register")]
 pub fn redirect_register(_user: UserJWT, is_boosted: IsBoosted) -> ApiResponse {
     match is_boosted {
-        IsBoosted(true) => ApiResponse::HtmxRedirect(HtmxRedirect::to(discover_uri!(
-            discover::discover_page(Some(true), _)
-        ))),
+        IsBoosted(true) => ApiResponse::HtmxRedirect(HtmxRedirect::to(
+            discover_uri!(discover::discover_page(Some(true), _)),
+        )),
         IsBoosted(false) => ApiResponse::Redirect(Redirect::to(discover_uri!(
             discover::discover_page(Some(true), _)
         ))),

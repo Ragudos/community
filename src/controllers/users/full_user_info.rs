@@ -1,15 +1,16 @@
 use rocket_db_pools::Connection;
 
-use crate::{
-    helpers::db::DbConn,
-    models::db::enums::{AccountStatus, Gender, Occupation},
-    models::users::schema::FullUserInfo,
-};
+use crate::helpers::db::DbConn;
+use crate::models::db::enums::{AccountStatus, Gender, Occupation};
+use crate::models::users::schema::FullUserInfo;
 
 /// Used when visiting a user's profile page
 impl FullUserInfo {
     #[allow(non_snake_case)]
-    pub async fn get(db: &mut Connection<DbConn>, id: &i64) -> Result<FullUserInfo, sqlx::Error> {
+    pub async fn get(
+        db: &mut Connection<DbConn>,
+        id: &i64,
+    ) -> Result<FullUserInfo, sqlx::Error> {
         Ok(sqlx::query_as!(
             FullUserInfo,
             r#"

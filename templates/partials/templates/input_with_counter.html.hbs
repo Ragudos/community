@@ -1,0 +1,33 @@
+<template id="input-with-counter">
+    <style>
+        .counter-container {
+            font-size: 80%;
+        }
+
+        .identifier-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+    </style>
+
+    <div class="container">
+        <div class="identifier-container">
+            <slot name="label"></slot>
+            <div class="counter-container">
+                <span class="counter">0</span>
+                /
+                <span class="max-count">0</span>
+            </div>
+        </div>
+        <slot name="input"></slot>
+    </div>
+</template>

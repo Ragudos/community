@@ -1,4 +1,5 @@
 interface Window {
+    startReceivingNotifications(): void;
     closeDropdown(el: HTMLButtonElement | HTMLAnchorElement): void;
     openDialog(button: HTMLButtonElement): void;
     closeDialog(button: HTMLButtonElement): void;

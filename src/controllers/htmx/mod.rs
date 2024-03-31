@@ -1,10 +1,7 @@
 use std::convert::Infallible;
 
-use rocket::{
-    async_trait,
-    request::{FromRequest, Outcome},
-    Request,
-};
+use rocket::request::{FromRequest, Outcome};
+use rocket::{async_trait, Request};
 
 pub mod redirect;
 pub mod refresh;
@@ -17,7 +14,9 @@ pub struct IsHTMX(pub bool);
 impl<'r> FromRequest<'r> for IsBoosted {
     type Error = Infallible;
 
-    async fn from_request(request: &'r Request<'_>) -> Outcome<Self, Self::Error> {
+    async fn from_request(
+        request: &'r Request<'_>,
+    ) -> Outcome<Self, Self::Error> {
         let is_boosted = request.headers().get_one("HX-Boosted");
 
         Outcome::Success(IsBoosted(match is_boosted {
@@ -31,7 +30,9 @@ impl<'r> FromRequest<'r> for IsBoosted {
 impl<'r> FromRequest<'r> for IsHTMX {
     type Error = Infallible;
 
-    async fn from_request(request: &'r Request<'_>) -> Outcome<Self, Self::Error> {
+    async fn from_request(
+        request: &'r Request<'_>,
+    ) -> Outcome<Self, Self::Error> {
         let is_htmx = request.headers().get_one("HX-Request");
 
         Outcome::Success(IsHTMX(match is_htmx {

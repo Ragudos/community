@@ -63,7 +63,10 @@ impl CommunityPost {
         );
         query.push_bind(limit);
 
-        let cp: Vec<CommunityPost> = query.build_query_as().fetch_all(&mut ***db).await?;
+        let cp: Vec<CommunityPost> = query
+            .build_query_as()
+            .fetch_all(&mut ***db)
+            .await?;
 
         Ok(cp)
     }

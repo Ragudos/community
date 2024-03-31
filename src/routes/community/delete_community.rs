@@ -28,16 +28,21 @@ pub async fn delete_community_page(
         return ApiResponse::Status(Status::Forbidden);
     })?;
 
-    if deletion_jwt.community_id != community_id || deletion_jwt.user_id != user._id {
+    if deletion_jwt.community_id != community_id
+        || deletion_jwt.user_id != user._id
+    {
         return Err(ApiResponse::Status(Status::Forbidden));
     }
 
-    let authenticity_token = csrf_token.authenticity_token().map_err(|error| {
-        eprintln!("Error: {}", error);
-        return ApiResponse::Status(Status::InternalServerError);
-    })?;
+    let authenticity_token =
+        csrf_token.authenticity_token().map_err(|error| {
+            eprintln!("Error: {}", error);
+            return ApiResponse::Status(Status::InternalServerError);
+        })?;
 
-    let Some(community_name) = Community::get_name(&mut db, &community_id).await? else {
+    let Some(community_name) =
+        Community::get_name(&mut db, &community_id).await?
+    else {
         return Err(ApiResponse::Status(Status::NotFound));
     };
 

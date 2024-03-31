@@ -1,10 +1,18 @@
 use rocket::FromFormField;
-use serde::Deserialize;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgHasArrayType;
 use sqlx::prelude::Type;
 
-#[derive(Serialize, Deserialize, PartialEq, Eq, Type, FromFormField, Clone, Debug)]
+#[derive(
+    Serialize,
+    Deserialize,
+    PartialEq,
+    Eq,
+    Type,
+    FromFormField,
+    Clone,
+    Debug
+)]
 #[sqlx(type_name = "notificationtype", rename_all = "lowercase")]
 pub enum NotificationType {
     Follows,
@@ -12,7 +20,16 @@ pub enum NotificationType {
     CommunityPosts,
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Eq, Type, FromFormField, Clone, Debug)]
+#[derive(
+    Serialize,
+    Deserialize,
+    PartialEq,
+    Eq,
+    Type,
+    FromFormField,
+    Clone,
+    Debug
+)]
 #[sqlx(type_name = "requeststatus", rename_all = "lowercase")]
 pub enum RequestStatus {
     Pending,
@@ -20,7 +37,16 @@ pub enum RequestStatus {
     Accepted,
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Eq, Type, FromFormField, Clone, Debug)]
+#[derive(
+    Serialize,
+    Deserialize,
+    PartialEq,
+    Eq,
+    Type,
+    FromFormField,
+    Clone,
+    Debug
+)]
 #[sqlx(type_name = "gender", rename_all = "lowercase")]
 pub enum Gender {
     Male,
@@ -29,7 +55,16 @@ pub enum Gender {
     Unknown,
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Eq, Type, FromFormField, Clone, Debug)]
+#[derive(
+    Serialize,
+    Deserialize,
+    PartialEq,
+    Eq,
+    Type,
+    FromFormField,
+    Clone,
+    Debug
+)]
 #[sqlx(type_name = "occupation", rename_all = "lowercase")]
 pub enum Occupation {
     Student,
@@ -43,7 +78,16 @@ pub enum Occupation {
     Other,
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Eq, Type, FromFormField, Clone, Debug)]
+#[derive(
+    Serialize,
+    Deserialize,
+    PartialEq,
+    Eq,
+    Type,
+    FromFormField,
+    Clone,
+    Debug
+)]
 #[sqlx(type_name = "userrole", rename_all = "lowercase")]
 pub enum UserRole {
     Admin,
@@ -51,7 +95,16 @@ pub enum UserRole {
     User,
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Eq, Type, FromFormField, Clone, Debug)]
+#[derive(
+    Serialize,
+    Deserialize,
+    PartialEq,
+    Eq,
+    Type,
+    FromFormField,
+    Clone,
+    Debug
+)]
 #[sqlx(type_name = "accountstatus", rename_all = "lowercase")]
 pub enum AccountStatus {
     Active,
@@ -59,19 +112,40 @@ pub enum AccountStatus {
     Banned,
 }
 
-#[derive(Hash, Serialize, Deserialize, PartialEq, Eq, Type, FromFormField, Clone, Debug)]
+#[derive(
+    Hash,
+    Serialize,
+    Deserialize,
+    PartialEq,
+    Eq,
+    Type,
+    FromFormField,
+    Clone,
+    Debug
+)]
 #[sqlx(type_name = "communitycategory", rename_all = "lowercase")]
 pub enum CommunityCategory {
+    #[serde(rename = "art")]
     Art,
+    #[serde(rename = "music")]
     Music,
+    #[serde(rename = "gaming")]
     Gaming,
+    #[serde(rename = "sports")]
     Sports,
+    #[serde(rename = "science")]
     Science,
+    #[serde(rename = "technology")]
     Technology,
+    #[serde(rename = "literature")]
     Literature,
+    #[serde(rename = "healthandfitness")]
     HealthAndFitness,
+    #[serde(rename = "selfimprovement")]
     SelfImprovement,
+    #[serde(rename = "academics")]
     Academics,
+    #[serde(rename = "other")]
     Other,
 }
 
@@ -81,7 +155,16 @@ impl PgHasArrayType for CommunityCategory {
     }
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Eq, Type, FromFormField, Clone, Debug)]
+#[derive(
+    Serialize,
+    Deserialize,
+    PartialEq,
+    Eq,
+    Type,
+    FromFormField,
+    Clone,
+    Debug
+)]
 #[sqlx(type_name = "conversationtype", rename_all = "lowercase")]
 pub enum ConversationType {
     Direct,

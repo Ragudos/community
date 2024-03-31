@@ -1,16 +1,12 @@
-use std::sync::{
-    atomic::{AtomicBool, AtomicU32, Ordering},
-    RwLock,
-};
+use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
+use std::sync::RwLock;
 
 use rocket::http::Status;
 use rocket_dyn_templates::{context, Template};
 use time::{Duration, OffsetDateTime};
 
-use crate::{
-    models::{Toast, ToastTypes},
-    responders::ApiResponse,
-};
+use crate::models::{Toast, ToastTypes};
+use crate::responders::ApiResponse;
 
 pub struct RateLimiter {
     pub capacity: AtomicU32,
@@ -26,7 +22,9 @@ pub trait RateLimiterTrait {
 
 impl RateLimiterTrait for RateLimiter {
     fn start_time_accumulator(&self) -> Result<(), ApiResponse> {
-        let did_time_start = self.did_time_accumulator_start.load(Ordering::Acquire);
+        let did_time_start = self
+            .did_time_accumulator_start
+            .load(Ordering::Acquire);
 
         if !did_time_start {
             let mut time_accumulator = self.time_accumulator_started.write()
@@ -75,10 +73,13 @@ impl RateLimiterTrait for RateLimiter {
                         headers: None
                     }
                 })?.saturating_add(Duration::seconds(30));
-            let time_before_acceptance =
-                (time_after_thirty_seconds - OffsetDateTime::now_utc()).whole_seconds();
+            let time_before_acceptance = (time_after_thirty_seconds
+                - OffsetDateTime::now_utc())
+            .whole_seconds();
 
-            if time_before_acceptance.is_negative() || time_before_acceptance == 0 {
+            if time_before_acceptance.is_negative()
+                || time_before_acceptance == 0
+            {
                 self.requests.swap(0, Ordering::Relaxed);
                 self.did_time_accumulator_start
                     .swap(false, Ordering::Release);

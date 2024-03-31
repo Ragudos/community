@@ -1,7 +1,5 @@
-use rocket::{
-    serde::{Deserialize, Serialize},
-    FromForm,
-};
+use rocket::serde::{Deserialize, Serialize};
+use rocket::FromForm;
 use sqlx::prelude::FromRow;
 use time::OffsetDateTime;
 
