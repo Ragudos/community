@@ -24,7 +24,7 @@ dialog {
     white-space: normal;
 
     border: 1px solid;
-    border-color: hsl(var(--border) / var(--_border-opacity, 0.75));
+    border-color: hsl(var(--border) / var(--_border-opacity, 0.675));
     border-radius: $radius;
 
     @include layered-shadow(hsl(0 0% 2% / 0.75), 3);

@@ -50,7 +50,7 @@ pub fn breadcrumbs_helper<'reg, 'rc>(
         1;
     let total_pages: i64 = c
         .data()
-        .get("page_count")
+        .get("pagination")
         .and_then(|v| v.as_i64())
         .unwrap_or(1);
 

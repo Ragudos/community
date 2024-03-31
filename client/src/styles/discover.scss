@@ -250,3 +250,48 @@
         width: 1px;
     }
 }
+
+#section-of-communities {
+    margin-top: 2rem;
+}
+
+.breadcrumbs-container {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+
+    margin-top: 4rem;
+
+    button {
+        border: 1px solid hsl(var(--border) / var(--_border-opacity, 0.675));
+        background-color: hsl(var(--muted) / var(--_background-opacity, 0.075));
+
+        &:hover {
+            --_background-opacity: 0.175;
+        }
+
+        &:disabled {
+            --_background-opacity: 0.075 !important;
+        }
+    }
+}
+
+.breadcrumbs {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.25rem;
+
+    button {
+        padding: 0.25rem;
+        transform: scale(0.9);
+
+        &:active {
+            transform: scale(0.85);
+        }
+
+        &:disabled {
+            transform: scale(0.8);
+        }
+    }
+}

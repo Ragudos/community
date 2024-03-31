@@ -531,7 +531,7 @@ impl Community {
 
         query.push(
             r#"
-            ORDER BY COALESCE(cm.weighted_score, 0) DESC, c._created_at DESC
+            ORDER BY c._created_at DESC, COALESCE(cm.weighted_score, 0) DESC
             LIMIT
             "#,
         );

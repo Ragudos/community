@@ -38,30 +38,7 @@
         white-space: nowrap;
     }
 
-    backdrop-filter: blur(1rem);
-
-    &::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-
-        background-color: hsl(
-            var(--background) / var(--_background-opacity, 0.87)
-        );
-        backdrop-filter: blur(1rem);
-
-        border-radius: inherit;
-
-        width: 100%;
-        height: 100%;
-
-        z-index: 1;
-    }
-
-    * {
-        position: relative;
-        z-index: 2;
-    }
+    background-color: hsl(var(--background) / var(--_background-opacity, 1));
 }
 
 .dropdown {

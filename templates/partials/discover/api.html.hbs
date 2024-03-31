@@ -3,9 +3,13 @@
 <h1 class="sr-only">Discover Communities</h1>
 {{#if did_error}}
 {{> partials/discover/error}}
+<div id="breadcrumbs" hx-swap-oob="true"
+    class="container breadcrumbs-container"></div>
 {{else}}
 {{#if (eq (len communities) 0)}}
 {{> partials/discover/empty}}
+<div id="breadcrumbs" hx-swap-oob="true"
+    class="container breadcrumbs-container"></div>
 {{else}}
 <div class="discover-grid">
     {{#each communities}}
@@ -13,15 +17,16 @@
     {{/each}}
 </div>
 {{#unless (lte pagination 1)}}
-{{#if (eq offset 0)}}
-{{> partials/discover/breadcrumbs_prev_btn}}
-<div class="breadcrumbs">
-    {{#breadcrumbs offset pagination}}
-    {{> partials/discover/breadcrumbs_btn}}
-    {{/breadcrumbs}}
+<div id="breadcrumbs" hx-swap-oob="true"
+    class="container breadcrumbs-container">
+    {{> partials/discover/breadcrumbs_prev_btn}}
+    <div class="breadcrumbs">
+        {{#breadcrumbs offset pagination}}
+        {{> partials/discover/breadcrumbs_btn}}
+        {{/breadcrumbs}}
+    </div>
+    {{> partials/discover/breadcrumbs_next_btn}}
 </div>
-{{> partials/discover/breadcrumbs_prev_btn}}
-{{/if}}
 {{/unless}}
 {{/if}}
 {{/if}}

@@ -1,11 +1,12 @@
 .notifications-container {
-    width: min(98vw, 25rem);
+    width: min(78.5vw, 25rem);
 
     .notifications-header {
         padding: 0.25rem 0.75rem;
 
-        border-bottom: 1px solid hsl(var(--border) / var(--_border-opacity, 0.675));
-        
+        border-bottom: 1px solid
+            hsl(var(--border) / var(--_border-opacity, 0.675));
+
         display: flex;
         justify-content: space-between;
         align-items: center;

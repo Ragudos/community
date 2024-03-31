@@ -145,6 +145,8 @@ pub async fn discover_page<'r>(
         }
     };
 
+    println!("Pagination: {:?}", pagination);
+
     let theme = Theme::from_cookie_jar(cookie_jar);
     let metadata = SeoMetadata::build()
         .theme(theme)

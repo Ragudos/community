@@ -2,18 +2,21 @@
     hx-target="main" hx-target-error="body"
     rel="noreferrer noopener"
     href="/community/{{community._id}}/about?includeheader=true"
-    class="discover-card">
+    class="discover-card"
+    aria-describedby="community-description-{{community._id}}">
     <div role="presentation"
         style="background-image: url({{community.cover_image}})"
         class="discover-cover-image background"></div>
     <div class="discover-cc">
         <div class="discover-nc">
             <img src="{{community.display_image}}"
-                alt="{{community.display_name}}'s display image" width="40"
+                alt=" " width="40"
                 height="40" />
-            <span class="discover-name">{{community.display_name}}</span>
+            <div id="community-name-{{community._id}}"
+                class="discover-name">{{community.display_name}}</div>
         </div>
-        <p class="discover-desc">{{community.description}}</p>
+        <p id="community-description-{{community._id}}"
+            class="discover-desc">{{community.description}}</p>
         <div class="discover-metadata">
             <span>{{#if
                 community.is_private}}Private{{else}}Public{{/if}}</span>

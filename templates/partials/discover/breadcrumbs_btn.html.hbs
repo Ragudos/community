@@ -1,7 +1,9 @@
-{{#if (eq (sub this.value 1) ../offset)}}
-<button disabled class="square">{{this.value}}</button>
+{{#if (eq (sub this.value 1) offset)}}
+<button disabled class="square">{{value}}</button>
 {{else}}
-<button class="square" hx-get="/discover/api"
-    hx-include="[name='offset'],[name='category'],[name='search']"
-    hx-swap="outerHTML">{{this.value}}</button>
+<button data-change-offset class="square" hx-get="/discover/api"
+    hx-target="#section-of-communities"
+    value="{{(sub value 1)}}"
+    name="offset"
+    hx-include="[name='category'],[name='search']">{{value}}</button>
 {{/if}}

@@ -1,7 +1,7 @@
 <aside id="discover-filters">
     <div class="container discover-filters-container">
         <input id="communities-offset" type="hidden" name="offset"
-            value="{{offset}}" />
+            value="{{(add offset 1)}}" />
         <div data-loading-states data-loading-delay="250"
             class="search-input-container">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
@@ -13,7 +13,7 @@
             <input name="search" value="{{query}}" hx-get="/discover/api"
                 hx-target="#section-of-communities"
                 hx-include="[name='category']"
-                hx-sync="#search-input:replace,[name='categories']:replace"
+                hx-sync="#search-input:replace,[name='categories']:replace, [data-change-offset]:replace"
                 id="search-input" type="search" name="search"
                 title="Search by name" placeholder="Search by name"
                 autocomplete="off" autocapitalize="off" data-loading-disable
@@ -81,6 +81,17 @@
         </div>
     </div>
 </aside>
+{{#unless (lte pagination 1)}}
+<div class="container breadcrumbs-container" id="breadcrumbs">
+    {{> partials/discover/breadcrumbs_prev_btn}}
+    <div class="breadcrumbs">
+        {{#breadcrumbs offset pagination}}
+        {{> partials/discover/breadcrumbs_btn}}
+        {{/breadcrumbs}}
+    </div>
+    {{> partials/discover/breadcrumbs_next_btn}}
+</div>
+{{/unless}}
 <section class="container" id="section-of-communities">
     <h1 class="sr-only">Discover Communities</h1>
     {{#if did_error}}
@@ -94,15 +105,6 @@
         {{> partials/discover/preview_card community=this}}
         {{/each}}
     </div>
-    {{#unless (lte pagination 1)}}
-    {{> partials/discover/breadcrumbs_prev_btn}}
-    <div class="breadcrumbs">
-        {{#breadcrumbs offset pagination}}
-        {{> partials/discover/breadcrumbs_btn}}
-        {{/breadcrumbs}}
-    </div>
-    {{> partials/discover/breadcrumbs_next_btn}}
-    {{/unless}}
     {{/if}}
     {{/if}}
 </section>

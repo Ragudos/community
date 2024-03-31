@@ -110,7 +110,8 @@ async fn seed_data(rocket: Rocket<Build>) -> Result {
                         }
                     }
 
-                    if let Err(e) = query!(
+                    for i in 0..=100 {
+                        if let Err(e) = query!(
                         r#"
                             INSERT INTO communities
                             (_id, display_name, display_image, description, is_private, owner_id, cover_image)
@@ -119,8 +120,8 @@ async fn seed_data(rocket: Rocket<Build>) -> Result {
                                 SELECT 1 FROM communities WHERE _id = $1 AND owner_id = $6
                             );
                         "#,
-                        0,
-                        "Rustaceans",
+                        i,
+                        format!("Rustaceans{}", i),
                         "/assets/dummy/community_display_image.jpg",
                         "A community for Rust developers",
                         false,
@@ -133,6 +134,7 @@ async fn seed_data(rocket: Rocket<Build>) -> Result {
                         eprintln!("Failed to seed data: {:?}", e);
                         let _ = tx.rollback().await;
                         return Err(rocket);
+                    }
                     }
 
                     if let Err(e) = tx.commit().await {
