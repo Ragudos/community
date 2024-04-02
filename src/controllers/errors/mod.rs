@@ -46,99 +46,34 @@ where
 impl From<Box<dyn std::error::Error>> for ApiResponse {
     fn from(error: Box<dyn std::error::Error>) -> Self {
         eprintln!("{:?}", error);
-
-        ApiResponse::Render {
-            status: Status::InternalServerError,
-            template: Some(Template::render(
-                "partials/toast",
-                context! {
-                    toast: Toast {
-                        message: "Something went wrong. Please try again later.".to_string(),
-                        r#type: Some(ToastTypes::Error)
-                    }
-                },
-            )),
-            headers: None,
-        }
+        ApiResponse::Status(Status::InternalServerError)
     }
 }
 
 impl From<sqlx::Error> for ApiResponse {
     fn from(error: sqlx::Error) -> Self {
         eprintln!("{:?}", error);
-
-        ApiResponse::Render {
-            status: Status::InternalServerError,
-            template: Some(Template::render(
-                "partials/toast",
-                context! {
-                    toast: Toast {
-                        message: "An unexpected error occured. Please try again.".to_string(),
-                        r#type: Some(ToastTypes::Error)
-                    }
-                },
-            )),
-            headers: None,
-        }
+        ApiResponse::Status(Status::InternalServerError)
     }
 }
 
 impl From<serde_json::Error> for ApiResponse {
     fn from(error: serde_json::Error) -> Self {
         eprintln!("{:?}", error);
-
-        ApiResponse::Render {
-            status: Status::UnprocessableEntity,
-            template: Some(Template::render(
-                "partials/toast",
-                context! {
-                    toast: Toast {
-                        message: "We cannot process your request. Please try again later.".to_string(),
-                        r#type: Some(ToastTypes::Error)
-                    }
-                },
-            )),
-            headers: None,
-        }
+        ApiResponse::Status(Status::UnprocessableEntity)
     }
 }
 
 impl From<bcrypt::BcryptError> for ApiResponse {
     fn from(error: bcrypt::BcryptError) -> Self {
         eprintln!("{:?}", error);
-
-        ApiResponse::Render {
-            status: Status::InternalServerError,
-            template: Some(Template::render(
-                "partials/toast",
-                context! {
-                    toast: Toast {
-                        message: "We cannot validate your information. Please try again later.".to_string(),
-                        r#type: Some(ToastTypes::Error)
-                    }
-                },
-            )),
-            headers: None,
-        }
+        ApiResponse::Status(Status::InternalServerError)
     }
 }
 
 impl From<ParseIntError> for ApiResponse {
     fn from(error: ParseIntError) -> Self {
         eprintln!("{:?}", error);
-
-        ApiResponse::Render {
-            status: Status::UnsupportedMediaType,
-            template: Some(Template::render(
-                "partials/toast",
-                context! {
-                    toast: Toast {
-                        message: "Invalid payload".to_string(),
-                        r#type: Some(ToastTypes::Error)
-                    }
-                },
-            )),
-            headers: None,
-        }
+        ApiResponse::Status(Status::UnsupportedMediaType)
     }
 }

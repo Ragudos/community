@@ -63,6 +63,7 @@ impl<'a> Responder<'a, 'static> for ApiResponse {
                         "HX-Trigger",
                         serde_json::to_string(&trigger_header).unwrap(),
                     ))
+                    .header(Header::new("Hx-Reswap", "innerHTML"))
                     .ok();
 
                 response

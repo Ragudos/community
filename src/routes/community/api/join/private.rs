@@ -155,6 +155,7 @@ pub async fn private_join_post<'r, 'v>(
         // If the owner is offline, they can simple receive this notif once it loads
         // when they turn online.
         let _ = realtime_notification.send(RealtimeNotification {
+            _id: notification._id,
             _recipient_id: notification._recipient_id,
             _sender_id: notification._sender_id,
             message: notification.message,

@@ -77,23 +77,18 @@ a,
     }
 
     &:active {
-        transform: scale(0.9);
-    }
-
-    &:disabled {
-        --_background-opacity: 1 !important;
-        cursor: not-allowed !important;
-        opacity: 0.5 !important;
+        transform: scale(0.95);
     }
 }
 
 button,
 input,
 a,
-textarea {
+textarea,
+.dropdown summary {
     &:disabled {
+        cursor: default;
         --_background-opacity: 1 !important;
-        cursor: not-allowed !important;
         opacity: 0.5 !important;
     }
 }

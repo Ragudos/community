@@ -90,6 +90,28 @@ impl CommunityJoinRequest {
         Ok(())
     }
 
+    pub async fn delete_pending_join_request(
+        tx: &mut Transaction<'_, Postgres>,
+        community_id: &i64,
+        user_id: &i64,
+    ) -> Result<(), sqlx::Error> {
+        sqlx::query!(
+            r#"
+            DELETE FROM community_join_requests
+            WHERE (_community_id = $1
+            AND _user_id = $2)
+            AND status = $3;
+            "#,
+            community_id,
+            user_id,
+            RequestStatus::Pending as RequestStatus
+        )
+        .execute(&mut **tx)
+        .await?;
+
+        Ok(())
+    }
+
     /// Deletes ALL join requests of a user, the pending, accepted, and rejected ones.
     /// If you wish to remove only the pending requests, use `delete_pending_join_requests_of_user`.
     pub async fn delete_join_requests_of_user(

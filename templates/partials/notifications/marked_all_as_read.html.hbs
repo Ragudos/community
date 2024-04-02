@@ -1,0 +1,8 @@
+{{#each notifications as |notification|}}
+<li id="notification-{{notification._id}}" hx-boost="false"
+    data-type="read-notification" hx-swap-oob="outerHTML">
+    {{> partials/notifications/notification_block notification=notification}}
+</li>
+{{/each}}
+<div class="notifications-count" id="unread-notifications-count"
+    hx-swap-oob="true"></div>

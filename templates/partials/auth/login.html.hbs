@@ -1,10 +1,10 @@
 <span class="title-sm">Sign in to your account.</span>
 <form hx-swap="innerHTML" hx-replace-url="/discover" data-loading-delay="50"
-    data-loading-aria-busy
+    data-loading-aria-busy hx-sync="a"
     hx-target="body" class="auth-form" data-loading-path="/auth/api/login"
-    hx-target-error="#nothing" hx-sync="#submit-form, a"
-    hx-post="/auth/api/login" hx-trigger="submit" method="post"
-    action="/auth/api/login" id="submit-form" hx-headers='{"Toaster": "true"}''>
+    hx-target-error="#nothing" hx-post="/auth/api/login" hx-trigger="submit"
+    method="post" action="/auth/api/login" id="submit-form"
+    hx-headers='{"Toaster": "true"}'>
     <div class="input-group">
         <label class="label" for="username">Username</label>
         <input placeholder="johndoe" type="text" name="username" id="username"

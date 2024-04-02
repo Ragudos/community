@@ -19,9 +19,12 @@ use crate::env::{Env, Environment};
 use crate::helpers::{db, get_environment, handlebars};
 use crate::routes::auth::api::catchers as auth_api_catchers;
 use crate::routes::auth::catchers as auth_catchers;
+use crate::routes::community::api::catchers as community_api_catchers;
 use crate::routes::community::catchers as community_catchers;
 use crate::routes::notifications::api::catchers as notifications_api_catchers;
 use crate::routes::notifications::catchers as notifications_catchers;
+use crate::routes::user::api::catchers as user_api_catchers;
+use crate::routes::user::catchers as user_catchers;
 
 pub mod catchers;
 pub mod controllers;
@@ -69,7 +72,12 @@ fn attact_notification_routes(rocket: Rocket<Build>) -> Rocket<Build> {
         "/notifications/api",
         rocket_routes![
             routes::notifications::api::sse_notifications,
-            routes::notifications::api::notifications
+            routes::notifications::api::notifications,
+            routes::notifications::api::mark_as_read::mark_as_read_endpoint,
+            routes::notifications::api::mark_as_read::mark_all_as_read_endpoint,
+            routes::notifications::api::read::read_notification_endpoint,
+            routes::notifications::api::delete::delete_notification_endpoint,
+            routes::notifications::api::delete::delete_all_read_notifications_endpoint,
         ],
     )
 }
@@ -93,10 +101,7 @@ fn attach_post_routes(rocket: Rocket<Build>) -> Rocket<Build> {
 
 fn attach_user_routes(rocket: Rocket<Build>) -> Rocket<Build> {
     rocket
-        .mount(
-            "/user",
-            rocket_routes![routes::user::logged_out, routes::user::page],
-        )
+        .mount("/user", rocket_routes![routes::user::user_profile_page])
         .mount(
             "/user/api",
             rocket_routes![routes::user::api::img::user_img_endpoint],
@@ -169,6 +174,7 @@ fn attach_community_routes(rocket: Rocket<Build>) -> Rocket<Build> {
                 routes::community::settings::community_settings_page,
                 routes::community::delete_community::delete_community_page,
                 routes::community::change_join_process::change_join_process_page,
+                routes::community::leave::leave_community_page
             ],
         )
         .mount(
@@ -178,9 +184,11 @@ fn attach_community_routes(rocket: Rocket<Build>) -> Rocket<Build> {
                 routes::community::api::rename::non_htmx_rename_endpoint,
                 routes::community::api::request_deletion::request_deletion_endpoint,
                 routes::community::api::request_change_join_process::request_change_join_process_endpoint,
+                routes::community::api::request_leave::request_leave_endpoint,
                 routes::community::api::change_join_process::change_join_process_endpoint,
                 routes::community::api::delete_community::delete_community_endpoint,
                 routes::community::api::leave_community::leave_community_endpoint,
+                routes::community::api::cancel_join_request::cancel_join_request_endpoint
             ],
         )
         .mount(
@@ -211,18 +219,46 @@ fn register_catchers(rocket: Rocket<Build>) -> Rocket<Build> {
             ],
         )
         .register(
+            "/community/api",
+            rocket_catchers! [
+                community_api_catchers::unauthorized_community_api,
+                community_api_catchers::forbidden_community_api,
+                community_api_catchers::internal_server_error_community_api,
+                community_api_catchers::not_found_community_api,
+                community_api_catchers::default_community_api_error
+            ]
+        )
+        .register(
             "/auth",
             rocket_catchers![
                 auth_catchers::auth_internal_server_error_get,
-                auth_catchers::auth_api_forbidden
+                auth_catchers::auth_page_forbidden
             ],
         )
         .register(
             "/auth/api",
             rocket_catchers![
                 auth_api_catchers::auth_api_internal_server_error,
-                auth_api_catchers::forbidden_auth_api
+                auth_api_catchers::forbidden_auth_api,
+                auth_api_catchers::not_found_auth_api,
+                auth_api_catchers::default_auth_api_error
             ],
+        )
+        .register(
+            "/user",
+            rocket_catchers![
+                user_catchers::page_unauthorized
+            ]
+        )
+        .register(
+            "/user/api",
+            rocket_catchers![
+                user_api_catchers::unauthorized_user_api,
+                user_api_catchers::forbidden_user_api,
+                user_api_catchers::internal_server_error_user_api,
+                user_api_catchers::not_found_user_api,
+                user_api_catchers::default_user_api_error
+            ]
         )
         .register(
             "/notifications",
@@ -233,7 +269,9 @@ fn register_catchers(rocket: Rocket<Build>) -> Rocket<Build> {
         .register(
             "/notifications/api",
             rocket_catchers![
-                notifications_api_catchers::unauthorized_api_notifications
+                notifications_api_catchers::unauthorized_api_notifications,
+                notifications_api_catchers::forbidden_api_notifications,
+                notifications_api_catchers::internal_server_error_api_notifications
             ],
         )
 }

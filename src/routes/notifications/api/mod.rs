@@ -3,10 +3,9 @@ use rocket::response::stream::{Event, EventStream};
 use rocket::tokio::select;
 use rocket::tokio::sync::broadcast::error::RecvError;
 use rocket::tokio::sync::broadcast::Sender;
-use rocket::{get, FromForm, FromFormField, Shutdown, State};
+use rocket::{get, FromForm, Shutdown, State};
 use rocket_db_pools::Connection;
 use rocket_dyn_templates::{context, Template};
-use serde::{Deserialize, Serialize};
 
 use crate::helpers::db::DbConn;
 use crate::models::notifications::{Notification, RealtimeNotification};
@@ -15,20 +14,12 @@ use crate::models::NOTIFICATIONS_LIMIT;
 use crate::responders::ApiResponse;
 
 pub mod catchers;
-
-#[derive(FromFormField, Serialize, Deserialize)]
-pub enum NotificationFilterEnum {
-    #[serde(rename = "all")]
-    All,
-    #[serde(rename = "read")]
-    Read,
-    #[serde(rename = "unread")]
-    Unread,
-}
+pub mod delete;
+pub mod mark_as_read;
+pub mod read;
 
 #[derive(FromForm)]
 pub struct NotificationFilter {
-    pub filter: NotificationFilterEnum,
     pub offset: Option<i64>,
 }
 
@@ -48,58 +39,18 @@ pub async fn notifications(
         return Err(ApiResponse::Status(Status::BadRequest));
     }
 
-    let notifications = if let Some(filter) = &filter {
-        match filter {
-            NotificationFilter {
-                filter: NotificationFilterEnum::All,
-                offset: _,
-            } => {
-                Notification::get_all_notifications_of_user(
-                    &mut db,
-                    &user._id,
-                    &NOTIFICATIONS_LIMIT,
-                    &offset,
-                )
-                .await?
-            }
-            NotificationFilter {
-                filter: NotificationFilterEnum::Read,
-                offset: _,
-            } => {
-                Notification::get_all_read_notifications_of_user(
-                    &mut db,
-                    &user._id,
-                    &NOTIFICATIONS_LIMIT,
-                    &offset,
-                )
-                .await?
-            }
-            NotificationFilter {
-                filter: NotificationFilterEnum::Unread,
-                offset: _,
-            } => {
-                Notification::get_all_unread_notifications_of_user(
-                    &mut db,
-                    &user._id,
-                    &NOTIFICATIONS_LIMIT,
-                    &offset,
-                )
-                .await?
-            }
-        }
-    } else {
-        Notification::get_all_notifications_of_user(
-            &mut db,
-            &user._id,
-            &NOTIFICATIONS_LIMIT,
-            &offset,
-        )
-        .await?
-    };
-    let unread_count = notifications
-        .iter()
-        .filter(|n| !n.is_read.unwrap_or(false))
-        .count();
+    let notifications = Notification::get_all_notifications_of_user(
+        &mut db,
+        &user._id,
+        &NOTIFICATIONS_LIMIT,
+        &offset,
+    )
+    .await?;
+    let unread_count = notifications.iter().fold(0, |acc, x| {
+        acc + if x.is_read.unwrap_or(false) { 0 } else { 1 }
+    });
+    let has_unread = unread_count > 0;
+    let has_read = notifications.len() > unread_count;
 
     Ok(ApiResponse::Render {
         status: Status::Ok,
@@ -110,8 +61,9 @@ pub async fn notifications(
                 oobswap,
                 unread_count,
                 isfirst,
-                filter: filter.map(|f| f.filter),
-                offset: offset
+                offset,
+                has_unread,
+                has_read
             },
         )),
         headers: None,

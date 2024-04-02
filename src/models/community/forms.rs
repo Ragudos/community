@@ -50,6 +50,13 @@ pub struct EditDisplayName<'r> {
 }
 
 #[derive(FromForm, Debug)]
+pub struct RequestLeave<'r> {
+    #[field(validate = validate_positive_integer())]
+    pub community_id: i64,
+    pub authenticity_token: &'r str,
+}
+
+#[derive(FromForm, Debug)]
 pub struct RequestDeletion<'r> {
     #[field(validate = validate_positive_integer())]
     pub community_id: i64,
@@ -58,9 +65,12 @@ pub struct RequestDeletion<'r> {
 
 #[derive(FromForm, Debug)]
 pub struct LeaveCommunity<'r> {
-    #[field(validate = validate_positive_integer())]
-    pub community_id: i64,
+    #[field(validate = len(8..=64))]
+    #[field(validate = validate_password())]
+    pub user_password: &'r str,
     pub authenticity_token: &'r str,
+    #[field(validate = validate_honeypot())]
+    pub honeypot: &'r str,
 }
 
 #[derive(FromForm, Debug)]

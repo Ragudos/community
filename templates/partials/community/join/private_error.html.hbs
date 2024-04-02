@@ -1,0 +1,7 @@
+{{#each errors as |error|}}
+{{#if (eq error.field "reason")}}
+<span class="error errored" id="message-error" hx-swap-oob="true">
+    <small data-loading-class="hidden">{{error.message}}</small>
+</span>
+{{/if}}
+{{/each}}

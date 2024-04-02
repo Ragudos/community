@@ -20,6 +20,20 @@ html:focus-within {
     scroll-behavior: smooth;
 }
 
+button,
+input,
+optgroup,
+select,
+textarea {
+    font-family: inherit;
+    font-feature-settings: inherit;
+    font-variation-settings: inherit;
+    font-size: 100%;
+    line-height: inherit;
+    letter-spacing: inherit;
+    color: inherit;
+}
+
 body,
 h1,
 h2,

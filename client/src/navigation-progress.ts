@@ -16,7 +16,7 @@ function onLoadStart(options: Options) {
     return (evt: CustomEvent) => {
         const target = evt.target;
 
-        if (!(target instanceof HTMLAnchorElement) && !(target instanceof HTMLFormElement)) {
+        if (!(target instanceof HTMLAnchorElement)) {
             return;
         }
 
@@ -39,7 +39,7 @@ function onProgress(options: Options) {
     return (evt: CustomEvent) => {
         const target = evt.target;
 
-        if (!(target instanceof HTMLAnchorElement) && !(target instanceof HTMLFormElement)) {
+        if (!(target instanceof HTMLAnchorElement)) {
             return;
         }
 
@@ -64,7 +64,7 @@ function onLoadEnd() {
     return (evt: CustomEvent) => {
         const target = evt.target;
 
-        if (!(target instanceof HTMLAnchorElement) && !(target instanceof HTMLFormElement)) {
+        if (!(target instanceof HTMLAnchorElement)) {
             return;
         }
 

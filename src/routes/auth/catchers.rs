@@ -3,7 +3,6 @@ use rocket_dyn_templates::{context, Template};
 
 use crate::models::seo::metadata::SeoMetadata;
 use crate::models::users::preferences::Theme;
-use crate::models::Toast;
 
 #[catch(500)]
 pub fn auth_internal_server_error_get(request: &Request<'_>) -> Template {
@@ -16,26 +15,12 @@ pub fn auth_internal_server_error_get(request: &Request<'_>) -> Template {
 }
 
 #[catch(403)]
-pub fn auth_api_forbidden(request: &Request<'_>) -> Template {
-    let is_toaster = request
-        .headers()
-        .get_one("Toaster")
-        .map_or(false, |s| s == "true");
+pub fn auth_page_forbidden(request: &Request<'_>) -> Template {
     let message = "Your request has been forbidden. This may be because of a missing CSRF-TOKEN. Please refresh the page and try again.";
+    let metadata = SeoMetadata::build()
+        .theme(Theme::from_cookie_jar(request.cookies()))
+        .title("Forbidden")
+        .finalize();
 
-    if is_toaster {
-        Template::render(
-            "partials/toast",
-            context! {
-                toast: Toast::error(Some(message.to_string()))
-            },
-        )
-    } else {
-        let metadata = SeoMetadata::build()
-            .theme(Theme::from_cookie_jar(request.cookies()))
-            .title("Forbidden")
-            .finalize();
-
-        Template::render("pages/auth/error", context! { metadata, message })
-    }
+    Template::render("pages/auth/error", context! { metadata, message })
 }

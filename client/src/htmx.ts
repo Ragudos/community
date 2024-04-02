@@ -4,10 +4,15 @@ export function initHtmx() {
     document.addEventListener("htmx:sendAbort", onAbort);
     document.addEventListener("htmx:sendError", onError);
 
+    document.addEventListener("htmx:beforeSwap", (evt: CustomEvent) => {
+        if (evt.detail.xhr.status === 204) {
+            evt.detail.shouldSwap = true;
+        }
+    });
+
     window.htmx.defineExtension("remove-me", {
         onEvent: removeMeExtension(timers),
     });
-
     document.addEventListener("HxEvent:Toast", (evt) => {
         console.log(evt);
     });

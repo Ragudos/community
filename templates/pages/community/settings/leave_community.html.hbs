@@ -4,7 +4,7 @@
         style="--_max-content-width: 30rem;">
         <div
             style="display: flex; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap;">
-            <div class="title-sm">Delete {{community_name}}</div>
+            <div class="title-sm">Leave {{community_name}}</div>
         </div>
         <div class="warning warning__with-icon" style="margin-top: 0.5rem;">
             <div>
@@ -16,20 +16,20 @@
                 </svg>
             </div>
             <div>
-                You cannot recover this community once you delete it. Please be
-                certain.
+                You cannot recover your points once you delete this community.
+                Please be certain.
             </div>
         </div>
-        <form hx-sync="a" hx-trigger="submit" hx-target="#form-container"
+        <form hx-trigger="submit" hx-target="#form-container"
             hx-target-error="#nothing" hx-sync="#submit-form, a"
             style="gap: 1rem;"
             data-loading-aria-busy data-loading-delay="250"
             hx-confirm="Are you absolutely sure?"
             hx-target-error="#nothing"
-            hx-delete="/community/api/delete-community" class="auth-form"
+            hx-delete="/community/api/leave" class="auth-form"
             method="POST"
-            action="/community/api/delete-community" id="submit-form"
-            hx-headers="{'Toaster': 'true'}">
+            hx-sync="a"
+            action="/community/api/leave-community" id="submit-form">
             <input type="hidden" readonly name="authenticity_token"
                 value="{{authenticity_token}}" />
             <input type="text" name="honeypot" hidden value />
@@ -44,7 +44,8 @@
             </div>
             <div style="display: flex; flex-direction: column; gap: 0.5rem">
                 <button data-loading-disable type="button" class="btn"
-                    style="width: 100%" onclick="window.location.reload()">
+                    style="width: 100%"
+                    onclick="window.location.reload()">
                     Go back
                 </button>
                 <button data-loading-disable type="submit" class="destructive"
@@ -52,7 +53,7 @@
                     <span data-loading-class="hidden">Delete
                         {{community_name}}</span>
                     <span data-loading-class-remove="hidden" class="hidden">
-                        Deleting... Please do not leave the page.
+                        Leaving... Please do not leave the page.
                     </span>
                 </button>
             </div>

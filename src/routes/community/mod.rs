@@ -19,10 +19,10 @@ pub mod api;
 pub mod catchers;
 pub mod change_join_process;
 pub mod delete_community;
+pub mod leave;
 pub mod members;
 pub mod settings;
 
-// TODO: Implement to get the uid from the URL
 #[get("/<community_id>?<shouldboost>&<includeheader>&<list_query..>")]
 pub async fn community_page<'r>(
     mut db: Connection<DbConn>,
@@ -44,8 +44,8 @@ pub async fn community_page<'r>(
 
     if !community_preview
         .is_viewer_a_member
-        .unwrap_or(false)
-        && community_preview.owner_id != user._id
+        .unwrap_or(false) &&
+        community_preview.owner_id != user._id
     {
         return Ok(ApiResponse::Redirect(Redirect::to(community_uri!(
             about::about_community_page(community_id, includeheader)

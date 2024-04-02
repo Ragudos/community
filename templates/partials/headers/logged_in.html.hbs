@@ -61,33 +61,92 @@
                         <path stroke-linecap="round" stroke-linejoin="round"
                             d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
                     </svg>
-                    <div class="notifications-count"
+                    <div class="notifications-count notifier"
                         id="unread-notifications-count">
                     </div>
                 </summary>
                 <div class="dropdown-wrapper" id="create-stuff-dropdown">
                     <div>
-                        <div class="notifications-container">
+                        <div id="main-notifications"
+                            class="notifications-container">
                             <div class="notifications-header">
-                                <div class="title-xs">Notifications</div>
-                                <div class="notifications-actions">
-                                    <select name="filter" hx-trigger="change"
-                                        hx-target="#notifications"
-                                        hx-get="/notifications/api">
-                                        <option value="all">All</option>
-                                        <option value="unread">Unread</option>
-                                        <option value="read">Read</option>
-                                    </select>
+                                <div
+                                    style="font-weight: 500;">Notifications</div>
+                            </div>
+                            <div class="notifications-content-wrapper">
+                                <div id="notifications-loader">
+                                    <div class="spinner"
+                                        data-loading-class="spin"
+                                        data-loading-path="/notifications/api/markasread?type=all"></div>
+                                </div>
+                                <div class="empty-notifications">
+                                    You can relax for now.
+                                    You have no notifications.
+                                </div>
+                                <ul class="notifications-content"
+                                    id="notifications">
+                                    <li
+                                        style="display: flex; justify-content: center;">
+                                        <span class="spinner"
+                                            data-loading-class="spin"></span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="notifications-footer">
+                                <div id="notifications-actions"
+                                    class="notifications-actions">
+                                    <button
+                                        id="mark-all-notifications-as-read"
+                                        hx-put="/notifications/api/mark-all-as-read"
+                                        data-loading-disable
+                                        data-loading-delay="250"
+                                        hx-swap="none"
+                                        hx-target-error="#nothing"
+                                        hx-indicator="#notifications-loader">
+                                        Mark all as read
+                                    </button>
+                                    <button
+                                        id="delete-all-read-notifications"
+                                        hx-delete="/notifications/api/delete-all-read"
+                                        hx-swap="none"
+                                        data-loading-disable
+                                        data-loading-delay="250"
+                                        hx-target-error="#nothing"
+                                        hx-indicator="#notifications-loader">
+                                        Delete all read notifications
+                                    </button>
+                                    <script>
+                                        document.addEventListener("htmx:afterSwap", (evt) => {
+                                            const target = evt.target;
+
+                                            if (!(target instanceof HTMLButtonElement)) {
+                                                return;
+                                            }
+
+                                            if (target.id != "delete-all-read-notifications") {
+                                                return;
+                                            }
+
+                                            if (evt.detail.xhr.status != 204) {
+                                                return;
+                                            }
+
+                                            document.querySelectorAll("[data-type=read-notification]").forEach((notif) => {
+                                                notif.remove();
+                                            });
+                                        });
+                                    </script>
+                                </div>
+                                <div class="status">
+                                    unsynced
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                        viewBox="0 0 16 16" fill="currentColor"
+                                        class="w-4 h-4">
+                                        <path
+                                            d="M5.28 4.22a.75.75 0 0 0-1.06 1.06L6.94 8l-2.72 2.72a.75.75 0 1 0 1.06 1.06L8 9.06l2.72 2.72a.75.75 0 1 0 1.06-1.06L9.06 8l2.72-2.72a.75.75 0 0 0-1.06-1.06L8 6.94 5.28 4.22Z" />
+                                    </svg>
                                 </div>
                             </div>
-                            <ul class="notifications-content"
-                                id="notifications">
-                                <li
-                                    style="display: flex; justify-content: center;">
-                                    <span class="spinner"
-                                        data-loading-class="spin"></span>
-                                </li>
-                            </ul>
                         </div>
                     </div>
                 </div>

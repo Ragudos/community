@@ -81,6 +81,23 @@ impl UserNotificationPreference {
 }
 
 impl Notification {
+    pub async fn get_link(
+        conn: &mut Connection<DbConn>,
+        notification_id: &i64,
+    ) -> Result<Option<Option<String>>, sqlx::Error> {
+        Ok(sqlx::query!(
+            r#"
+            SELECT link
+            FROM notifications
+            WHERE _id = $1
+            "#,
+            notification_id,
+        )
+        .fetch_optional(&mut ***conn)
+        .await?
+        .map(|row| row.link))
+    }
+
     #[allow(non_snake_case)]
     pub async fn get_all_read_notifications_of_user(
         conn: &mut Connection<DbConn>,
@@ -214,32 +231,111 @@ impl Notification {
         Ok(())
     }
 
+    #[allow(non_snake_case)]
     pub async fn mark_all_notifications_of_user_as_read(
         tx: &mut Transaction<'_, Postgres>,
         user_id: &i64,
-    ) -> Result<(), sqlx::Error> {
-        sqlx::query!(
+    ) -> Result<Vec<Notification>, sqlx::Error> {
+        Ok(sqlx::query_as!(
+            Notification,
             r#"
             UPDATE notifications
             SET is_read = true
             WHERE _recipient_id = $1
+            AND is_read = false
+            RETURNING
+            _id,
+            _recipient_id,
+            _sender_id,
+            _created_at,
+            notification_type AS "notification_type: NotificationType",
+            is_read,
+            message,
+            link
             "#,
             user_id,
         )
-        .execute(&mut **tx)
-        .await?;
-
-        Ok(())
+        .fetch_all(&mut **tx)
+        .await?)
     }
 
+    pub async fn does_exist(
+        conn: &mut Connection<DbConn>,
+        notification_id: &i64,
+    ) -> Result<bool, sqlx::Error> {
+        Ok(sqlx::query!(
+            r#"
+            SELECT EXISTS (
+                SELECT 1
+                FROM notifications
+                WHERE _id = $1
+            )
+            "#,
+            notification_id,
+        )
+        .fetch_one(&mut ***conn)
+        .await?
+        .exists
+        .unwrap_or(false))
+    }
+
+    pub async fn does_user_own_notification(
+        conn: &mut Connection<DbConn>,
+        user_id: &i64,
+        notification_id: &i64,
+    ) -> Result<bool, sqlx::Error> {
+        Ok(sqlx::query!(
+            r#"
+            SELECT EXISTS (
+                SELECT 1
+                FROM notifications
+                WHERE _id = $1
+                AND _recipient_id = $2
+            )
+            "#,
+            notification_id,
+            user_id,
+        )
+        .fetch_one(&mut ***conn)
+        .await?
+        .exists
+        .unwrap_or(false))
+    }
+
+    #[allow(non_snake_case)]
     pub async fn mark_as_read(
+        tx: &mut Transaction<'_, Postgres>,
+        notification_id: &i64,
+    ) -> Result<Notification, sqlx::Error> {
+        Ok(sqlx::query_as!(
+            Notification,
+            r#"
+            UPDATE notifications
+            SET is_read = true
+            WHERE _id = $1
+            RETURNING
+            _id,
+            _recipient_id,
+            _sender_id,
+            _created_at,
+            notification_type AS "notification_type: NotificationType",
+            is_read,
+            message,
+            link
+            "#,
+            notification_id,
+        )
+        .fetch_one(&mut **tx)
+        .await?)
+    }
+
+    pub async fn delete(
         tx: &mut Transaction<'_, Postgres>,
         notification_id: &i64,
     ) -> Result<(), sqlx::Error> {
         sqlx::query!(
             r#"
-            UPDATE notifications
-            SET is_read = true
+            DELETE FROM notifications
             WHERE _id = $1
             "#,
             notification_id,

@@ -81,9 +81,26 @@
         user._id))}}
         {{#if community.is_private}}
         {{#if did_user_request_to_join}}
-        <a href="/user/community-join-requests/{{community._id}}"
-            hx-target="main" hx-target-error="main">Check the status of your
-            join request</a>
+        <div style="display: flex; gap: 0.5rem;">
+            <form data-loading-states
+                hx-delete="/community/api/cancel-join-request"
+                data-loading-delay="250" hx-boost="false">
+                <input type="hidden" name="community_id"
+                    value="{{community._id}}" />
+                <button data-loading-disable class="destructive">
+                    <span data-loading-class="hidden">Cancel join request</span>
+                    <span data-loading-class-remove="hidden"
+                        class="hidden">Cancelling... Please wait
+                        <div class="spinner" data-loading-class="spin"></div>
+                    </span>
+                </button>
+            </form>
+            <a href="/user/community-join-requests/{{community._id}}"
+                hx-target="main" hx-target-error="main" class="link">Check the
+                status
+                of your
+                join request</a>
+        </div>
         {{else}}
         {{> partials/templates/input_with_counter}}
         <button type="button" class="primary" onclick="openDialog(this)"
@@ -153,13 +170,17 @@
             </div>
             <div class="overlay-ctrls">
                 <div>
-                    <button data-loading-disable style="width: 100%;"
+                    <button data-loading-delay="250" data-loading-disable
+                        style="width: 100%;"
                         type="submit" class="primary"
                         onclick="requestSubmit(this)"
                         data-target="join-request-form">
                         <span data-loading-class="hidden">Send</span>
                         <span class="hidden"
-                            data-loading-class-remove="hidden">Sending...</span>
+                            data-loading-class-remove="hidden">Sending...
+                            <div class="spinner"
+                                data-loading-class="spin"></div>
+                        </span>
                     </button>
                 </div>
             </div>

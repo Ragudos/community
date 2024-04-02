@@ -1,6 +1,6 @@
 export function initDropdown() {
     document.addEventListener("click", onDocumentClick);
-    window.closeDropdown = function(el) {
+    window.closeDropdown = function (el) {
         const targetId = el.getAttribute("aria-controls"),
             target = document.getElementById(targetId);
 
@@ -34,7 +34,9 @@ function onDocumentClick(evt: MouseEvent) {
         }
     }
 
-    const child = openDropdown.querySelector("details.dropdown[open] > *:not(summary)");
+    const child = openDropdown.querySelector(
+        "details.dropdown[open] > *:not(summary)",
+    );
 
     if (evt.target === child) {
         return;
@@ -44,9 +46,7 @@ function onDocumentClick(evt: MouseEvent) {
 
     for (let i = 0; i < childChildren.length; ++i) {
         if (evt.target === childChildren[i]) {
-            if (evt.target instanceof HTMLElement) {
-                return;
-            }
+            return;
         }
     }
 

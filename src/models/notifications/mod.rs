@@ -9,6 +9,7 @@ use super::db::enums::NotificationType;
 #[derive(FromForm, Serialize, Deserialize, Clone, Debug)]
 #[serde(crate = "rocket::serde")]
 pub struct RealtimeNotification {
+    pub _id: i64,
     pub _recipient_id: i64,
     pub _sender_id: i64,
     pub message: String,

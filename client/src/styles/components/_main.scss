@@ -33,6 +33,7 @@
     --success: #{color_in_theme("success")};
     --success-foreground: #{color_in_theme("success-foreground")};
     --muted: #{color_in_theme("muted")};
+    --muted-foreground: #{color_in_theme("muted-foreground")};
 }
 
 body {
@@ -71,6 +72,14 @@ main {
 
 .h-5 {
     height: 1.25rem;
+}
+
+.w-4 {
+    width: 1rem;
+}
+
+.h-4 {
+    height: 1rem;
 }
 
 .error {

@@ -1,7 +1,7 @@
 <span class="title-sm">Create your account.</span>
 <form data-loading-delay="50" data-loading-aria-busy hx-target="#form-container"
     class="auth-form"
-    hx-target-error="#nothing" hx-sync="#submit-form, a"
+    hx-target-error="#nothing" hx-sync="a"
     hx-post="/auth/api/register" hx-trigger="submit" method="post"
     action="/auth/api/register" id="submit-form"
     hx-headers='{"Toaster": "true"}'>
