@@ -1,41 +1,51 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{helpers::get_environment, models::users::preferences::Theme};
+use crate::helpers::get_environment;
+use crate::models::users::preferences::Theme;
 
 const SITE_NAME: &str = "Community";
-const DESCRIPTION: &str = "Community is a social media platform for communities.";
+const DESCRIPTION: &str =
+    "Community is a social media platform for communities.";
 
 #[derive(Default, Serialize, Deserialize, Clone)]
-pub struct OpenGraphMetadata {
-    pub title: &'static str,
-    pub description: &'static str,
-    pub image: &'static str,
-    pub url: &'static str,
+pub struct OpenGraphImage<'r> {
+    pub url: &'r str,
+    pub alt: &'r str,
+    pub width: u32,
+    pub height: u32,
 }
 
 #[derive(Default, Serialize, Deserialize, Clone)]
-pub struct SeoMetadata {
-    pub title: &'static str,
-    pub description: &'static str,
-    pub open_graph: Option<OpenGraphMetadata>,
-    pub site_name: &'static str,
-    pub language: &'static str,
-    pub theme: &'static str,
+pub struct OpenGraphMetadata<'r> {
+    pub title: &'r str,
+    pub description: &'r str,
+    pub image: Option<OpenGraphImage<'r>>,
+    pub url: &'r str,
+}
+
+#[derive(Default, Serialize, Deserialize, Clone)]
+pub struct SeoMetadata<'r> {
+    pub title: &'r str,
+    pub description: &'r str,
+    pub open_graph: Option<OpenGraphMetadata<'r>>,
+    pub site_name: &'r str,
+    pub language: &'r str,
+    pub theme: &'r str,
     pub env: String,
 }
 
 #[derive(Default, Clone)]
-pub struct SeoMetadataBuilder {
-    title: &'static str,
-    description: &'static str,
-    open_graph: Option<OpenGraphMetadata>,
-    site_name: &'static str,
-    language: Option<&'static str>,
-    theme: Option<&'static str>,
+pub struct SeoMetadataBuilder<'r> {
+    title: &'r str,
+    description: &'r str,
+    open_graph: Option<OpenGraphMetadata<'r>>,
+    site_name: &'r str,
+    language: Option<&'r str>,
+    theme: Option<&'r str>,
     env: String,
 }
 
-impl SeoMetadataBuilder {
+impl<'r> SeoMetadataBuilder<'r> {
     pub fn new() -> Self {
         Self {
             title: SITE_NAME,
@@ -46,22 +56,22 @@ impl SeoMetadataBuilder {
         }
     }
 
-    pub fn title(mut self, title: &'static str) -> Self {
+    pub fn title(mut self, title: &'r str) -> Self {
         self.title = title;
         self
     }
 
-    pub fn description(mut self, description: &'static str) -> Self {
+    pub fn description(mut self, description: &'r str) -> Self {
         self.description = description;
         self
     }
 
-    pub fn open_graph(mut self, open_graph: OpenGraphMetadata) -> Self {
+    pub fn open_graph(mut self, open_graph: OpenGraphMetadata<'r>) -> Self {
         self.open_graph = Some(open_graph);
         self
     }
 
-    pub fn language(mut self, language: &'static str) -> Self {
+    pub fn language(mut self, language: &'r str) -> Self {
         self.language = Some(language);
         self
     }
@@ -71,7 +81,7 @@ impl SeoMetadataBuilder {
         self
     }
 
-    pub fn finalize(self) -> SeoMetadata {
+    pub fn finalize(self) -> SeoMetadata<'r> {
         SeoMetadata {
             env: self.env,
             title: self.title,
@@ -84,8 +94,8 @@ impl SeoMetadataBuilder {
     }
 }
 
-impl SeoMetadata {
-    pub fn build() -> SeoMetadataBuilder {
+impl<'r> SeoMetadata<'r> {
+    pub fn build() -> SeoMetadataBuilder<'r> {
         SeoMetadataBuilder::new()
     }
 }

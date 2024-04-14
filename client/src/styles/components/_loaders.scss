@@ -1,0 +1,122 @@
+.spinner {
+    width: 1rem;
+    height: 1rem;
+    display: inline-block;
+    border-radius: 50%;
+    border: 2px solid;
+    border-color: hsl(var(--border) / 0.075);
+    border-right-color: hsl(var(--border) / 0.87);
+}
+
+.skeleton {
+    --_max-opacity: 0.075;
+    animation-duration: 2s;
+    animation-iteration-count: infinite;
+    animation-delay: var(--_delay, 0ms);
+    animation-direction: alternate;
+    animation-fill-mode: forwards;
+    display: inline-block;
+    height: 1em;
+    position: relative;
+    overflow: hidden;
+    border-radius: $radius;
+
+    .skeleton {
+        border-radius: calc($radius / 2);
+    }
+}
+
+.skeleton.skeleton-landscape {
+    aspect-ratio: 16 / 9;
+    width: 100%;
+    height: auto;
+
+    @supports not (aspect-ratio: 16/9) {
+        height: 15rem;
+
+        @include s-mobilesmall {
+            height: 17.5rem;
+        }
+
+        @include s-mobile {
+            height: 20rem;
+        }
+
+        @include s-tablet {
+            height: 25rem;
+        }
+    }
+}
+
+.skeleton.skeleton-xlw {
+    width: min(100%, 24rem);
+}
+
+.skeleton.skeleton-lgw {
+    width: min(100%, 20rem);
+}
+
+.skeleton.skeleton-mdw {
+    width: min(100%, 16rem);
+}
+
+.skeleton.skeleton-smw {
+    width: min(100%, 12rem);
+}
+
+.skeleton.skeleton-xsw {
+    width: min(100%, 8rem);
+}
+
+.skeleton.skeleton-2xsw {
+    width: min(100%, 6rem);
+}
+
+.skeleton.skeleton-xlh {
+    height: 2rem;
+}
+
+.skeleton.skeleton-lgh {
+    height: 1.5rem;
+}
+
+.skeleton.skeleton-mdh {
+    height: 1.25rem;
+}
+
+.skeleton.skeleton-smh {
+    height: 1rem;
+}
+
+.skeleton.shimmer {
+    &:after {
+        position: absolute;
+        inset: 0;
+        transform: translateX(-100%);
+        animation-duration: 2s;
+        animation-iteration-count: infinite;
+        animation-delay: var(--_delay, 0);
+        animation-name: shimmer;
+        content: "";
+    }
+}
+
+.skeleton.fade {
+    animation-name: fade;
+}
+
+.skeleton {
+    background-color: hsl(var(--skeleton)) !important;
+}
+
+.skeleton.shimmer {
+    &:after {
+        background-image: linear-gradient(
+            90deg,
+            hsl(var(--skeleton-shimmer) / 0) 0,
+            hsl(var(--skeleton-shimmer) / 0.2) 20%,
+            hsl(var(--skeleton-shimmer) / 0.5) 60%,
+            hsl(var(--skeleton-shimmer) / 0)
+        ) !important;
+    }
+}

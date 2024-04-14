@@ -1,0 +1,21 @@
+.auth-form {
+    @include flex-column;
+    gap: $general-gap;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+
+.label-container {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+
+    input,
+    textarea {
+        margin-top: 0.5rem;
+    }
+}

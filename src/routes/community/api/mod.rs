@@ -1,0 +1,11 @@
+pub mod cancel_join_request;
+pub mod catchers;
+pub mod change_join_process;
+pub mod delete_community;
+pub mod join;
+pub mod leave_community;
+pub mod rename;
+pub mod request_change_join_process;
+pub mod request_deletion;
+pub mod request_leave;
+pub mod settings;

@@ -1,7 +1,5 @@
-use rocket::{
-    serde::{Deserialize, Serialize},
-    time::OffsetDateTime,
-};
+use rocket::serde::{Deserialize, Serialize};
+use rocket::time::OffsetDateTime;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub enum ConversationType {

@@ -1,15 +1,21 @@
-<!DOCTYPE html>
-<html lang="{{ metadata.language }}" data-theme="{{ metadata.theme }}">
+{{#if is_boosted}}
     <head>
-        {{> partials/head }}
-        <meta name="robots" content="noindex, nofollow">
+        {{> partials/head/main}}
     </head>
-    <body>
-        <header>
-            <h1>500 Internal Server Error</h1>
-        </header>
-        <main>
-            <p>Sorry, the page you are looking for could not be found.</p>
-        </main>
-    </body>
-</html>
+    <h1>500 Internal Server Error</h1>
+    <p>{{message}}</p>
+{{else}}
+    <!DOCTYPE html>
+    <html lang="{{ metadata.language }}" data-theme="{{ metadata.theme }}">
+        <head>
+        <meta name="robots" content="noindex, nofollow">
+        {{> partials/head/main}}
+        </head>
+        <body>
+            <main>
+                <h1>500 Internal Server Error</h1>
+                <p>{{message}}</p>
+            </main>
+        </body>
+    </html>
+{{/if}}

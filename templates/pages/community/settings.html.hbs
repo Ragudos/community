@@ -1,0 +1,30 @@
+{{#if is_boosted}}
+
+<head>
+    {{> partials/head/main}}
+    {{> partials/head/metadata}}
+    <link hx-preserve="true" rel="stylesheet"
+        href="/build/styles/settings.min.css" />
+</head>
+{{#if includemainheader}}
+<header class="fade-me-in fade-me-out" id="header" hx-swap-oob="true">
+    {{> partials/headers/logged_in}}
+</header>
+{{/if}}
+{{#if includeheader}}
+<aside class="fade-me-in fade-me-out" id="community-header" hx-swap-oob="true">
+    {{> partials/headers/community}}
+</aside>
+{{else}}
+{{> partials/headers/community_content oobswap=true}}
+{{/if}}
+{{> partials/community/settings}}
+{{else}}
+{{#> layouts/community}}
+{{#*inline "more_head_content"}}
+<link hx-preserve="true" rel="stylesheet"
+    href="/build/styles/settings.min.css" />
+{{/inline}}
+{{> partials/community/settings}}
+{{/layouts/community}}
+{{/if}}

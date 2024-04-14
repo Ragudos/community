@@ -1,0 +1,26 @@
+{{#if is_boosted}}
+
+<head>
+    {{> partials/head/main}}
+    {{> partials/head/metadata}}
+</head>
+{{#if isredirected}}
+<header id="header" hx-swap-oob="true"></header>
+<aside id="community-header" hx-swap-oob="true"></aside>
+<div class="min-h-screen ce-wrapper">
+    <div id="form-container" class="general-card container fade-me-out fade-me-in" style="--_max-content-width: 30rem;">
+        {{> partials/auth/login}}
+    </div>
+</div>
+{{else}}
+{{> partials/auth/login}}
+{{/if}}
+{{else}}
+{{#> layouts/auth}}
+<div class="min-h-screen ce-wrapper">
+    <div id="form-container" class="general-card container fade-me-out fade-me-in" style="--_max-content-width: 30rem;">
+        {{> partials/auth/login}}
+    </div>
+</div>
+{{/layouts/auth}}
+{{/if}}

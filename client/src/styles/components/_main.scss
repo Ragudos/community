@@ -1,0 +1,174 @@
+:root {
+    --max-content-width: #{$max-content-width};
+    --radius: #{$radius};
+    --header-padding-block: 0.5rem;
+    --animation-duration: 250ms;
+    --main-space-block: 1rem;
+}
+
+@include themify($themes) {
+    --red: #{color_in_theme("reed")};
+    color-scheme: $theme_name;
+    --primary: #{color_in_theme("primary")};
+    --primary-foreground: #{color_in_theme("primary-foreground")};
+    --secondary: #{color_in_theme("secondary")};
+    --secondary-foreground: #{color_in_theme("secondary-foreground")};
+    --accent: #{color_in_theme("accent")};
+    --accent-foreground: #{color_in_theme("accent-foreground")};
+    --destructive: #{color_in_theme("destructive")};
+    --destructive-foreground: #{color_in_theme("destructive-foreground")};
+    --background: #{color_in_theme("background")};
+    --lighter-background: #{color_in_theme("lighter-background")};
+    --text: #{color_in_theme("text")};
+    --link: #{color_in_theme("link")};
+    --input: #{color_in_theme("input")};
+    --ring: #{color_in_theme("ring")};
+    --skeleton: #{color_in_theme("skeleton")};
+    --skeleton-shimmer: #{color_in_theme("skeleton-shimmer")};
+    --border: #{color_in_theme("border")};
+    --warning: #{color_in_theme("warning")};
+    --warning-foreground: #{color_in_theme("warning-foreground")};
+    --info: #{color_in_theme("info")};
+    --info-foreground: #{color_in_theme("info-foreground")};
+    --success: #{color_in_theme("success")};
+    --success-foreground: #{color_in_theme("success-foreground")};
+    --muted: #{color_in_theme("muted")};
+    --muted-foreground: #{color_in_theme("muted-foreground")};
+}
+
+body {
+    --_min-height: calc(
+        100dvh - var(--main-space-block) * 2 - var(--header-padding-block) * 2
+    );
+
+    font-family: "Roboto", system-ui, sans-serif;
+    line-height: 1.5;
+
+    min-height: var(--_min-height);
+
+    color: hsl(var(--text) / var(--_text-opacity, 1));
+    background-color: hsl(var(--background) / var(--_background-opacity, 1));
+}
+
+main {
+    margin-block: var(--main-space-block);
+}
+
+.border {
+    border: 1px solid hsl(var(--border) / var(--_border-opacity, 0.87));
+}
+
+.w-6 {
+    width: 1.5rem;
+}
+
+.h-6 {
+    height: 1.5rem;
+}
+
+.w-5 {
+    width: 1.25rem;
+}
+
+.h-5 {
+    height: 1.25rem;
+}
+
+.w-4 {
+    width: 1rem;
+}
+
+.h-4 {
+    height: 1rem;
+}
+
+.error {
+    color: red;
+    margin-top: 0.5rem;
+}
+
+.background {
+    @include cover_background;
+}
+
+#page-progress-bar {
+    position: fixed;
+    top: 0;
+    margin-inline: 0;
+    left: 0;
+    right: 0;
+    width: 0;
+    opacity: 0;
+    height: 0.175rem;
+    @include layered-shadow(hsl(var(--accent) / 0.075), 1);
+    background-color: hsl(var(--accent));
+    pointer-events: none;
+    touch-action: none;
+    transition: width 250ms ease-in-out;
+    will-change: width, opacity;
+    z-index: 9999;
+}
+
+.fade-me-out.htmx-swapping,
+.fade-me-in {
+    transition: opacity 50ms ease-out;
+    will-change: opacity;
+}
+
+.fade-me-in.htmx-added,
+.fade-me-out.htmx-swapping {
+    opacity: 0;
+}
+
+.fade-me-in {
+    opacity: 1;
+}
+
+.warning {
+    padding: 1rem;
+
+    background-color: hsl(var(--warning) / var(--_background-opacity, 0.5));
+    color: hsl(var(--warning-foreground) / var(--_text-opacity, 1));
+
+    border: 1px solid hsl(var(--warning));
+    border-radius: calc(var(--radius) / 2);
+}
+
+.warning__with-icon {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    svg.outline {
+        stroke: hsl(var(--warning) / var(--_stroke-opacity, 1));
+    }
+
+    svg.fill {
+        fill: hsl(var(--warning) / var(--_fill-opacity, 1));
+    }
+}
+
+.p-0 {
+    padding: 0 !important;
+}
+
+svg {
+    will-change: color;
+    transition-property: color;
+    transition-duration: var(--animation-duration, 250ms);
+}
+
+.notifier {
+    width: fit-content;
+
+    padding: 0.025rem 0.075rem;
+
+    border-radius: 50%;
+
+    color: hsl(var(--text) / var(--_text-opacity, 1));
+    background-color: hsl(var(--red));
+
+    font-size: 0.675rem;
+    font-weight: 400;
+    font-style: normal;
+}

@@ -1,0 +1,26 @@
+<!-- For Resets -->
+<span id="nothing" hx-swap-oob="true"></span>
+<span id="username-error" hx-swap-oob="true"></span>
+<span id="password-error" hx-swap-oob="true"></span>
+{{#each errors}}
+{{#if (eq field "username")}}
+<span data-loading-class-remove="errored" class="error errored"
+    id="username-error" hx-swap-oob="true">
+    <small data-loading-class="hidden">{{message}}</small>
+</span>
+{{else}}
+{{#if (eq field "password")}}
+<span data-loading-class-remove="errored" class="error errored"
+    id="password-error" hx-swap-oob="true">
+    <small data-loading-class="hidden">{{message}}</small>
+</span>
+{{else}}
+{{#if (eq field "honeypot")}}
+{{> partials/toast message=message type="error"}}
+{{/if}}
+{{/if}}
+{{/if}}
+{{/each}}
+{{#if toast}}
+{{> partials/toast}}
+{{/if}}

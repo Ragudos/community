@@ -1,0 +1,220 @@
+button,
+input,
+textarea,
+select,
+a,
+.dropdown summary {
+    border-radius: calc(var(--radius) / 4);
+    color: hsl(var(--text) / var(--_text-opacity, 1));
+
+    &:focus-visible {
+        box-shadow:
+            0px 0px 0px 2px
+                hsl(
+                    var(--ring-offset, var(--background)) /
+                        var(--_ring-offset-opacity, 1)
+                ),
+            0px 0px 0px 4px hsl(var(--ring) / var(--_ring-opacity, 1));
+    }
+}
+
+button,
+a {
+    background-color: transparent;
+}
+
+input,
+textarea {
+    background-color: hsl(var(--text) / 0.075);
+
+    &:focus-visible {
+        background-color: transparent;
+    }
+}
+
+select {
+    background-color: hsl(var(--background) / var(--_background-opacity, 1));
+}
+
+input,
+textarea,
+select {
+    border: 1px solid;
+    border-color: hsl(var(--border) / var(--_border-opacity, 0.87));
+
+    padding: 0.5rem 0.75rem;
+
+    &:focus-visible {
+        --_border-opacity: 1;
+    }
+}
+
+a {
+    padding: 0.5rem;
+}
+
+button,
+input[type="submit"],
+.dropdown summary {
+    padding: 0.5rem 1rem;
+}
+
+button,
+input[type="submit"],
+a,
+.dropdown summary {
+    @include flex-center(inline-flex);
+
+    min-width: 7ch;
+    min-height: 3.5ch;
+
+    will-change: background-color, transform;
+    transition-property: background-color, transform;
+    transition-duration: var(--animation-duration);
+
+    &:hover {
+        --_background-opacity: 0.75;
+    }
+
+    &:active {
+        transform: scale(0.95);
+    }
+}
+
+button,
+input,
+a,
+textarea,
+.dropdown summary {
+    &:disabled {
+        cursor: default;
+        --_background-opacity: 1 !important;
+        opacity: 0.5 !important;
+    }
+}
+
+.btn {
+    background-color: hsl(var(--text) / var(--_background-opacity, 0.075));
+
+    &:hover {
+        --_background-opacity: 0.175;
+    }
+
+    &:disabled {
+        --_background-opacity: 0.075 !important;
+    }
+}
+
+.square {
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0.5rem;
+    min-height: auto;
+    min-width: auto;
+}
+
+.icon,
+.dropdown summary.icon {
+    min-width: auto;
+    min-height: auto;
+    width: $icon;
+    height: $icon;
+
+    padding: 0;
+
+    border-radius: 50%;
+
+    overflow: hidden;
+}
+
+.circle,
+.dropdown summary.circle {
+    min-width: auto;
+    min-height: auto;
+    padding: 0;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.input-group:has(.error.errored) {
+    .error {
+        color: red;
+    }
+
+    input,
+    textarea {
+        border-color: hsl(var(--destructive) / var(--_destructive-opacity, 1));
+
+        &:focus-visible {
+            --_border-opacity: 1;
+        }
+    }
+}
+
+.link {
+    will-change: opacity, text-decoration;
+    transition-property: opacity, text-decoration;
+    transition-duration: var(--animation-duration);
+
+    padding: 0;
+
+    min-height: auto;
+    min-width: auto;
+
+    color: hsl(var(--link) / var(--_text-opacity, 1));
+
+    &:hover {
+        text-decoration: underline;
+        text-underline-offset: 4px;
+        opacity: 0.75;
+    }
+}
+
+button.primary,
+input[type="submit"].primary,
+a.primary {
+    background-color: hsl(var(--primary) / var(--_background-opacity, 1));
+    color: hsl(var(--primary-foreground) / var(--_text-opacity, 1));
+}
+
+button.secondary,
+input[type="submit"].secondary,
+a.secondary {
+    background-color: hsl(var(--secondary) / var(--_background-opacity, 1));
+    color: hsl(var(--secondary-foreground) / var(--_text-opacity, 1));
+}
+
+button.accent,
+input[type="submit"].accent,
+a.accent {
+    background-color: hsl(var(--accent) / var(--_background-opacity, 1));
+    color: hsl(var(--accent-foreground) / var(--_text-opacity, 1));
+}
+
+button.destructive,
+input[type="submit"].destructive,
+a.destructive {
+    background-color: hsl(var(--destructive) / var(--_background-opacity, 1));
+    color: hsl(var(--destructive-foreground) / var(--_text-opacity, 1));
+}
+
+.label {
+    font-weight: 500;
+    cursor: pointer;
+    font-size: 1.025rem;
+}
+
+a.active-indicator {
+    opacity: 0.75;
+
+    &:hover {
+        opacity: 0.87;
+        background-color: hsl(var(--accent) / 0.075);
+        color: hsl(var(--accent-foreground));
+    }
+}
+
+a.active-indicator.active {
+    opacity: 1;
+    background-color: hsl(var(--accent) / 0.25);
+}

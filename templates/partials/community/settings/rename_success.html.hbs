@@ -1,0 +1,6 @@
+<input type="hidden" id="default-rename-value" value="{{new_name}}" hx-swap-oob="true" />
+<button disabled id="rename-submit" type="submit" class="btn" data-loading-disable hx-swap-oob="true">
+    <span data-loading-class="hidden">Rename</span>
+    <span data-loading>Renaming...</span>
+</button>
+{{> partials/toast}}

@@ -1,52 +1,20 @@
-import { mount_toaster, toast } from "@webdevaaron/vanilla-toast";
-mount_toaster();
+import { initDialog } from "./dialog";
+import { initDropdown } from "./dropdown";
+import { initHtmx } from "./htmx";
+import { initNavigationProgress } from "./navigation-progress";
+import { initNotifications } from "./notifications";
+import { initReducedMotion } from "./reduced-motion";
+import { InputWithCounter } from "./web/input_with_counter";
 
-const timers = [];
-let errors = 0;
-let timeout: ReturnType<typeof setTimeout>;
-let timeout2: ReturnType<typeof setTimeout>;
+function init() {
+    initReducedMotion();
+    initNotifications();
+    initHtmx();
+    initNavigationProgress();
+    initDropdown();
+    initDialog();
 
-function getTheme() {
-    let theme = document.documentElement.getAttribute("data-theme");
-    return theme == "dark" || theme == "light" ? theme : window.matchMedia("(prefers-color-scheme: dark)").matches;
+    customElements.define("input-with-counter", InputWithCounter);
 }
 
-document.addEventListener("htmx:error", (evt) => {
-    if (evt instanceof CustomEvent) {
-        clearTimeout(timeout);
-        errors++;
-        
-        if (errors > 10) {
-            clearTimeout(timeout2);
-            toast.error({ message: "Wowza! Please slow down." },  { style: "plain", theme: document.documentElement.dataset.theme as "light" | "dark" || "light" })
-            // @ts-ignore
-            evt.target.querySelectorAll("*").forEach((el) => {
-                el.setAttribute("disabled", "true");
-            });
-
-            timeout2 = setTimeout(() => {
-                //@ts-ignore
-                evt.target.querySelectorAll("*").forEach((el) => {
-                    el.removeAttribute("disabled");
-                    errors = 0;
-                });
-            }, 10_000);
-            return;
-        }
-
-        timeout = setTimeout(() => {
-            errors = 0;
-        }, 10_000);
-    }
-});
-
-document.addEventListener("htmx:responseError", (evt) => {
-    if (evt instanceof CustomEvent) {
-        const message = evt.detail.xhr?.responseText || "Something went wrong.";
-        toast.error({ message }, { style: "plain", theme: document.documentElement.dataset.theme as "light" | "dark" || "light"})
-    }
-});
-
-document.addEventListener("htmx:sendError", (evt) => {
-    toast.error({ message: "Failed to connect to server." }, { style: "plain", theme: document.documentElement.dataset.theme as "light" | "dark" || "light" });
-});
+window.addEventListener("DOMContentLoaded", init);

@@ -1,0 +1,27 @@
+{{#if (or (eq pagination 0) (eq offset (sub pagination 1)))}}
+<button disabled aria-label="Go to next list of communities">
+    Next
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"
+        fill="currentColor" class="w-4 h-4">
+        <path fill-rule="evenodd"
+            d="M6.22 4.22a.75.75 0 0 1 1.06 0l3.25 3.25a.75.75 0 0 1 0 1.06l-3.25 3.25a.75.75 0 0 1-1.06-1.06L8.94 8 6.22 5.28a.75.75 0 0 1 0-1.06Z"
+            clip-rule="evenodd" />
+    </svg>
+</button>
+{{else}}
+<button data-change-offset
+    aria-label="Go to next list of communities"
+    hx-get="/discover/api" hx-target="#section-of-communities"
+    name="offset"
+    value="{{(add offset 1)}}"
+    hx-include="[name='category'],#search-input"
+    hx-sync="[name='category']">
+    Next
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"
+        fill="currentColor" class="w-4 h-4">
+        <path fill-rule="evenodd"
+            d="M6.22 4.22a.75.75 0 0 1 1.06 0l3.25 3.25a.75.75 0 0 1 0 1.06l-3.25 3.25a.75.75 0 0 1-1.06-1.06L8.94 8 6.22 5.28a.75.75 0 0 1 0-1.06Z"
+            clip-rule="evenodd" />
+    </svg>
+</button>
+{{/if}}

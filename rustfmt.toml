@@ -1,0 +1,17 @@
+unstable_features = true
+reorder_imports = true
+array_width = 50
+attr_fn_like_width = 60
+binop_separator = "Back"
+chain_width = 50
+combine_control_expr = false
+comment_width = 50
+max_width = 80
+merge_derives = false
+imports_granularity  = "Module"
+reorder_impl_items = true
+group_imports = "StdExternalCrate"
+single_line_let_else_max_width = 0
+tab_spaces = 4
+trailing_comma = "Vertical"
+trailing_semicolon = true

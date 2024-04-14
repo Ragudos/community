@@ -1,0 +1,29 @@
+@use "sass:math";
+
+@mixin font-size($font-size, $line-height: normal, $letter-spacing: normal) {
+    font-size: #{math.div($font-size, 16)}rem;
+
+    @if $line-height == normal {
+        line-height: normal;
+    } @else {
+        line-height: $line-height / $font-size;
+    }
+
+    @if $letter-spacing == normal {
+        letter-spacing: normal;
+    } @else {
+        letter-spacing: #{$letter-spacing / $font-size}em;
+    }
+}
+
+@mixin font-face($font-name, $path, $weight: normal, $style: normal) {
+    @font-face {
+        font-family: quote($font-name);
+        src:
+            url($path + ".woff") format("woff"),
+            url($path + ".ttf") format("truetype");
+        font-weight: $weight;
+        font-style: $style;
+        font-display: swap;
+    }
+}

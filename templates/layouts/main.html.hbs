@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="{{ metadata.language }}" data-theme="{{ metadata.theme }}">
+    <head>
+        {{> partials/head/metadata}}
+        {{#> additional_head_content}}
+        {{/additional_head_content}}
+        {{> partials/head/main}}
+    </head>
+    <!-- TODO: Fix hx-boost. If logged out, all bosted links should properly redirect to
+    the auth page. -->
+    <body hx-ext="head-support, loading-states, remove-me, response-targets">
+        <div id="page-progress-bar"></div>
+        {{#> header}}
+        <header class="fade-me-out fade-me-in" id="header"></header>
+        <aside class="fade-me-in fade-me-out" id="community-header"></aside>
+        {{/header}}
+        <main class="fade-me-out fade-me-in">
+            {{> @partial-block}}
+        </main>
+        <div hx-get="/test" hx-trigger="load delay:1s" hx-swap="none"></div>
+        <ol id="toast-container" aria-label="Notifcations"></ol>
+        <!-- Used when doing OOB in error responses -->
+        <div id="nothing" hidden></div>
+        {{#if (eq metadata.env "development")}}
+        <div id="screen_size_indicator"
+            style="position: fixed; bottom: 0; right: 0; z-index: 99999; color: white; background: black;"></div>
+        <script>!function () { let e; function n() { document.getElementById("screen_size_indicator").innerText = `${window.innerWidth}px` } window.addEventListener("resize", () => { clearTimeout(e), e = setTimeout(n, 1e3) }) }();</script>
+        <script>
+            document.addEventListener("htmx:syntax:error", (evt) => {
+                console.log(evt);
+            });
+            document.addEventListener("htmx:targetError", (evt) => {
+                console.log(evt);
+            });
+        </script>
+        {{/if}}
+    </body>
+
+</html>

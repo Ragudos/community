@@ -1,0 +1,84 @@
+dialog::backdrop {
+    background-color: hsl(0 0% 2% / 0.5);
+}
+
+dialog {
+    --_overlay-height: 35rem;
+
+    background-color: transparent;
+    border: none;
+    border-radius: 0;
+
+    min-width: 192px;
+    width: min(var(--_overlay-width, 35rem), 100vw - 2rem);
+    max-height: min(100dvh - 2rem, var(--_overlay-height));
+
+    @include flex-column;
+
+    padding: 0;
+
+    opacity: 1;
+
+    position: static;
+
+    white-space: normal;
+
+    border: 1px solid;
+    border-color: hsl(var(--border) / var(--_border-opacity, 0.675));
+    border-radius: $radius;
+
+    @include layered-shadow(hsl(0 0% 2% / 0.75), 3);
+
+    inset: 0;
+    margin: auto;
+
+    background-color: hsl(var(--background) / var(--_background-opacity, 0.75));
+    color: hsl(var(--text) / var(--_text-opacity, 1));
+    backdrop-filter: blur(2rem);
+}
+
+dialog:modal {
+    position: fixed;
+}
+
+dialog:not([open]) {
+    display: none;
+}
+
+dialog > * > * {
+    padding: 1rem;
+    border-color: inherit;
+}
+
+dialog textarea {
+    resize: vertical;
+    width: 100%;
+    min-height: 4rem;
+}
+
+dialog .actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+.overlay-header > div {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    border-bottom: 1px solid;
+}
+
+.overlay-ctrls > div {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+    align-items: center;
+
+    border-top: 1px solid;
+}
+
+.overlay-content {
+    overflow: auto;
+}

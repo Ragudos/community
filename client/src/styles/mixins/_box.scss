@@ -1,0 +1,30 @@
+@mixin box($width, $height: $width) {
+    width: $width;
+    height: $height;
+}
+
+@mixin flex-column($type: flex) {
+    display: $type;
+    flex-direction: column;
+}
+
+@mixin flex-center($type: flex) {
+    display: $type;
+    justify-content: center;
+    align-items: center;
+}
+
+@mixin flex-center-column($type: flex) {
+    @include flex-center($type);
+    flex-direction: column;
+}
+
+@mixin flex-center-vert($type: flex) {
+    display: $type;
+    align-items: center;
+}
+
+@mixin flex-center-horiz {
+    display: $type;
+    justify-content: center;
+}

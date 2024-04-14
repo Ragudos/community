@@ -1,0 +1,63 @@
+{{#> layouts/main}}
+<div class="min-h-screen ce-wrapper">
+    <div id="form-container" class="container general-card"
+        style="--_max-content-width: 30rem;">
+        <div
+            style="display: flex; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap;">
+            <div class="title-sm">Leave {{community_name}}</div>
+        </div>
+        <div class="warning warning__with-icon" style="margin-top: 0.5rem;">
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                    viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor" class="w-6 h-6 stroke">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+                </svg>
+            </div>
+            <div>
+                You cannot recover your points once you delete this community.
+                Please be certain.
+            </div>
+        </div>
+        <form hx-trigger="submit" hx-target="#form-container"
+            hx-target-error="#nothing" hx-sync="#submit-form, a"
+            style="gap: 1rem;"
+            data-loading-aria-busy data-loading-delay="250"
+            hx-confirm="Are you absolutely sure?"
+            hx-target-error="#nothing"
+            hx-delete="/community/api/leave" class="auth-form"
+            method="POST"
+            hx-sync="a"
+            action="/community/api/leave-community" id="submit-form">
+            <input type="hidden" readonly name="authenticity_token"
+                value="{{authenticity_token}}" />
+            <input type="text" name="honeypot" hidden value />
+            <div class="input-group">
+                <label for="password">Confirm with your password</label>
+                <input data-loading-disable autocomplete="current-password"
+                    autocapitalize="off" spellcheck="false"
+                    type="password" id="password" name="user_password"
+                    placeholder="********" required maxlength="60"
+                    minlength="8" />
+                <span id="user-password-error"></span>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 0.5rem">
+                <button data-loading-disable type="button" class="btn"
+                    style="width: 100%"
+                    onclick="window.location.reload()">
+                    Go back
+                </button>
+                <button data-loading-disable type="submit" class="destructive"
+                    style="width: 100%;">
+                    <span data-loading-class="hidden">Delete
+                        {{community_name}}</span>
+                    <span data-loading-class-remove="hidden" class="hidden">
+                        Leaving... Please do not leave the page.
+                    </span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{{/layouts/main}}

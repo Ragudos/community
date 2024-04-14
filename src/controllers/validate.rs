@@ -1,40 +1,47 @@
-use rocket::{
-    form::{Error, Result},
-    fs::TempFile,
-};
+use rocket::form::{Error, Result};
 
-const ONE_MEGABYTE: u64 = 1_000_000;
+pub fn validate_password<'v>(_password: &str) -> Result<'v, ()> {
+    Ok(())
+}
 
-pub fn validate_input<'v>(name: &str) -> Result<'v, ()> {
-    if name.chars().any(|c| {
-        if c == '<' || c == '>' {
-            return true;
-        }
+pub fn validate_password_with_confirmation<'v>(
+    password: &str,
+    confirm_password: &str,
+) -> Result<'v, ()> {
+    validate_password(password)?; // Validate password first
 
-        false
-    }) {
-        Err(Error::validation("String cannot contain '<' or '>'."))?;
+    if password != confirm_password {
+        return Err(Error::validation("Passwords do not match"))?;
     }
 
     Ok(())
 }
 
-pub fn check_image<'v>(file: &TempFile<'v>) -> Result<'v, ()> {
-    if file.len() > ONE_MEGABYTE {
-        Err(Error::validation("Image can only be up to 1MB."))?;
+pub fn validate_positive_integer<'v>(integer: &i64) -> Result<'v, ()> {
+    if integer.is_negative() {
+        return Err(Error::validation("Integer cannot be negative."))?;
     }
 
-    let Some(content_type) = file.content_type() else {
-        return Err(Error::validation("Image must be a valid format."))?;
-    };
+    Ok(())
+}
 
-    if content_type.is_avif()
-        || content_type.is_webp()
-        || content_type.is_jpeg()
-        || content_type.is_png()
+pub fn validate_ascii_text<'v>(display_name: &str) -> Result<'v, ()> {
+    if !display_name
+        .chars()
+        .all(|c| c.is_alphanumeric() || c.is_whitespace())
     {
-        Ok(())
-    } else {
-        Err(Error::validation("Image must be a valid format."))?
+        return Err(Error::validation("No special characters are allowed."))?;
     }
+
+    Ok(())
+}
+
+pub fn validate_honeypot<'v>(honeypot: &str) -> Result<'v, ()> {
+    if !honeypot.is_empty() {
+        return Err(Error::validation(
+            "You were detected to be a bot. Please try again.",
+        ))?;
+    }
+
+    Ok(())
 }

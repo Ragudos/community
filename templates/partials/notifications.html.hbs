@@ -1,0 +1,24 @@
+{{#unless (eq (len notifications) 0)}}
+{{#each notifications as |notification|}}
+{{#if notification.is_read}}
+<li id="notification-{{notification._id}}" hx-boost="false"
+    data-type="read-notification">
+    {{> partials/notifications/notification_block notification=notification}}
+</li>
+{{else}}
+<li id="notification-{{notification._id}}" hx-boost="false"
+    data-type="unread-notification">
+    {{> partials/notifications/notification_block notification=notification}}
+</li>
+{{/if}}
+{{/each}}
+{{/unless}}
+{{#if isfirst}}
+<script>window.startReceivingNotifications()</script>
+{{/if}}
+{{#if has_unread}}
+<div class="notifications-count notifier" id="unread-notifications-count"
+    hx-swap-oob="true">
+    {{unread_count}}
+</div>
+{{/if}}

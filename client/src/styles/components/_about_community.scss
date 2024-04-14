@@ -1,0 +1,52 @@
+.main-about {
+    padding: 1rem;
+    max-width: 800px;
+
+    .cover-image {
+        aspect-ratio: 16/9;
+        width: 100%;
+        border-radius: $radius;
+
+        @supports not (aspect-ratio: 16/9) {
+            height: 15rem;
+
+            @include s-mobilesmall {
+                height: 17.5rem;
+            }
+
+            @include s-mobile {
+                height: 20rem;
+            }
+
+            @include s-tablet {
+                height: 25rem;
+            }
+        }
+    }
+
+    .about-title {
+        margin-bottom: 1rem;
+    }
+    .about-description-container {
+        margin-block: 2rem;
+    }
+
+    .about-description {
+        max-width: 550px;
+    }
+
+    .about-metadata {
+        margin-top: 1rem;
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        flex-wrap: wrap;
+        font-size: 80%;
+    }
+
+    .about-metadata > div {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+}

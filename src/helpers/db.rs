@@ -1,12 +1,10 @@
 use bcrypt::{hash, DEFAULT_COST};
-use rocket::{
-    fairing::{AdHoc, Result},
-    Build, Rocket,
-};
+use rocket::fairing::{AdHoc, Result};
+use rocket::{Build, Rocket};
 use rocket_db_pools::Database;
 use sqlx::query;
 
-use crate::models::users::metadata::{Gender, Occupation, UserRole};
+use crate::models::db::enums::{Gender, Occupation};
 
 #[derive(Database)]
 #[database("sqlx")]
@@ -14,13 +12,18 @@ pub struct DbConn(sqlx::PgPool);
 
 async fn run_migrations(rocket: Rocket<Build>) -> Result {
     match DbConn::fetch(&rocket) {
-        Some(db) => match sqlx::migrate!("db/sqlx/migrations").run(&**db).await {
-            Ok(_) => Ok(rocket),
-            Err(e) => {
-                eprintln!("Failed to run migrations: {:?}", e);
-                Err(rocket)
+        Some(db) => {
+            match sqlx::migrate!("db/sqlx/migrations")
+                .run(&**db)
+                .await
+            {
+                Ok(_) => Ok(rocket),
+                Err(e) => {
+                    eprintln!("Failed to run migrations: {:?}", e);
+                    Err(rocket)
+                }
             }
-        },
+        }
         None => Err(rocket),
     }
 }
@@ -34,10 +37,10 @@ async fn seed_data(rocket: Rocket<Build>) -> Result {
                 Ok(mut tx) => {
                     if let Err(e) = query!(
                         r#"
-                            INSERT INTO users (id, display_name, display_image)
+                            INSERT INTO users (_id, display_name, display_image)
                             SELECT $1, $2, $3
                             WHERE NOT EXISTS (
-                                SELECT 1 FROM users WHERE id = $1
+                                SELECT 1 FROM users WHERE _id = $1
                             );
                         "#,
                         0,
@@ -54,11 +57,11 @@ async fn seed_data(rocket: Rocket<Build>) -> Result {
 
                     if let Err(e) = query!(
                         r#"
-                            INSERT INTO users_metadata
-                            (id, occupation, gender)
+                            INSERT INTO user_metadata
+                            (_id, occupation, gender)
                             SELECT $1, $2, $3
                             WHERE NOT EXISTS (
-                                SELECT 1 FROM users_metadata WHERE id = $1
+                                SELECT 1 FROM user_metadata WHERE _id = $1
                             );
                         "#,
                         0,
@@ -79,11 +82,11 @@ async fn seed_data(rocket: Rocket<Build>) -> Result {
                         Ok(hashed_password) => {
                             if let Err(e) = query!(
                                 r#"
-                                    INSERT INTO users_credentials
-                                    (id, email, password_hash, first_name, last_name)
+                                    INSERT INTO user_credentials
+                                    (_id, email, password_hash, first_name, last_name)
                                     SELECT $1, $2, $3, $4, $5
                                     WHERE NOT EXISTS (
-                                        SELECT 1 FROM users_credentials WHERE id = $1
+                                        SELECT 1 FROM user_credentials WHERE _id = $1
                                     );
                                 "#,
                                 0,
@@ -107,17 +110,18 @@ async fn seed_data(rocket: Rocket<Build>) -> Result {
                         }
                     }
 
-                    if let Err(e) = query!(
+                    for i in 0..=100 {
+                        if let Err(e) = query!(
                         r#"
                             INSERT INTO communities
-                            (id, display_name, display_image, description, is_private, owner_id, cover_image)
+                            (_id, display_name, display_image, description, is_private, owner_id, cover_image)
                             SELECT $1, $2, $3, $4, $5, $6, $7
                             WHERE NOT EXISTS (
-                                SELECT 1 FROM communities WHERE id = $1 AND owner_id = $6
+                                SELECT 1 FROM communities WHERE _id = $1 AND owner_id = $6
                             );
                         "#,
-                        0,
-                        "Rustaceans",
+                        i,
+                        format!("Rustaceans{}", i),
                         "/assets/dummy/community_display_image.jpg",
                         "A community for Rust developers",
                         false,
@@ -131,23 +135,6 @@ async fn seed_data(rocket: Rocket<Build>) -> Result {
                         let _ = tx.rollback().await;
                         return Err(rocket);
                     }
-
-                    if let Err(e) = query!(
-                        r#"
-                            INSERT INTO community_memberships
-                            (user_id, community_id, role)
-                            SELECT $1, $2, $3 
-                            WHERE NOT EXISTS (
-                                SELECT 1 FROM community_memberships WHERE user_id = $1 AND community_id = $2
-                            );
-                        "#,
-                        0,
-                        0,
-                        UserRole::Owner as UserRole
-                    ).execute(&mut *tx).await {
-                        eprintln!("Failed to seed data: {:?}", e);
-                        let _ = tx.rollback().await;
-                        return Err(rocket);
                     }
 
                     if let Err(e) = tx.commit().await {

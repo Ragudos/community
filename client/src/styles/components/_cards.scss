@@ -1,0 +1,7 @@
+.general-card {
+    @include layered-shadow;
+    padding: 2rem;
+    border-radius: $radius;
+    border: 1px solid;
+    border-color: hsl(var(--border));
+}

@@ -1,0 +1,325 @@
+@use "./variables" as *;
+@use "./mixins" as *;
+
+.discover-grid {
+    --_content-width: min(100%, 20rem);
+    --_content-height: 23rem;
+    @include s-mobile {
+        --_content-width: min(100%, 22rem);
+    }
+    @include s-large {
+        --_content-width: 100%;
+    }
+    display: grid;
+    gap: 1rem;
+    place-items: center;
+    grid-template-columns: 1fr;
+
+    @include s-mobile {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    @include s-large {
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+}
+
+.discover-grid > * {
+    position: relative;
+
+    @include box(var(--_content-width), var(--_content-height));
+
+    border-radius: $radius;
+    border: 1px solid;
+
+    @include flex-column;
+    align-items: flex-start;
+    justify-content: flex-start;
+
+    overflow: hidden;
+
+    padding: 0;
+
+    font-size: 1rem;
+    font-weight: 400;
+
+    background-color: hsl(var(--background));
+    border-color: hsl(var(--border));
+}
+
+.discover-cover-image {
+    height: 20rem;
+    width: 100%;
+    position: relative;
+}
+
+.discover-cc {
+    padding: 1rem;
+
+    @include flex-column;
+
+    gap: 1rem;
+    height: 100%;
+    width: 100%;
+}
+
+.discover-nc {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    span {
+        font-weight: 500;
+        font-size: 1.125rem;
+    }
+}
+
+.discover-nc img {
+    border-radius: calc($radius / 2);
+}
+
+.discover-desc {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+}
+
+.discover-metadata {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: auto;
+}
+
+.discover-grid > *:hover:not(.skeleton) {
+    @include layered-shadow(hsl(0 0% 0% / 0.25), 1);
+}
+
+.discover-filters-container {
+    @include flex-column;
+    gap: 1rem;
+
+    margin-block: 2rem;
+}
+
+.search-input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+
+    input {
+        width: 100%;
+
+        padding-block: 1rem;
+        padding-inline: 3rem;
+
+        border-radius: $radius;
+    }
+
+    .spinner {
+        right: 1rem;
+        border-color: hsl(var(--accent) / 0.5);
+        border-right-color: hsl(var(--accent) / 0.875);
+        width: 1rem;
+        height: 1rem;
+        opacity: 0;
+        will-change: opacity;
+        transition: opacity var(--animation-duration, 250ms);
+    }
+
+    .spinner.htmx-request {
+        opacity: 1;
+    }
+
+    svg,
+    .spinner {
+        position: absolute;
+
+        pointer-events: none;
+        touch-action: none;
+    }
+
+    svg {
+        left: 1rem;
+    }
+}
+
+.discover-filters {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.category-filters-container {
+    position: relative;
+    overflow-x: auto;
+
+    &::before,
+    &::after {
+        @include pseudo(4rem, 100%);
+
+        z-index: 1;
+
+        pointer-events: none;
+        touch-action: none;
+        top: 0;
+    }
+
+    &::before {
+        right: 0;
+        background: linear-gradient(
+            to right,
+            transparent,
+            hsl(var(--background) / 0.5),
+            hsl(var(--background) / 1)
+        );
+    }
+
+    &::after {
+        left: 0;
+        background: linear-gradient(
+            to left,
+            transparent,
+            hsl(var(--background) / 0.5),
+            hsl(var(--background) / 1)
+        );
+    }
+}
+
+.category-filters {
+    display: flex;
+    gap: 1rem;
+    overflow: auto;
+    padding-block: 1rem;
+    padding-inline: 2rem;
+
+    &::-webkit-scrollbar {
+        height: 0.5rem;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: hsl(var(--muted) / 0.25);
+        border-radius: $radius;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+        background-color: hsl(var(--muted) / 0.5);
+    }
+
+    &::-webkit-scrollbar-thumb:active {
+        background-color: hsl(var(--muted) / 0.375);
+    }
+
+    &::-webkit-scrollbar-track {
+        background-color: transparent;
+    }
+}
+
+.category-filter {
+    padding: 0.5rem 1rem;
+    white-space: nowrap;
+
+    border-radius: $radius;
+    border: 1px solid hsl(var(--border) / var(--_border-opacity, 0.675));
+
+    user-select: none;
+
+    will-change: background-color, transform, opacity;
+    transition-property: background-color, transform, opacity;
+    transition-duration: var(--animation-duration, 250ms);
+
+    cursor: pointer;
+
+    &:focus-within {
+        box-shadow:
+            0px 0px 0px 2px
+                hsl(
+                    var(--ring-offset, var(--background)) /
+                        var(--_ring-offset-opacity, 1)
+                ),
+            0px 0px 0px 4px hsl(var(--ring) / var(--_ring-opacity, 1));
+    }
+
+    &:has(:disabled) {
+        --_background-opacity: 1 !important;
+        opacity: 0.5 !important;
+        pointer-events: none !important;
+    }
+
+    &:has(:checked) {
+        --_background-opacity: 0.25;
+    }
+
+    &:active {
+        transform: scale(0.9);
+    }
+
+    input {
+        border: 0;
+        clip: rect(0 0 0 0);
+        height: 1px;
+        margin: -1px;
+        overflow: hidden;
+        padding: 0;
+        position: absolute;
+        width: 1px;
+    }
+}
+
+#section-of-communities {
+    margin-top: 2rem;
+}
+
+.breadcrumbs-container {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+
+    margin-top: 4rem;
+
+    button {
+        gap: 0.5rem;
+        font-weight: 400;
+        font-size: 80%;
+        --_background-opacity: 0;
+
+        background-color: hsl(var(--accent) / var(--_background-opacity, 0));
+
+        &:hover {
+            --_background-opacity: 0.075;
+        }
+
+        &:disabled {
+            --_background-opacity: 0 !important;
+        }
+    }
+}
+
+.breadcrumbs {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.25rem;
+    flex-shrink: 1;
+    flex-wrap: wrap;
+
+    button {
+        padding: 1rem;
+
+        width: 2rem;
+        height: 2rem;
+
+        border-radius: 50%;
+
+        min-width: auto;
+        min-height: auto;
+
+        &:disabled {
+            --_background-opacity: 0.175 !important;
+            transform: scale(0.9);
+        }
+    }
+}

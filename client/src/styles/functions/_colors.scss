@@ -1,0 +1,12 @@
+@use "../mixins/" as *;
+@use "../variables" as *;
+
+// $theme_name: Either light or dark
+// $color_name: Either text, background, primary, secondary, or accent
+@function theme($theme_name, $color_name) {
+    @return map-get(map-get($themes, $theme_name), $color_name);
+}
+
+@function color_in_theme($key) {
+    @return map-get($theme_map, $key);
+}
